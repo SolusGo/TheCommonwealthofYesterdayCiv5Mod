@@ -1,5 +1,13 @@
 # Patch Notes
 
+## Version 1 hotfix — Dawn of Man artwork
+
+### Added
+
+- Added the supplied childhood-bedroom artwork as the Commonwealth's Dawn of Man image.
+- Center-cropped the source to 4:3, resized it to Civ V's 1024×768 Dawn of Man dimensions, and exported it as a DXT1 DDS texture.
+- Registered the texture in the database, checked-in mod manifest, and ModBuddy project with VFS import enabled.
+
 ## Version 1 hotfix — Ledger control style
 
 ### Fixed

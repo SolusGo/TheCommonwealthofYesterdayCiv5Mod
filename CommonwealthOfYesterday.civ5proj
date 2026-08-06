@@ -81,6 +81,9 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="Art\DawnOfMan\CommonwealthDawnOfMan.dds">
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
     <Content Include="README.md"><ImportIntoVFS>False</ImportIntoVFS></Content>
     <Content Include="PATCH_NOTES.md"><ImportIntoVFS>False</ImportIntoVFS></Content>
   </ItemGroup>
@@ -88,6 +91,8 @@
     <Folder Include="SQL\" />
     <Folder Include="Lua\" />
     <Folder Include="UI\" />
+    <Folder Include="Art\" />
+    <Folder Include="Art\DawnOfMan\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Firaxis\ModBuddy\Civ5Mod.targets" />
 </Project>
