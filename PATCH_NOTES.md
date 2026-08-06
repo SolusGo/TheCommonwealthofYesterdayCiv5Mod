@@ -1,5 +1,15 @@
 # Patch Notes
 
+## Version 1 hotfix — Civilization and unique component icons
+
+### Added
+
+- Added the supplied sunset-house image as the civilization icon, including a separate tintable house alpha emblem for map and setup contexts.
+- Added the supplied warrior portrait as the Old Friend unit icon.
+- Added the supplied room artwork as the Childhood Bedroom building icon.
+- Generated transparent DXT5 textures at 256, 128, 80, 64, 45, and 32 pixels for all three colour atlases, plus the required 128, 80, 64, 45, and 32-pixel civilization alpha atlas.
+- Registered all atlases before the core SQL and enabled VFS import for every texture.
+
 ## Version 1 hotfix — Leader icon
 
 ### Added

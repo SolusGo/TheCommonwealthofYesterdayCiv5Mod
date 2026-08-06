@@ -30,7 +30,7 @@ INSERT INTO Civilizations
 SELECT 'CIVILIZATION_COMMONWEALTH_YESTERDAY', 'TXT_KEY_CIV_COMMONWEALTH_DESC', 'TXT_KEY_CIV_COMMONWEALTH_PEDIA',
  'TXT_KEY_CIV5_COMMONWEALTH', 'TXT_KEY_CIV_COMMONWEALTH_STRATEGY', 1, 1, 'TXT_KEY_CIV_COMMONWEALTH_SHORT_DESC',
  'TXT_KEY_CIV_COMMONWEALTH_ADJECTIVE', 'PLAYERCOLOR_COMMONWEALTH_YESTERDAY', ArtDefineTag, ArtStyleType,
- ArtStyleSuffix, ArtStylePrefix, PortraitIndex, IconAtlas, AlphaIconAtlas, MapImage,
+ ArtStyleSuffix, ArtStylePrefix, 0, 'COMMONWEALTH_CIV_ATLAS', 'COMMONWEALTH_CIV_ALPHA_ATLAS', MapImage,
  'TXT_KEY_CIV5_DOM_COMMONWEALTH_TEXT', 'Art/DawnOfMan/CommonwealthDawnOfMan.dds', DawnOfManAudio, SoundtrackTag
 FROM Civilizations WHERE Type='CIVILIZATION_AMERICA';
 INSERT INTO Civilization_Leaders VALUES ('CIVILIZATION_COMMONWEALTH_YESTERDAY','LEADER_CHILD_WE_WERE');
@@ -62,7 +62,7 @@ SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND','TXT_KEY_UNIT_OLD_FRIEND','TXT_KEY_UNIT_OL
  RequiresFaithPurchaseEnabled,Moves,BaseSightRange,Class,CombatClass,Domain,DefaultUnitAI,MilitarySupport,
  MilitaryProduction,Pillage,PrereqTech,ObsoleteTech,GoodyHutUpgradeUnitClass,HurryCostModifier,
  ExtraMaintenanceCost,UnitArtInfo,UnitArtInfoCulturalVariation,UnitArtInfoEraVariation,UnitFlagIconOffset,
- PortraitIndex,IconAtlas,UnitFlagAtlas,1 FROM Units WHERE Type='UNIT_WARRIOR';
+ 0,'COMMONWEALTH_OLD_FRIEND_ATLAS',UnitFlagAtlas,1 FROM Units WHERE Type='UNIT_WARRIOR';
 INSERT INTO Unit_AITypes SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND', UnitAIType FROM Unit_AITypes WHERE UnitType='UNIT_WARRIOR';
 INSERT INTO Unit_Flavors SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND', FlavorType, Flavor FROM Unit_Flavors WHERE UnitType='UNIT_WARRIOR';
 
@@ -90,7 +90,7 @@ INSERT INTO Buildings
  IconAtlas,ArtInfoCulturalVariation,ArtInfoEraVariation,ArtInfoRandomVariation,ShowInPedia)
 SELECT 'BUILDING_COMMONWEALTH_BEDROOM','TXT_KEY_BUILDING_BEDROOM','TXT_KEY_BUILDING_BEDROOM_PEDIA',
  'TXT_KEY_BUILDING_BEDROOM_STRATEGY','TXT_KEY_BUILDING_BEDROOM_HELP',0,40,FaithCost,HurryCostModifier,
- MinAreaSize,ConquestProb,1,0,BuildingClass,ArtDefineTag,NULL,FreeStartEra,PortraitIndex,IconAtlas,
+ MinAreaSize,ConquestProb,1,0,BuildingClass,ArtDefineTag,NULL,FreeStartEra,0,'COMMONWEALTH_BEDROOM_ATLAS',
  ArtInfoCulturalVariation,ArtInfoEraVariation,ArtInfoRandomVariation,1
 FROM Buildings WHERE Type='BUILDING_MONUMENT';
 INSERT INTO Building_YieldChanges VALUES ('BUILDING_COMMONWEALTH_BEDROOM','YIELD_CULTURE',2);

@@ -32,6 +32,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>Art/CommonwealthComponentIconAtlases.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>SQL/00_Commonwealth_Core.sql</FileName>
       </Action>
       <Action>
@@ -62,6 +67,33 @@
     <OutputPath>.</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Art\CommonwealthComponentIconAtlases.xml">
+      <SubType>XML</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationIcon256.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationIcon128.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationIcon80.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationIcon64.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationIcon45.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationIcon32.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationAlpha128.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationAlpha80.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationAlpha64.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationAlpha45.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Civilization\CommonwealthCivilizationAlpha32.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\OldFriend\CommonwealthOldFriendIcon256.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\OldFriend\CommonwealthOldFriendIcon128.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\OldFriend\CommonwealthOldFriendIcon80.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\OldFriend\CommonwealthOldFriendIcon64.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\OldFriend\CommonwealthOldFriendIcon45.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\OldFriend\CommonwealthOldFriendIcon32.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Bedroom\CommonwealthBedroomIcon256.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Bedroom\CommonwealthBedroomIcon128.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Bedroom\CommonwealthBedroomIcon80.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Bedroom\CommonwealthBedroomIcon64.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Bedroom\CommonwealthBedroomIcon45.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Bedroom\CommonwealthBedroomIcon32.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="Art\CommonwealthLeaderIconAtlases.xml">
       <SubType>XML</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
@@ -109,6 +141,9 @@
     <Folder Include="Art\" />
     <Folder Include="Art\DawnOfMan\" />
     <Folder Include="Art\Leader\" />
+    <Folder Include="Art\Civilization\" />
+    <Folder Include="Art\OldFriend\" />
+    <Folder Include="Art\Bedroom\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Firaxis\ModBuddy\Civ5Mod.targets" />
 </Project>

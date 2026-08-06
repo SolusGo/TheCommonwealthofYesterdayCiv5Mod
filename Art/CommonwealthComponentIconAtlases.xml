@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GameData>
+  <IconTextureAtlases>
+    <Row><Atlas>COMMONWEALTH_CIV_ATLAS</Atlas><IconSize>256</IconSize><Filename>Art/Civilization/CommonwealthCivilizationIcon256.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ATLAS</Atlas><IconSize>128</IconSize><Filename>Art/Civilization/CommonwealthCivilizationIcon128.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ATLAS</Atlas><IconSize>80</IconSize><Filename>Art/Civilization/CommonwealthCivilizationIcon80.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ATLAS</Atlas><IconSize>64</IconSize><Filename>Art/Civilization/CommonwealthCivilizationIcon64.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ATLAS</Atlas><IconSize>45</IconSize><Filename>Art/Civilization/CommonwealthCivilizationIcon45.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ATLAS</Atlas><IconSize>32</IconSize><Filename>Art/Civilization/CommonwealthCivilizationIcon32.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ALPHA_ATLAS</Atlas><IconSize>128</IconSize><Filename>Art/Civilization/CommonwealthCivilizationAlpha128.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ALPHA_ATLAS</Atlas><IconSize>80</IconSize><Filename>Art/Civilization/CommonwealthCivilizationAlpha80.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ALPHA_ATLAS</Atlas><IconSize>64</IconSize><Filename>Art/Civilization/CommonwealthCivilizationAlpha64.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ALPHA_ATLAS</Atlas><IconSize>45</IconSize><Filename>Art/Civilization/CommonwealthCivilizationAlpha45.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_CIV_ALPHA_ATLAS</Atlas><IconSize>32</IconSize><Filename>Art/Civilization/CommonwealthCivilizationAlpha32.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>256</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon256.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>128</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon128.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>80</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon80.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>64</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon64.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>45</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon45.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>32</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon32.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>256</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon256.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>128</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon128.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>80</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon80.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>64</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon64.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>45</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon45.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>32</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon32.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+  </IconTextureAtlases>
+</GameData>
