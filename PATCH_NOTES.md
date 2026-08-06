@@ -1,5 +1,11 @@
 # Patch Notes
 
+## Version 1 hotfix — Ledger control style
+
+### Fixed
+
+- Replaced the invalid `Grid9DetailTwo` Old Friend row style with Civ V's supported `GridBlackIndent8` style. Opening the Ledger no longer raises a Control Definition Error.
+
 ## Version 1 hotfix — Starting roster and interface
 
 ### Fixed

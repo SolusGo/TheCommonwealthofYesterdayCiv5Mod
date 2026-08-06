@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Context ID="CommonwealthPanel">
-  <Instance Name="FriendRow"><Grid Size="550,66" Style="Grid9DetailTwo"><Label ID="FriendText" Anchor="L,C" Offset="10,0" Size="530,54" WrapWidth="530" Font="TwCenMT18" /></Grid></Instance>
+  <Instance Name="FriendRow"><Grid Size="550,66" Style="GridBlackIndent8"><Label ID="FriendText" Anchor="L,C" Offset="10,0" Size="530,54" WrapWidth="530" Font="TwCenMT18" /></Grid></Instance>
   <GridButton ID="MemoryButton" Anchor="R,T" Offset="24,146" Size="196,42" Style="BaseButton" String="MEMORIES: 0 / 100" ToolTip="Open the Commonwealth Memories panel" />
   <Grid ID="Panel" Anchor="R,T" Offset="24,196" Size="500,408" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
     <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
