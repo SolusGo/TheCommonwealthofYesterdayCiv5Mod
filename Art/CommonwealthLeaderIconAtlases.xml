@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GameData>
+  <IconTextureAtlases>
+    <Row><Atlas>COMMONWEALTH_LEADER_ATLAS</Atlas><IconSize>256</IconSize><Filename>Art/Leader/CommonwealthLeaderIcon256.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_LEADER_ATLAS</Atlas><IconSize>128</IconSize><Filename>Art/Leader/CommonwealthLeaderIcon128.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_LEADER_ATLAS</Atlas><IconSize>80</IconSize><Filename>Art/Leader/CommonwealthLeaderIcon80.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_LEADER_ATLAS</Atlas><IconSize>64</IconSize><Filename>Art/Leader/CommonwealthLeaderIcon64.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_LEADER_ATLAS</Atlas><IconSize>45</IconSize><Filename>Art/Leader/CommonwealthLeaderIcon45.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_LEADER_ATLAS</Atlas><IconSize>32</IconSize><Filename>Art/Leader/CommonwealthLeaderIcon32.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+  </IconTextureAtlases>
+</GameData>

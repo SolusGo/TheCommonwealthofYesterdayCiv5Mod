@@ -1,5 +1,13 @@
 # Patch Notes
 
+## Version 1 hotfix — Leader icon
+
+### Added
+
+- Added the supplied portrait as The Child We Were's leader icon.
+- Generated transparent DXT5 atlas textures at Civ V's required 256, 128, 80, 64, 45, and 32-pixel sizes.
+- Registered the new leader atlas before the core civilization database action and enabled VFS import for every DDS texture.
+
 ## Version 1 hotfix — Dawn of Man artwork
 
 ### Added

@@ -27,6 +27,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>Art/CommonwealthLeaderIconAtlases.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>SQL/00_Commonwealth_Core.sql</FileName>
       </Action>
       <Action>
@@ -57,6 +62,16 @@
     <OutputPath>.</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Art\CommonwealthLeaderIconAtlases.xml">
+      <SubType>XML</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Art\Leader\CommonwealthLeaderIcon256.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Leader\CommonwealthLeaderIcon128.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Leader\CommonwealthLeaderIcon80.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Leader\CommonwealthLeaderIcon64.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Leader\CommonwealthLeaderIcon45.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\Leader\CommonwealthLeaderIcon32.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="SQL\00_Commonwealth_Core.sql">
       <SubType>SQL</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
@@ -93,6 +108,7 @@
     <Folder Include="UI\" />
     <Folder Include="Art\" />
     <Folder Include="Art\DawnOfMan\" />
+    <Folder Include="Art\Leader\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Firaxis\ModBuddy\Civ5Mod.targets" />
 </Project>
