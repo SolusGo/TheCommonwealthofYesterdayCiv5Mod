@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="c9f981d8-e712-4dc8-9db4-4b63980b81ae" version="1">
+  <Properties>
+    <Name>The Commonwealth of Yesterday</Name>
+    <Teaser>Carry old friends and treasured memories into the future.</Teaser>
+    <Description>A Vox Populi civilization led by The Child We Were. Preserve Old Friends, age Childhood Bedrooms, and spend Memories on powerful Reminiscences.</Description>
+    <Authors>ThatOneYi</Authors>
+    <AffectsSavedGames>1</AffectsSavedGames>
+    <MinCompatibleSaveVersion>0</MinCompatibleSaveVersion>
+    <SupportsSinglePlayer>1</SupportsSinglePlayer>
+    <SupportsMultiplayer>0</SupportsMultiplayer>
+    <SupportsHotSeat>0</SupportsHotSeat>
+    <SupportsMac>0</SupportsMac>
+  </Properties>
+  <Dependencies />
+  <References />
+  <Blocks />
+  <Files>
+    <File import="0">SQL\00_Commonwealth_Core.sql</File>
+    <File import="0">SQL\10_Commonwealth_Text.sql</File>
+    <File import="1">Lua\CommonwealthLoader.lua</File>
+    <File import="1">Lua\CommonwealthCore.lua</File>
+    <File import="1">UI\CommonwealthPanel.lua</File>
+    <File import="1">UI\CommonwealthPanel.xml</File>
+  </Files>
+  <Actions>
+    <OnModActivated>
+      <UpdateDatabase>SQL\00_Commonwealth_Core.sql</UpdateDatabase>
+      <UpdateDatabase>SQL\10_Commonwealth_Text.sql</UpdateDatabase>
+    </OnModActivated>
+  </Actions>
+  <EntryPoints>
+    <EntryPoint type="InGameUIAddin" file="Lua\CommonwealthLoader.lua">
+      <Name>Commonwealth Gameplay</Name>
+      <Description>Memories, Old Friends, and Childhood Bedroom systems.</Description>
+    </EntryPoint>
+    <EntryPoint type="InGameUIAddin" file="UI\CommonwealthPanel.xml">
+      <Name>Memories Panel</Name>
+      <Description>Reminiscence controls and Old Friends ledger.</Description>
+    </EntryPoint>
+  </EntryPoints>
+</Mod>
