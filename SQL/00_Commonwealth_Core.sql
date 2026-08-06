@@ -36,9 +36,11 @@ FROM Civilizations WHERE Type='CIVILIZATION_AMERICA';
 INSERT INTO Civilization_Leaders VALUES ('CIVILIZATION_COMMONWEALTH_YESTERDAY','LEADER_CHILD_WE_WERE');
 INSERT INTO Civilization_FreeBuildingClasses VALUES ('CIVILIZATION_COMMONWEALTH_YESTERDAY','BUILDINGCLASS_PALACE');
 INSERT INTO Civilization_FreeTechs VALUES ('CIVILIZATION_COMMONWEALTH_YESTERDAY','TECH_AGRICULTURE');
+-- The handicap supplies the normal starting defender, which resolves through
+-- the Warrior override as one Old Friend. Adding a Warrior here would create a
+-- duplicate, so the civilization only declares its Settler like base-game civs.
 INSERT INTO Civilization_FreeUnits (CivilizationType, UnitClassType, UnitAIType, Count) VALUES
-('CIVILIZATION_COMMONWEALTH_YESTERDAY','UNITCLASS_SETTLER','UNITAI_SETTLE',1),
-('CIVILIZATION_COMMONWEALTH_YESTERDAY','UNITCLASS_WARRIOR','UNITAI_ATTACK',1);
+('CIVILIZATION_COMMONWEALTH_YESTERDAY','UNITCLASS_SETTLER','UNITAI_SETTLE',1);
 INSERT INTO Civilization_Start_Region_Priority VALUES ('CIVILIZATION_COMMONWEALTH_YESTERDAY','REGION_GRASS');
 INSERT INTO Civilization_CityNames VALUES
 ('CIVILIZATION_COMMONWEALTH_YESTERDAY','TXT_KEY_CITY_HOME'),

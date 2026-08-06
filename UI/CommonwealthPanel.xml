@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Context ID="CommonwealthPanel" Hidden="0">
-  <Instance Name="FriendRow"><Grid Size="570,64" Style="Grid9DetailTwo" Padding="8,6"><Label ID="FriendText" Size="550,52" WrapWidth="550" Font="TwCenMT18" /></Grid></Instance>
-  <Container Anchor="R,T" Offset="18,72" Size="340,48"><Grid Anchor="R,T" Size="340,48" Style="Grid9DetailFive140" Padding="8,6"><Stack Anchor="L,C" StackGrowth="Right" Padding="8"><Label ID="MemoryLabel" String="Memories: 0/100" Font="TwCenMT20" ColorSet="Beige_Black_Alpha" /><Button ID="OpenButton" Size="92,32" String="Relive" /><Button ID="LedgerButton" Size="92,32" String="Friends" /></Stack></Grid></Container>
-  <Grid ID="Panel" Anchor="R,T" Offset="18,126" Size="500,430" Style="Grid9DetailFive140" Hidden="1" Padding="14,14"><Stack StackGrowth="Bottom" Padding="8"><Label String="MEMORIES" Font="TwCenMT24" ColorSet="Beige_Black_Alpha" /><Label ID="StatusLabel" Size="466,50" WrapWidth="466" Font="TwCenMT18" /><Button ID="BoysButton" Size="466,52" String="The Boys Are Online" ToolTip="Military momentum and formation combat bonuses for 8 turns." /><Button ID="WorldButton" Size="466,52" String="One More World Before Bed" ToolTip="Development and stronger Workers for 8 turns." /><Button ID="SummerButton" Size="466,52" String="The Summer That Never Ended" ToolTip="Culture, Happiness, and old Bedrooms flourish for 8 turns." /><Label String="Every Reminiscence is followed by four turns of Melancholy." Font="TwCenMT16" Color="255,190,160,255" /><Button ID="CloseButton" Size="110,34" String="Close" /></Stack></Grid>
-  <Grid ID="Ledger" Anchor="C,C" Size="620,520" Style="Grid9DetailFive140" Hidden="1" Padding="14,14"><Stack StackGrowth="Bottom" Padding="8"><Label String="THE OLD FRIENDS LEDGER" Font="TwCenMT24" ColorSet="Beige_Black_Alpha" /><Label String="The people who were there when the world was new." Font="TwCenMT18" /><ScrollPanel Size="582,400" Vertical="1"><Stack ID="LedgerStack" StackGrowth="Bottom" Padding="5" /></ScrollPanel><Button ID="LedgerClose" Size="110,34" String="Close" /></Stack></Grid>
+<Context ID="CommonwealthPanel">
+  <Instance Name="FriendRow"><Grid Size="550,66" Style="Grid9DetailTwo"><Label ID="FriendText" Anchor="L,C" Offset="10,0" Size="530,54" WrapWidth="530" Font="TwCenMT18" /></Grid></Instance>
+  <GridButton ID="MemoryButton" Anchor="R,T" Offset="24,146" Size="196,42" Style="BaseButton" String="MEMORIES: 0 / 100" ToolTip="Open the Commonwealth Memories panel" />
+  <Grid ID="Panel" Anchor="R,T" Offset="24,196" Size="500,408" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
+    <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
+    <Label Anchor="C,T" Offset="0,18" Size="452,28" Font="TwCenMT24" FontStyle="Shadow" String="MEMORIES" ColorSet="Beige_Black_Alpha" />
+    <Label ID="StatusLabel" Anchor="C,T" Offset="0,55" Size="452,48" WrapWidth="452" Font="TwCenMT18" FontStyle="Shadow" />
+    <GridButton ID="BoysButton" Anchor="C,T" Offset="0,112" Size="452,52" Style="BaseButton" String="The Boys Are Online" ToolTip="Military momentum and formation combat bonuses for 8 turns." />
+    <GridButton ID="WorldButton" Anchor="C,T" Offset="0,172" Size="452,52" Style="BaseButton" String="One More World Before Bed" ToolTip="Development and stronger Workers for 8 turns." />
+    <GridButton ID="SummerButton" Anchor="C,T" Offset="0,232" Size="452,52" Style="BaseButton" String="The Summer That Never Ended" ToolTip="Culture, Happiness, and old Bedrooms flourish for 8 turns." />
+    <Label Anchor="C,T" Offset="0,296" Size="452,38" WrapWidth="452" Font="TwCenMT16" FontStyle="Shadow" String="Every Reminiscence is followed by four turns of Melancholy." Color="255,190,160,255" />
+    <GridButton ID="LedgerButton" Anchor="L,B" Offset="24,22" Size="190,38" Style="BaseButton" String="Old Friends Ledger" />
+    <GridButton ID="CloseButton" Anchor="R,B" Offset="24,22" Size="100,38" Style="BaseButton" String="Close" />
+  </Grid>
+  <Grid ID="Ledger" Anchor="C,C" Size="610,520" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
+    <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
+    <Label Anchor="C,T" Offset="0,18" Size="560,28" Font="TwCenMT24" FontStyle="Shadow" String="THE OLD FRIENDS LEDGER" ColorSet="Beige_Black_Alpha" />
+    <Label Anchor="C,T" Offset="0,51" Size="560,22" Font="TwCenMT18" FontStyle="Shadow" String="The people who were there when the world was new." />
+    <ScrollPanel Anchor="C,T" Offset="0,82" Size="566,370" Vertical="1"><Stack ID="LedgerStack" StackGrowth="Bottom" Padding="6" /></ScrollPanel>
+    <GridButton ID="LedgerClose" Anchor="R,B" Offset="24,22" Size="100,38" Style="BaseButton" String="Close" />
+  </Grid>
 </Context>

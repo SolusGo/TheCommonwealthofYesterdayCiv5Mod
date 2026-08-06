@@ -1,5 +1,14 @@
 # Patch Notes
 
+## Version 1 hotfix — Starting roster and interface
+
+### Fixed
+
+- Removed the explicitly granted Warrior. Civ V's handicap rules already supply a starting defender, which becomes the Old Friend through the civilization override; granting another produced two Old Friends.
+- Replaced the always-visible top-right Memories bar with a compact button below the standard interface controls.
+- Moved Reminiscence and Ledger controls into styled popups so they no longer overlap the turn counter, help, menu, or notification area.
+- Normalized punctuation in the panel's dynamic text.
+
 ## Version 1 hotfix — Starting units
 
 ### Fixed
