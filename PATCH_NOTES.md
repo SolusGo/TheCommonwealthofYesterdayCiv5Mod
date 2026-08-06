@@ -1,5 +1,11 @@
 # Patch Notes
 
+## Version 1 hotfix — Starting units
+
+### Fixed
+
+- Added the Commonwealth's starting Settler and Old Friend. Previously the civilization began with neither a city nor a Settler, causing Civ V to eliminate the player as soon as the game started.
+
 ## Version 1 — Initial playable release
 
 ### Added
