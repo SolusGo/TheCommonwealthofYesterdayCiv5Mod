@@ -1,6 +1,6 @@
 # The Commonwealth of Yesterday
 
-A single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
+A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -44,6 +44,12 @@ The Childhood Bedroom replaces the Monument. It costs 40 Production, has no main
 4. Enable **The Commonwealth of Yesterday (v 1)** in the Mods menu and start a new game.
 
 The first release borrows base-game icons and scene art so it is immediately loadable. Custom sunset-house, leader, Bedroom, and Old Friend art can replace those references later without changing the gameplay systems.
+
+## ModBuddy development
+
+Open `CommonwealthOfYesterday.civ5proj` in the Civilization V SDK's ModBuddy. The project contains the database activation actions, both in-game UI add-ins, VFS settings, metadata, and all source files required to build or deploy the mod.
+
+The project and checked-in `.modinfo` intentionally share the same mod GUID. ModBuddy's default output path is the project directory, matching the existing repository layout.
 
 ## Technical notes
 

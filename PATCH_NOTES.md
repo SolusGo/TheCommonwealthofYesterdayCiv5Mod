@@ -14,6 +14,7 @@
 - Childhood Bedroom Monument replacement with local Happiness, Keepsake aging, Culture scaling, and Memory generation.
 - Compact Memories panel and living Old Friends Ledger.
 - Persistent save data and load restoration.
+- A complete ModBuddy `.civ5proj` with database actions, UI add-ins, source-file entries, and VFS settings.
 
 ### Current implementation differences
 
