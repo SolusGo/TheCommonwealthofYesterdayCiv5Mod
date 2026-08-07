@@ -1,5 +1,14 @@
 # Patch Notes
 
+## Repository version 1.0.26 - Expanded city names
+
+### Added
+
+- Expanded the Commonwealth city list from 6 to 36 names.
+- Added names themed around home, childhood spaces, late nights, weekends, shared screens, and old online meeting places.
+- Expanded the Cities of Yesterday Civilopedia section to explain the new names as part of the civilization's emotional geography.
+- Kept Home, New Home, The Old Server, Summer's End, After School, and Last Light at the front of the founding order.
+
 ## Repository version 1.0.25 - Detailed Civilopedia
 
 ### Added

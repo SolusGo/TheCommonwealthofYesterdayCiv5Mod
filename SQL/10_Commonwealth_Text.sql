@@ -73,7 +73,13 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
  'The civilization is strongest when early investments survive into the middle and late game. Its weakness is disruption: a lost Old Friend cannot rebuild Years Together, a late Bedroom cannot recover missed Keepsakes, and poorly timed Melancholy can leave Memories unavailable when an emergency begins.'),
 ('TXT_KEY_CIV5_COMMONWEALTH_HEADING_8','Cities of Yesterday'),
 ('TXT_KEY_CIV5_COMMONWEALTH_TEXT_8',
- 'The capital is [COLOR_POSITIVE_TEXT]Home[ENDCOLOR], the fixed point from which every remembered journey begins. [COLOR_POSITIVE_TEXT]New Home[ENDCOLOR] acknowledges that belonging can be rebuilt without erasing what came before. [COLOR_POSITIVE_TEXT]The Old Server[ENDCOLOR] preserves the meeting place where friendships once assembled nightly. [COLOR_POSITIVE_TEXT]Summer''s End[ENDCOLOR] marks the first awareness that even endless seasons pass. [COLOR_POSITIVE_TEXT]After School[ENDCOLOR] remembers the daily hour when obligation gave way to possibility. [COLOR_POSITIVE_TEXT]Last Light[ENDCOLOR] is the glow of one more screen, one more match, and one more goodnight.'),
+ 'The capital is [COLOR_POSITIVE_TEXT]Home[ENDCOLOR], the fixed point from which every remembered journey begins. [COLOR_POSITIVE_TEXT]New Home[ENDCOLOR] acknowledges that belonging can be rebuilt without erasing what came before. The Usual Spot, Familiar Roads, The Shortcut Home, The Porch Light, The Corner Shop, The Bus Stop, and The Back Yard give the Commonwealth a geography assembled from daily life rather than conquest.'
+ || '[NEWLINE][NEWLINE]' ||
+ 'Other cities preserve remembered time. Summer''s End, The Long Weekend, Golden Hour, Rainy Saturday, After Midnight, Before Sunrise, One More Night, Tomorrow Night, No School Tomorrow, and Last Light recall hours that once appeared unlimited and seasons understood only after they had passed.'
+ || '[NEWLINE][NEWLINE]' ||
+ 'The Commonwealth''s shared digital worlds survive as The Old Server, The Old Lobby, The Group Chat, The LAN Room, Split Screen, Second Controller, The Save File, The Memory Card, The Loading Screen, and The Final Save. These are not merely pieces of technology; they are meeting places whose vanished routines can remain vivid long after the machines themselves are obsolete.'
+ || '[NEWLINE][NEWLINE]' ||
+ 'After School, The Last Bell, The Playground, The Treehouse, The Secret Base, The Blanket Fort, and The Spare Room complete the map. Together, the cities of Yesterday transform childhood''s small places into the landmarks of a civilization.'),
 ('TXT_KEY_CIV5_COMMONWEALTH_HEADING_9','Symbolism'),
 ('TXT_KEY_CIV5_COMMONWEALTH_TEXT_9',
  'The Commonwealth''s colours join sunset orange to the deep blue of evening: the warm last light of childhood against the night in which so many shared worlds were made. Its house emblem represents safety, return, and the ordinary place that memory transforms into sacred ground. The linked figures carried by the Old Friend represent companionship surviving the change from one age to the next.'
@@ -116,6 +122,36 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 ('TXT_KEY_CITY_SUMMER_END','Summer''s End'),
 ('TXT_KEY_CITY_AFTER_SCHOOL','After School'),
 ('TXT_KEY_CITY_LAST_LIGHT','Last Light'),
+('TXT_KEY_CITY_COMMONWEALTH_USUAL_SPOT','The Usual Spot'),
+('TXT_KEY_CITY_COMMONWEALTH_FAMILIAR_ROADS','Familiar Roads'),
+('TXT_KEY_CITY_COMMONWEALTH_SHORTCUT_HOME','The Shortcut Home'),
+('TXT_KEY_CITY_COMMONWEALTH_PORCH_LIGHT','The Porch Light'),
+('TXT_KEY_CITY_COMMONWEALTH_CORNER_SHOP','The Corner Shop'),
+('TXT_KEY_CITY_COMMONWEALTH_BUS_STOP','The Bus Stop'),
+('TXT_KEY_CITY_COMMONWEALTH_BACK_YARD','The Back Yard'),
+('TXT_KEY_CITY_COMMONWEALTH_LONG_WEEKEND','The Long Weekend'),
+('TXT_KEY_CITY_COMMONWEALTH_GOLDEN_HOUR','Golden Hour'),
+('TXT_KEY_CITY_COMMONWEALTH_RAINY_SATURDAY','Rainy Saturday'),
+('TXT_KEY_CITY_COMMONWEALTH_AFTER_MIDNIGHT','After Midnight'),
+('TXT_KEY_CITY_COMMONWEALTH_BEFORE_SUNRISE','Before Sunrise'),
+('TXT_KEY_CITY_COMMONWEALTH_ONE_MORE_NIGHT','One More Night'),
+('TXT_KEY_CITY_COMMONWEALTH_TOMORROW_NIGHT','Tomorrow Night'),
+('TXT_KEY_CITY_COMMONWEALTH_NO_SCHOOL_TOMORROW','No School Tomorrow'),
+('TXT_KEY_CITY_COMMONWEALTH_OLD_LOBBY','The Old Lobby'),
+('TXT_KEY_CITY_COMMONWEALTH_GROUP_CHAT','The Group Chat'),
+('TXT_KEY_CITY_COMMONWEALTH_LAN_ROOM','The LAN Room'),
+('TXT_KEY_CITY_COMMONWEALTH_SPLIT_SCREEN','Split Screen'),
+('TXT_KEY_CITY_COMMONWEALTH_SECOND_CONTROLLER','Second Controller'),
+('TXT_KEY_CITY_COMMONWEALTH_SAVE_FILE','The Save File'),
+('TXT_KEY_CITY_COMMONWEALTH_MEMORY_CARD','The Memory Card'),
+('TXT_KEY_CITY_COMMONWEALTH_LOADING_SCREEN','The Loading Screen'),
+('TXT_KEY_CITY_COMMONWEALTH_FINAL_SAVE','The Final Save'),
+('TXT_KEY_CITY_COMMONWEALTH_LAST_BELL','The Last Bell'),
+('TXT_KEY_CITY_COMMONWEALTH_PLAYGROUND','The Playground'),
+('TXT_KEY_CITY_COMMONWEALTH_TREEHOUSE','The Treehouse'),
+('TXT_KEY_CITY_COMMONWEALTH_SECRET_BASE','The Secret Base'),
+('TXT_KEY_CITY_COMMONWEALTH_BLANKET_FORT','The Blanket Fort'),
+('TXT_KEY_CITY_COMMONWEALTH_SPARE_ROOM','The Spare Room'),
 
 -- Unique unit and promotions.
 ('TXT_KEY_UNIT_OLD_FRIEND','Old Friend'),
