@@ -51,6 +51,7 @@
     <File import="0">SQL\10_Commonwealth_Text.sql</File>
     <File import="1">Lua\CommonwealthLoader.lua</File>
     <File import="1">Lua\CommonwealthCore.lua</File>
+    <File import="1">Lua\CommonwealthFriends.lua</File>
     <File import="1">UI\CommonwealthPanel.lua</File>
     <File import="1">UI\CommonwealthPanel.xml</File>
     <File import="1">UI\FrontEnd\GameSetup\SelectCivilization.xml</File>

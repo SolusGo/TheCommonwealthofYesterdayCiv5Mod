@@ -1,5 +1,22 @@
 # Patch Notes
 
+## Version 1 hotfix — Advanced Old Friends Ledger
+
+### Added
+
+- Added permanent Friend IDs and archive records that persist through saves, upgrades, and death.
+- Added Online, Offline, and All Ledger filters with selectable profile cards.
+- Added profile fields for gamertag, epithet, status, form, creation era/turn, Years Together, level, XP, location, eras survived, and Memories generated.
+- Added movement, battle, kill, lowest-HP, upgrade, lineage, and adjacent-turn friendship tracking through Vox Populi gameplay and combat events.
+- Added chronological creation, era-transition, upgrade, near-death, kill, and death timeline entries.
+- Added derived epithets, closest-friend records, Locate for living units, and a narrative Remember action.
+- Added migration from the original lightweight living-unit records when a game first loads the advanced archive.
+
+### Improved
+
+- Inset the civilization map by eight pixels on every side so its artwork stays beneath the Dawn of Man frame.
+- Re-encoded the map as DXT5 to preserve the transparent frame-safe margin.
+
 ## Version 1 hotfix — Civilization map artwork
 
 ### Added
