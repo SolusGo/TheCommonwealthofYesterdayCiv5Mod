@@ -1,5 +1,20 @@
 # Patch Notes
 
+## Repository version 1.0.28 - Melancholy debuffs
+
+### Added
+
+- Implemented the original four-turn Melancholy penalties: -10% military-unit Production, -10% Science, or -10% Culture and -2 Happiness.
+- Added four dedicated hidden penalty buildings whose real-building counts are strictly toggled between `0` and `1`.
+- Used Vox Populi's signed `Unhappiness` field for September Morning, applying one capital-only source of 2 Unhappiness instead of an unsupported negative Happiness building.
+- Displayed the active penalty in the Memories status label and expanded all three Reminiscence tooltips.
+- Updated the Civilopedia and README with the implemented penalties.
+
+### Safety
+
+- Empire refreshes explicitly clear every inactive penalty building, preventing effects from stacking or remaining after Melancholy ends.
+- No negative building counts or permanent player-yield mutations are used.
+
 ## Repository version 1.0.27 - Reminiscence status names
 
 ### Fixed
@@ -264,7 +279,7 @@
 - The Boys Are Online uses a general city Production modifier rather than a military-unit-only Production modifier. Its adjacency combat component is implemented.
 - One More World Before Bed currently implements the Worker movement and work-rate components. Internal trade-route yields and newly founded city Food are reserved for a later compatibility pass.
 - The Summer That Never Ended implements Culture, Happiness, and Bedroom Food. Great Person rate and Golden Age Point multipliers are reserved for a later compatibility pass.
-- Melancholy is tracked, displayed, and blocks activation. Category-specific negative yield modifiers are not applied in this release because negative dummy-building counts are unsafe in Civ V.
+- The original release tracked and displayed Melancholy without applying its negative modifiers. Repository version 1.0.28 now implements them with dedicated one-copy penalty buildings.
 - Keepsake Tourism uses the Vox Populi city tourism setter when exposed. On DLL builds that omit it, Culture aging still works and Tourism is skipped safely.
 - The Ledger currently lists living Old Friends and their core history. Offline profiles, detailed combat telemetry, relationship timelines, renaming, reunion notices, epithets, and achievements remain narrative/UI expansion work.
 - Base-game art is used as placeholder art in version 1.

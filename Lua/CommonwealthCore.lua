@@ -23,6 +23,10 @@ local B_CULT = GameInfoTypes.BUILDING_COMMONWEALTH_CULTURE
 local B_SCI = GameInfoTypes.BUILDING_COMMONWEALTH_SCIENCE
 local B_HAPPY = GameInfoTypes.BUILDING_COMMONWEALTH_HAPPINESS
 local B_FOOD = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM_FOOD
+local MEL_MILITARY = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_MILITARY
+local MEL_SCIENCE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_SCIENCE
+local MEL_CULTURE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_CULTURE
+local MEL_UNHAPPINESS = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_UNHAPPINESS
 local TECH_ARCH = GameInfoTypes.TECH_ARCHAEOLOGY
 local save = Modding.OpenSaveData()
 local friendIdentities = {
@@ -201,11 +205,18 @@ local function applyEmpireEffects(p)
   if not isCommonwealth(player) then return end
   local active, melancholy = tonumber(get(p, 'ACTIVE', 0)) or 0, tonumber(get(p, 'MEL', 0)) or 0
   for city in player:Cities() do
-    city:SetNumRealBuilding(B_PROD, active == 1 and 15 or (melancholy == 1 and 0 or 0))
+    city:SetNumRealBuilding(B_PROD, active == 1 and 15 or 0)
     city:SetNumRealBuilding(B_CULT, active == 3 and 15 or 0)
     city:SetNumRealBuilding(B_SCI, 0)
     city:SetNumRealBuilding(B_HAPPY, active == 3 and 2 or 0)
     city:SetNumRealBuilding(B_FOOD, active == 3 and city:GetNumRealBuilding(BEDROOM) > 0 and 1 or 0)
+    -- Dedicated signed-effect buildings are toggled only between zero and one.
+    -- This avoids unsupported negative building counts and cleans every stale
+    -- Melancholy state whenever empire effects are refreshed.
+    city:SetNumRealBuilding(MEL_MILITARY, melancholy == 1 and 1 or 0)
+    city:SetNumRealBuilding(MEL_SCIENCE, melancholy == 2 and 1 or 0)
+    city:SetNumRealBuilding(MEL_CULTURE, melancholy == 3 and 1 or 0)
+    city:SetNumRealBuilding(MEL_UNHAPPINESS, melancholy == 3 and city:IsCapital() and 1 or 0)
     refreshTourism(city)
   end
 end

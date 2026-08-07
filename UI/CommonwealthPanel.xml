@@ -12,9 +12,9 @@
     <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
     <Label Anchor="C,T" Offset="0,18" Size="452,28" Font="TwCenMT24" FontStyle="Shadow" String="MEMORIES" ColorSet="Beige_Black_Alpha" />
     <Label ID="StatusLabel" Anchor="C,T" Offset="0,55" Size="452,48" WrapWidth="452" Font="TwCenMT18" FontStyle="Shadow" />
-    <GridButton ID="BoysButton" Anchor="C,T" Offset="0,112" Size="452,52" Style="BaseButton" String="The Boys Are Online" ToolTip="Military momentum and formation combat bonuses for 8 turns." />
-    <GridButton ID="WorldButton" Anchor="C,T" Offset="0,172" Size="452,52" Style="BaseButton" String="One More World Before Bed" ToolTip="Development and stronger Workers for 8 turns." />
-    <GridButton ID="SummerButton" Anchor="C,T" Offset="0,232" Size="452,52" Style="BaseButton" String="The Summer That Never Ended" ToolTip="Culture, Happiness, and old Bedrooms flourish for 8 turns." />
+    <GridButton ID="BoysButton" Anchor="C,T" Offset="0,112" Size="452,52" Style="BaseButton" String="The Boys Are Online" ToolTip="+15% Production and adjacent formation strength, followed by -10% military Production during Everyone Logged Off." />
+    <GridButton ID="WorldButton" Anchor="C,T" Offset="0,172" Size="452,52" Style="BaseButton" String="One More World Before Bed" ToolTip="Workers gain +1 Movement and +25% work rate, followed by -10% Science during The Sun Is Coming Up." />
+    <GridButton ID="SummerButton" Anchor="C,T" Offset="0,232" Size="452,52" Style="BaseButton" String="The Summer That Never Ended" ToolTip="+15% Culture, Happiness, and Bedroom Food, followed by -10% Culture and -2 Happiness during September Morning." />
     <Label Anchor="C,T" Offset="0,296" Size="452,38" WrapWidth="452" Font="TwCenMT16" FontStyle="Shadow" String="Every Reminiscence is followed by four turns of Melancholy." Color="255,190,160,255" />
     <GridButton ID="LedgerButton" Anchor="L,B" Offset="24,22" Size="190,38" Style="BaseButton" String="Old Friends Ledger" />
     <GridButton ID="CloseButton" Anchor="R,B" Offset="24,22" Size="100,38" Style="BaseButton" String="Close" />

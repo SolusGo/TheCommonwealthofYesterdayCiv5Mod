@@ -10,6 +10,11 @@ local melancholy = {
   [2]='The Sun Is Coming Up',
   [3]='September Morning'
 }
+local melancholyEffects = {
+  [1]='-10% military Production',
+  [2]='-10% Science',
+  [3]='-10% Culture, -2 Happiness'
+}
 local ledgerRows, selectedFriend, ledgerFilter = {}, nil, 'online'
 local conversationsEnabled = true
 local conversationEvents = {
@@ -33,7 +38,7 @@ end
 local function redraw()
   local cost=25+state.used*10; Controls.MemoryButton:SetText('MEMORIES: '..state.mem..' / 100')
   if state.activeTurns>0 then Controls.StatusLabel:SetText(labels[state.active]..' - '..state.activeTurns..' turns remain')
-  elseif state.melTurns>0 then Controls.StatusLabel:SetText('Melancholy: '..melancholy[state.mel]..' - '..state.melTurns..' turns remain')
+  elseif state.melTurns>0 then Controls.StatusLabel:SetText('Melancholy: '..melancholy[state.mel]..' ('..melancholyEffects[state.mel]..') - '..state.melTurns..' turns remain')
   else Controls.StatusLabel:SetText('Next Reminiscence: '..cost..' Memories') end
   local disabled=state.activeTurns>0 or state.melTurns>0 or state.mem<cost
   Controls.BoysButton:SetDisabled(disabled); Controls.WorldButton:SetDisabled(disabled); Controls.SummerButton:SetDisabled(disabled)

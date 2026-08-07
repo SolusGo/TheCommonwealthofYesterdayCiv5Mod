@@ -46,7 +46,7 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
  || '[NEWLINE][NEWLINE]' ||
  '[COLOR_POSITIVE_TEXT]The Summer That Never Ended[ENDCOLOR] grants +15% [ICON_CULTURE] Culture in every city, +2 [ICON_HAPPINESS_1] Happiness per city, and +1 [ICON_FOOD] Food in each city containing a Childhood Bedroom.'
  || '[NEWLINE][NEWLINE]' ||
- 'In the current implementation, Melancholy is a visible recovery period that blocks activation of another Reminiscence; it does not reduce yields.'),
+ '[COLOR_NEGATIVE_TEXT]Everyone Logged Off[ENDCOLOR] imposes -10% military-unit Production. [COLOR_NEGATIVE_TEXT]The Sun Is Coming Up[ENDCOLOR] imposes -10% Science. [COLOR_NEGATIVE_TEXT]September Morning[ENDCOLOR] imposes -10% Culture and -2 Happiness. These penalties last for the full Melancholy period, alongside the restriction against activating another Reminiscence.'),
 ('TXT_KEY_CIV5_COMMONWEALTH_HEADING_4','Old Friends'),
 ('TXT_KEY_CIV5_COMMONWEALTH_TEXT_4',
  'The Old Friend replaces the Warrior at the same Combat Strength and a cost of 40 [ICON_PRODUCTION] Production. Its defining promotion, Since the Beginning, survives upgrades, allowing the identity and history of the original unit to continue through every later military form.'
@@ -186,4 +186,5 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 ('TXT_KEY_BUILDING_BEDROOM_STRATEGY',
  'Build the Childhood Bedroom immediately in every new city. It cannot gain a Keepsake during its construction era, and missed era transitions cannot be recovered. Each of its four possible Keepsakes adds +1 Culture and grants 2 Memories; after Archaeology, every two also add +1 Tourism. Early Bedrooms are therefore efficient cultural infrastructure and a reliable source of Memory bursts later in the game.'),
 ('TXT_KEY_BUILDING_BEDROOM_HELP','Replaces the Monument. +2 [ICON_CULTURE] Culture and +1 Local [ICON_HAPPINESS_1] Happiness. Gains up to four Keepsakes at later era transitions; each grants 2 Memories and +1 Culture, while every two add +1 [ICON_TOURISM] Tourism after Archaeology.'),
-('TXT_KEY_BUILDING_KEEPSAKE','Keepsake');
+('TXT_KEY_BUILDING_KEEPSAKE','Keepsake'),
+('TXT_KEY_BUILDING_MELANCHOLY','Melancholy');

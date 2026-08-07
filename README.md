@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.27** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.28** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -21,7 +21,11 @@ The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces
 - **One More World Before Bed:** a development window that gives Workers +1 Movement and +25% work rate.
 - **The Summer That Never Ended:** a cultural window with +15% Culture, +2 Happiness per city, and +1 Food in each Childhood Bedroom city.
 
-Durations scale with game speed. Only one effect can be active, and a new Reminiscence cannot begin during Melancholy. The AI chooses effects automatically.
+Durations scale with game speed. Only one effect can be active, and a new Reminiscence cannot begin during Melancholy. The AI chooses effects automatically. Each four-turn Melancholy has its own penalty:
+
+- **Everyone Logged Off:** -10% Production toward military units.
+- **The Sun Is Coming Up:** -10% Science.
+- **September Morning:** -10% Culture and -2 Happiness.
 
 ### Old Friend
 
@@ -84,7 +88,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.24 | `ef034a5` | Added the custom Old Friend unit flag. |
 | 1.0.25 | `d841b03` | Expanded every custom Civilopedia article. |
 | 1.0.26 | `d56567a` | Expanded the thematic city-name list. |
-| 1.0.27 | Current | Fixed shifted Reminiscence UI names. |
+| 1.0.27 | `ca20832` | Fixed shifted Reminiscence UI names. |
+| 1.0.28 | Current | Implemented safe Melancholy debuffs. |
 
 ## ModBuddy development
 
