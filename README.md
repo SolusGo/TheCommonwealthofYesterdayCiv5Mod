@@ -2,6 +2,8 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
+**Repository version: 1.0.15** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
 ## Civilization
@@ -44,6 +46,29 @@ The Childhood Bedroom replaces the Monument. It costs 40 Production, has no main
 4. Enable **The Commonwealth of Yesterday (v 1)** in the Mods menu and start a new game.
 
 The mod includes a custom 1024×768 DXT1 Dawn of Man scene, a 360×412 inset DXT5 civilization map, and complete DXT5 atlases for the leader, civilization, Old Friend, and Childhood Bedroom. A separate tintable house emblem is supplied for the civilization alpha atlas.
+
+## Repository version history
+
+Repository versions track individual development commits. Each new mod or documentation commit receives the next patch number; these numbers do not change the ModBuddy project or `.modinfo` version displayed by Civilization V.
+
+| Repository version | Commit | Change |
+| --- | --- | --- |
+| 1.0.0 | `280dc6e` | Added the initial Commonwealth civilization. |
+| 1.0.1 | `b241b23` | Added the ModBuddy project. |
+| 1.0.2 | `c7c6502` | Fixed the Commonwealth starting units. |
+| 1.0.3 | `0e60aac` | Fixed the starting roster and interface. |
+| 1.0.4 | `4050495` | Fixed the Old Friends Ledger control style. |
+| 1.0.5 | `742d324` | Added the Dawn of Man artwork. |
+| 1.0.6 | `c3e7e23` | Added the leader icon atlas. |
+| 1.0.7 | `6a4c5c4` | Added civilization and unique-component icons. |
+| 1.0.8 | `e28e33c` | Fixed the leader-selection layout. |
+| 1.0.9 | `3b1238b` | Restored the full trait name. |
+| 1.0.10 | `eab16a6` | Improved unique-icon framing and scale. |
+| 1.0.11 | `4482ae8` | Added the full-name civilization-selection layout. |
+| 1.0.12 | `2c00ce4` | Added the civilization map artwork. |
+| 1.0.13 | `f6892a5` | Added the advanced Old Friends Ledger. |
+| 1.0.14 | `68214d8` | Randomized Old Friend identities and fixed the Ledger font. |
+| 1.0.15 | Current | Added repository version tracking to this README. |
 
 ## ModBuddy development
 
