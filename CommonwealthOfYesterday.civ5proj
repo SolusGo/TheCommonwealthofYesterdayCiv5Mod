@@ -37,6 +37,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>Data/CommonwealthConversations.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>SQL/00_Commonwealth_Core.sql</FileName>
       </Action>
       <Action>
@@ -104,6 +109,10 @@
     <Content Include="Art\Leader\CommonwealthLeaderIcon64.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="Art\Leader\CommonwealthLeaderIcon45.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="Art\Leader\CommonwealthLeaderIcon32.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Data\CommonwealthConversations.xml">
+      <SubType>XML</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="SQL\00_Commonwealth_Core.sql">
       <SubType>SQL</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
@@ -161,6 +170,7 @@
     <Folder Include="Art\Civilization\" />
     <Folder Include="Art\OldFriend\" />
     <Folder Include="Art\Bedroom\" />
+    <Folder Include="Data\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Firaxis\ModBuddy\Civ5Mod.targets" />
 </Project>

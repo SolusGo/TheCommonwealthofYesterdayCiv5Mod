@@ -4,6 +4,11 @@ local labels = {'','The Boys Are Online','One More World Before Bed','The Summer
 local melancholy = {'','Everyone Logged Off','The Sun Is Coming Up','September Morning'}
 local ledgerRows, selectedFriend, ledgerFilter = {}, nil, 'online'
 local conversationsEnabled = true
+local conversationEvents = {
+  general='A QUIET MOMENT', new_era='A NEW ERA', upgrade='AFTER AN UPGRADE',
+  near_death='AFTER A CLOSE CALL', victory='AFTER THE BATTLE', reunion='REUNITED',
+  reminiscence='A REMINISCENCE'
+}
 local quotes = {
   'We used to speak every night.',
   'Nobody really left. Life just became busier.',
@@ -105,9 +110,9 @@ LuaEvents.CommonwealthConversationStatusResponse.Add(function(p,enabled)
   conversationsEnabled=tonumber(enabled)==1
   Controls.ConversationToggle:SetText(conversationsEnabled and 'Conversations: On (4% base)' or 'Conversations: Off')
 end)
-LuaEvents.CommonwealthConversationShown.Add(function(p,nameA,tagA,lineA,nameB,tagB,lineB,location)
+LuaEvents.CommonwealthConversationShown.Add(function(p,nameA,tagA,lineA,nameB,tagB,lineB,location,eventType)
   if p~=playerID() or not conversationsEnabled then return end
-  Controls.ConversationContext:SetText('Turn '..Game.GetGameTurn()..'   |   '..location)
+  Controls.ConversationContext:SetText((conversationEvents[eventType] or conversationEvents.general)..'   |   Turn '..Game.GetGameTurn()..'   |   '..location)
   Controls.ConversationSpeakerOne:SetText(nameA..' - '..tagA)
   Controls.ConversationLineOne:SetText('"'..lineA..'"')
   Controls.ConversationSpeakerTwo:SetText(nameB..' - '..tagB)

@@ -6,29 +6,13 @@ local SINCE = GameInfoTypes.PROMOTION_COMMONWEALTH_SINCE_BEGINNING
 local BEDROOM = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM
 local save = Modding.OpenSaveData()
 local combatCredit = {}
-local conversationLines = {
-  {id='river', kind='general', a='Remember when the map ended at the river?', b='It still does. We just learned how to cross it.'},
-  {id='online', kind='general', a='I thought everyone else had logged off.', b='Not everyone.'},
-  {id='save', kind='general', a='Do you still have the old save?', b='Of course. I could never bring myself to overwrite it.'},
-  {id='sunrise', kind='general', a='We said one more turn.', b='We always did. Then the sun came up.'},
-  {id='quiet', kind='general', a='It is quieter than it used to be.', b='Maybe. But you are still here.'},
-  {id='quest', kind='general', a='Do you remember what we were supposed to be doing?', b='No. That was never really the point.'},
-  {id='joke', kind='general', a='You are going to tell the same joke again, right?', b='You laughed the first hundred times.'},
-  {id='road', kind='general', a='Every road looks different now.', b='They all still lead home eventually.'},
-  {id='lobby', kind='general', a='The lobby used to fill up so quickly.', b='It only ever needed two of us.'},
-  {id='pause', kind='general', a='Are we lost?', b='No. We are exploring without a quest marker.'},
-  {id='bedroom_desk', kind='bedroom', a='That desk looks smaller than I remember.', b='We were smaller too.'},
-  {id='bedroom_screen', kind='bedroom', a='I can almost hear the old computer starting up.', b='Give it a minute. It always took a while.'},
-  {id='bedroom_light', kind='bedroom', a='The light through that window has not changed.', b='Maybe that is why we kept coming back.'},
-  {id='reminiscence_moment', kind='reminiscence', a='This feels exactly like it used to.', b='Do not look too closely. Just let it.'},
-  {id='reminiscence_time', kind='reminiscence', a='How long do you think this moment will last?', b='Long enough to remember it.'},
-  {id='scar', kind='scarred', a='You nearly logged off back there.', b='Nearly is doing a lot of work in that sentence.'},
-  {id='scar_save', kind='scarred', a='You had me worried.', b='I knew you would keep the save running.'},
-  {id='veteran_eras', kind='veteran', a='How many eras has it been now?', b='Enough that I have stopped counting.'},
-  {id='veteran_forms', kind='veteran', a='You look different again.', b='New armour. Same account.'},
-  {id='away_map', kind='away', a='We are a long way from Home.', b='Good thing we brought some of it with us.'},
-  {id='away_return', kind='away', a='Think we will find the way back?', b='We always have before.'}
-}
+local conversationLines = {}
+if GameInfo.Commonwealth_Conversations then
+  for row in GameInfo.Commonwealth_Conversations() do
+    conversationLines[#conversationLines+1]={id=row.ID,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo}
+  end
+end
+if #conversationLines == 0 then print('CommonwealthFriends: no conversation data was loaded') end
 local function isCommonwealth(player)
   return player and player:IsAlive() and player:GetCivilizationType() == CIV
 end
@@ -38,6 +22,9 @@ local function getr(p, id, field, default)
   local value = save.GetValue(rkey(p,id,field)); if value == nil then return default end; return value
 end
 local function setr(p, id, field, value) save.SetValue(rkey(p,id,field), value) end
+local function markFriendEvent(p,id,eventType)
+  setr(p,id,'EVENT_TYPE',eventType); setr(p,id,'EVENT_TURN',Game.GetGameTurn())
+end
 local function friendID(p, unitID)
   local id = tonumber(save.GetValue(mkey(p,unitID))) or 0
   return id > 0 and id or nil
@@ -103,7 +90,10 @@ local function updateUnitRecord(p, unit)
   local hp = unit:GetMaxHitPoints()-unit:GetDamage(); local oldLow = tonumber(getr(p,id,'LOW_HP',hp)) or hp
   if hp < oldLow then
     setr(p,id,'LOW_HP',hp)
-    if hp <= 10 and oldLow > 10 then appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived with only '..hp..' HP.') end
+    if hp <= 10 and oldLow > 10 then
+      appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived with only '..hp..' HP.')
+      markFriendEvent(p,id,'near_death')
+    end
   end
   setr(p,id,'LEVEL',unit:GetLevel()); setr(p,id,'XP',unit:GetExperience())
   setr(p,id,'CURRENT_UNIT',unit:GetID()); setr(p,id,'CURRENT_TYPE',unit:GetUnitType())
@@ -114,6 +104,7 @@ local function updateUnitRecord(p, unit)
     setr(p,id,'YEARS',years); setr(p,id,'ERAS',(tonumber(getr(p,id,'ERAS',0)) or 0)+1)
     setr(p,id,'MEMORIES',(tonumber(getr(p,id,'MEMORIES',0)) or 0)+1); setr(p,id,'LAST_ERA',era)
     appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived into the '..eraName(era)..' and gained Years Together '..years..'.')
+    markFriendEvent(p,id,'new_era')
   end
   local capital = Players[p]:GetCapitalCity()
   local distance = capital and Map.PlotDistance(unit:GetX(),unit:GetY(),capital:GetX(),capital:GetY()) or 0
@@ -143,8 +134,19 @@ local function nearBedroom(unit)
   end
   return false
 end
-local function unusedConversationLines(p,a,b,unitA,unitB)
-  local contextual, general = {}, {}
+local function pendingFriendEvent(p,id)
+  local eventType=getr(p,id,'EVENT_TYPE',''); local eventTurn=tonumber(getr(p,id,'EVENT_TURN',-1000)) or -1000
+  if eventType ~= '' and Game.GetGameTurn()-eventTurn <= 15 then return eventType,eventTurn end
+  return nil,-1000
+end
+local function pendingPairEvent(p,a,b)
+  local eventType=save.GetValue(conversationPairKey(p,a,b,'EVENT_TYPE')) or ''
+  local eventTurn=tonumber(save.GetValue(conversationPairKey(p,a,b,'EVENT_TURN'))) or -1000
+  if eventType ~= '' and Game.GetGameTurn()-eventTurn <= 15 then return eventType,eventTurn end
+  return nil,-1000
+end
+local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
+  local eventLines,contextual,general = {}, {}, {}
   local active=(tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0) > 0
   local bedroom=nearBedroom(unitA) or nearBedroom(unitB)
   local scarred=(unitA:GetMaxHitPoints()-unitA:GetDamage() <= 25) or (unitB:GetMaxHitPoints()-unitB:GetDamage() <= 25)
@@ -152,13 +154,15 @@ local function unusedConversationLines(p,a,b,unitA,unitB)
   local away=getr(p,a,'STATUS','') == 'Away From Home' or getr(p,b,'STATUS','') == 'Away From Home'
   for _,line in ipairs(conversationLines) do
     if tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) == 0 then
-      if line.kind == 'general' then general[#general+1]=line
+      if eventType and line.kind == eventType then eventLines[#eventLines+1]=line
+      elseif line.kind == 'general' then general[#general+1]=line
       elseif (line.kind == 'reminiscence' and active) or (line.kind == 'bedroom' and bedroom)
         or (line.kind == 'scarred' and scarred) or (line.kind == 'veteran' and veteran)
         or (line.kind == 'away' and away) then contextual[#contextual+1]=line end
     end
   end
-  return #contextual > 0 and contextual or general,active,bedroom
+  if #eventLines > 0 then return eventLines,active,bedroom,eventType end
+  return #contextual > 0 and contextual or general,active,bedroom,nil
 end
 local function tryConversation(p,pairs)
   local player=Players[p]
@@ -169,10 +173,10 @@ local function tryConversation(p,pairs)
   for _,pair in ipairs(pairs) do
     local lastPair=tonumber(save.GetValue(conversationPairKey(p,pair.a,pair.b,'LAST'))) or -1000
     if turn-lastPair >= 25 then
-      local lines,active,bedroom=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB)
-      local chance=4+(active and 4 or 0)+(bedroom and 2 or 0)
+      local lines,active,bedroom,eventType=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB,pair.eventType)
+      local chance=eventType and 35 or (4+(active and 4 or 0)+(bedroom and 2 or 0))
       if #lines > 0 and Game.Rand(100,'Commonwealth adjacent Old Friends conversation') < chance then
-        successes[#successes+1]={pair=pair,lines=lines}
+        successes[#successes+1]={pair=pair,lines=lines,eventType=eventType}
       end
     end
   end
@@ -185,19 +189,38 @@ local function tryConversation(p,pairs)
   save.SetValue('COY2_CONV_LAST_'..p,turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'LAST'),turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'USED_'..line.id),1)
+  if result.eventType then
+    if pair.eventFriend then setr(p,pair.eventFriend,'EVENT_TYPE','')
+    else save.SetValue(conversationPairKey(p,pair.a,pair.b,'EVENT_TYPE'),'') end
+  end
   setr(p,pair.a,'CONVERSATIONS',(tonumber(getr(p,pair.a,'CONVERSATIONS',0)) or 0)+1)
   setr(p,pair.b,'CONVERSATIONS',(tonumber(getr(p,pair.b,'CONVERSATIONS',0)) or 0)+1)
   appendTimeline(p,pair.a,'Shared a quiet conversation with '..nameB..' at '..location..'.')
   appendTimeline(p,pair.b,'Shared a quiet conversation with '..nameA..' at '..location..'.')
-  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,line.a,nameB,tagB,line.b,location)
+  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,line.a,nameB,tagB,line.b,location,result.eventType or 'general')
 end
 local function updateFriendships(p, units)
-  local pairs={}
+  local pairs={}; local turn=Game.GetGameTurn()
   for i=1,#units do for j=i+1,#units do
     if Map.PlotDistance(units[i]:GetX(),units[i]:GetY(),units[j]:GetX(),units[j]:GetY()) <= 1 then
       local a,b = registerFriend(units[i]),registerFriend(units[j])
       local key = pairKey(p,a,b); save.SetValue(key,(tonumber(save.GetValue(key)) or 0)+1)
-      pairs[#pairs+1]={a=a,b=b,unitA=units[i],unitB=units[j]}
+      local lastAdjacent=tonumber(save.GetValue(conversationPairKey(p,a,b,'ADJ_LAST'))) or -1000
+      if lastAdjacent > -1000 and turn-lastAdjacent >= 15 then
+        save.SetValue(conversationPairKey(p,a,b,'EVENT_TYPE'),'reunion')
+        save.SetValue(conversationPairKey(p,a,b,'EVENT_TURN'),turn)
+      end
+      save.SetValue(conversationPairKey(p,a,b,'ADJ_LAST'),turn)
+      local eventType,eventTurn=pendingPairEvent(p,a,b); local eventFriend=nil
+      if not eventType then
+        local eventA,turnA=pendingFriendEvent(p,a); local eventB,turnB=pendingFriendEvent(p,b)
+        if eventA or eventB then
+          if eventB and turnB > turnA then eventType,eventTurn,eventFriend=eventB,turnB,b else eventType,eventTurn,eventFriend=eventA,turnA,a end
+        end
+      end
+      local pair={a=a,b=b,unitA=units[i],unitB=units[j],eventType=eventType,eventFriend=eventFriend}
+      if eventFriend == b then pair.a,pair.b=b,a; pair.unitA,pair.unitB=units[j],units[i] end
+      pairs[#pairs+1]=pair
     end
   end end
   return pairs
@@ -205,8 +228,11 @@ end
 
 local function friendsTurn(p,allowConversation)
   local player=Players[p]; if not isCommonwealth(player) then return end
-  local units={}
+  local units={}; local active=tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0
+  local previousActive=tonumber(save.GetValue('COY2_CONV_ACTIVE_'..p)) or 0
   for unit in player:Units() do if unit:IsHasPromotion(SINCE) then updateUnitRecord(p,unit); units[#units+1]=unit end end
+  if active > 0 and previousActive == 0 then for _,unit in ipairs(units) do markFriendEvent(p,registerFriend(unit),'reminiscence') end end
+  save.SetValue('COY2_CONV_ACTIVE_'..p,active)
   local pairs=updateFriendships(p,units)
   if allowConversation then tryConversation(p,pairs) end
 end
@@ -238,6 +264,7 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,new
   setr(p,id,'CURRENT_UNIT',newID); setr(p,id,'CURRENT_TYPE',newUnit:GetUnitType())
   newUnit:SetName(getr(p,id,'NAME','Old Friend')..' - '..getr(p,id,'TAG',''))
   appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' became '..unitName(newUnit:GetUnitType())..'.')
+  markFriendEvent(p,id,'upgrade')
 end) end
 
 if Events.RunCombatSim then Events.RunCombatSim.Add(function(ap,au,_,_,_,dp,du)
@@ -252,7 +279,14 @@ if Events.EndCombatSim then Events.EndCombatSim.Add(function(ap,au,_,af,amax,dp,
     if unit and unit:IsHasPromotion(SINCE) then
       local id=registerFriend(unit); if not seen[id] then setr(p,id,'BATTLES',(tonumber(getr(p,id,'BATTLES',0)) or 0)+1); seen[id]=true end
       if type(maxHP)=='number' and type(finalDamage)=='number' then
-        local hp=maxHP-finalDamage; if hp < (tonumber(getr(p,id,'LOW_HP',hp)) or hp) then setr(p,id,'LOW_HP',hp) end
+        local hp=maxHP-finalDamage; local oldLow=tonumber(getr(p,id,'LOW_HP',hp)) or hp
+        if hp < oldLow then
+          setr(p,id,'LOW_HP',hp)
+          if hp <= 10 and oldLow > 10 then
+            appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived a battle with only '..hp..' HP.')
+            markFriendEvent(p,id,'near_death')
+          end
+        end
       end
     end
   end
@@ -263,6 +297,7 @@ if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(function(killedP,kille
   if credit and killerP == credit.p then
     setr(credit.p,credit.id,'KILLS',(tonumber(getr(credit.p,credit.id,'KILLS',0)) or 0)+1)
     appendTimeline(credit.p,credit.id,getr(credit.p,credit.id,'NAME','An Old Friend')..' defeated an enemy near tile '..x..', '..y..'.')
+    markFriendEvent(credit.p,credit.id,'victory')
   end
   combatCredit[killedP..'_'..killedID]=nil
   local player=Players[killedP]; if not isCommonwealth(player) then return end

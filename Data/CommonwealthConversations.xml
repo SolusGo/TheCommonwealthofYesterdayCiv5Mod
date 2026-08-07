@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GameData>
+  <Table name="Commonwealth_Conversations">
+    <Column name="ID" type="text" primarykey="true" />
+    <Column name="EventType" type="text" notnull="true" />
+    <Column name="SpeakerOne" type="text" notnull="true" />
+    <Column name="SpeakerTwo" type="text" notnull="true" />
+  </Table>
+
+  <Commonwealth_Conversations>
+    <Row><ID>river</ID><EventType>general</EventType><SpeakerOne>Remember when the map ended at the river?</SpeakerOne><SpeakerTwo>It still does. We just learned how to cross it.</SpeakerTwo></Row>
+    <Row><ID>online</ID><EventType>general</EventType><SpeakerOne>I thought everyone else had logged off.</SpeakerOne><SpeakerTwo>Not everyone.</SpeakerTwo></Row>
+    <Row><ID>save</ID><EventType>general</EventType><SpeakerOne>Do you still have the old save?</SpeakerOne><SpeakerTwo>Of course. I could never bring myself to overwrite it.</SpeakerTwo></Row>
+    <Row><ID>sunrise</ID><EventType>general</EventType><SpeakerOne>We said one more turn.</SpeakerOne><SpeakerTwo>We always did. Then the sun came up.</SpeakerTwo></Row>
+    <Row><ID>quiet</ID><EventType>general</EventType><SpeakerOne>It is quieter than it used to be.</SpeakerOne><SpeakerTwo>Maybe. But you are still here.</SpeakerTwo></Row>
+    <Row><ID>quest</ID><EventType>general</EventType><SpeakerOne>Do you remember what we were supposed to be doing?</SpeakerOne><SpeakerTwo>No. That was never really the point.</SpeakerTwo></Row>
+    <Row><ID>joke</ID><EventType>general</EventType><SpeakerOne>You are going to tell the same joke again, right?</SpeakerOne><SpeakerTwo>You laughed the first hundred times.</SpeakerTwo></Row>
+    <Row><ID>road</ID><EventType>general</EventType><SpeakerOne>Every road looks different now.</SpeakerOne><SpeakerTwo>They all still lead home eventually.</SpeakerTwo></Row>
+    <Row><ID>lobby</ID><EventType>general</EventType><SpeakerOne>The lobby used to fill up so quickly.</SpeakerOne><SpeakerTwo>It only ever needed two of us.</SpeakerTwo></Row>
+    <Row><ID>pause</ID><EventType>general</EventType><SpeakerOne>Are we lost?</SpeakerOne><SpeakerTwo>No. We are exploring without a quest marker.</SpeakerTwo></Row>
+
+    <Row><ID>bedroom_desk</ID><EventType>bedroom</EventType><SpeakerOne>That desk looks smaller than I remember.</SpeakerOne><SpeakerTwo>We were smaller too.</SpeakerTwo></Row>
+    <Row><ID>bedroom_screen</ID><EventType>bedroom</EventType><SpeakerOne>I can almost hear the old computer starting up.</SpeakerOne><SpeakerTwo>Give it a minute. It always took a while.</SpeakerTwo></Row>
+    <Row><ID>bedroom_light</ID><EventType>bedroom</EventType><SpeakerOne>The light through that window has not changed.</SpeakerOne><SpeakerTwo>Maybe that is why we kept coming back.</SpeakerTwo></Row>
+    <Row><ID>reminiscence_moment</ID><EventType>reminiscence</EventType><SpeakerOne>This feels exactly like it used to.</SpeakerOne><SpeakerTwo>Do not look too closely. Just let it.</SpeakerTwo></Row>
+    <Row><ID>reminiscence_time</ID><EventType>reminiscence</EventType><SpeakerOne>How long do you think this moment will last?</SpeakerOne><SpeakerTwo>Long enough to remember it.</SpeakerTwo></Row>
+    <Row><ID>scar</ID><EventType>scarred</EventType><SpeakerOne>You nearly logged off back there.</SpeakerOne><SpeakerTwo>Nearly is doing a lot of work in that sentence.</SpeakerTwo></Row>
+    <Row><ID>scar_save</ID><EventType>scarred</EventType><SpeakerOne>You had me worried.</SpeakerOne><SpeakerTwo>I knew you would keep the save running.</SpeakerTwo></Row>
+    <Row><ID>veteran_eras</ID><EventType>veteran</EventType><SpeakerOne>How many eras has it been now?</SpeakerOne><SpeakerTwo>Enough that I have stopped counting.</SpeakerTwo></Row>
+    <Row><ID>veteran_forms</ID><EventType>veteran</EventType><SpeakerOne>You look different again.</SpeakerOne><SpeakerTwo>New armour. Same account.</SpeakerTwo></Row>
+    <Row><ID>away_map</ID><EventType>away</EventType><SpeakerOne>We are a long way from Home.</SpeakerOne><SpeakerTwo>Good thing we brought some of it with us.</SpeakerTwo></Row>
+    <Row><ID>away_return</ID><EventType>away</EventType><SpeakerOne>Think we will find the way back?</SpeakerOne><SpeakerTwo>We always have before.</SpeakerTwo></Row>
+
+    <Row><ID>era_changed</ID><EventType>new_era</EventType><SpeakerOne>Everything changed again.</SpeakerOne><SpeakerTwo>Not everything.</SpeakerTwo></Row>
+    <Row><ID>era_map</ID><EventType>new_era</EventType><SpeakerOne>A whole new era. New roads, new rules.</SpeakerOne><SpeakerTwo>Same two names in the corner of the screen.</SpeakerTwo></Row>
+    <Row><ID>era_old_days</ID><EventType>new_era</EventType><SpeakerOne>Do you think these will become the old days too?</SpeakerOne><SpeakerTwo>They already are. We just cannot see it yet.</SpeakerTwo></Row>
+    <Row><ID>upgrade_armour</ID><EventType>upgrade</EventType><SpeakerOne>New armour. Same account.</SpeakerOne><SpeakerTwo>I was going to ask if it was still you.</SpeakerTwo></Row>
+    <Row><ID>upgrade_weapon</ID><EventType>upgrade</EventType><SpeakerOne>They gave me a better weapon.</SpeakerOne><SpeakerTwo>Try not to lose this one.</SpeakerTwo></Row>
+    <Row><ID>upgrade_form</ID><EventType>upgrade</EventType><SpeakerOne>Different name for the unit. Same name above it.</SpeakerOne><SpeakerTwo>That is the part that matters.</SpeakerTwo></Row>
+    <Row><ID>near_death_one_hp</ID><EventType>near_death</EventType><SpeakerOne>I am fine.</SpeakerOne><SpeakerTwo>You had one foot on the logout button.</SpeakerTwo></Row>
+    <Row><ID>near_death_save</ID><EventType>near_death</EventType><SpeakerOne>That was closer than I planned.</SpeakerOne><SpeakerTwo>I was already looking for the last autosave.</SpeakerTwo></Row>
+    <Row><ID>near_death_still_here</ID><EventType>near_death</EventType><SpeakerOne>Still here.</SpeakerOne><SpeakerTwo>I noticed. I was waiting for you.</SpeakerTwo></Row>
+    <Row><ID>victory_quiet</ID><EventType>victory</EventType><SpeakerOne>That went better than expected.</SpeakerOne><SpeakerTwo>You say that after every impossible fight.</SpeakerTwo></Row>
+    <Row><ID>victory_carry</ID><EventType>victory</EventType><SpeakerOne>Was that the last one?</SpeakerOne><SpeakerTwo>Do not worry. The map always finds another.</SpeakerTwo></Row>
+    <Row><ID>victory_credit</ID><EventType>victory</EventType><SpeakerOne>You saw that, right?</SpeakerOne><SpeakerTwo>I will tell everyone you carried us.</SpeakerTwo></Row>
+    <Row><ID>reunion_online</ID><EventType>reunion</EventType><SpeakerOne>There you are. I thought you had gone offline.</SpeakerOne><SpeakerTwo>I just took the long way around.</SpeakerTwo></Row>
+    <Row><ID>reunion_distance</ID><EventType>reunion</EventType><SpeakerOne>How long has it been?</SpeakerOne><SpeakerTwo>Long enough that this counts as a reunion.</SpeakerTwo></Row>
+    <Row><ID>reunion_lobby</ID><EventType>reunion</EventType><SpeakerOne>Same lobby?</SpeakerOne><SpeakerTwo>Same lobby. Different century.</SpeakerTwo></Row>
+  </Commonwealth_Conversations>
+</GameData>

@@ -47,6 +47,7 @@
     <File import="1">Art\Leader\CommonwealthLeaderIcon64.dds</File>
     <File import="1">Art\Leader\CommonwealthLeaderIcon45.dds</File>
     <File import="1">Art\Leader\CommonwealthLeaderIcon32.dds</File>
+    <File import="0">Data\CommonwealthConversations.xml</File>
     <File import="0">SQL\00_Commonwealth_Core.sql</File>
     <File import="0">SQL\10_Commonwealth_Text.sql</File>
     <File import="1">Lua\CommonwealthLoader.lua</File>
@@ -63,6 +64,7 @@
     <OnModActivated>
       <UpdateDatabase>Art\CommonwealthLeaderIconAtlases.xml</UpdateDatabase>
       <UpdateDatabase>Art\CommonwealthComponentIconAtlases.xml</UpdateDatabase>
+      <UpdateDatabase>Data\CommonwealthConversations.xml</UpdateDatabase>
       <UpdateDatabase>SQL\00_Commonwealth_Core.sql</UpdateDatabase>
       <UpdateDatabase>SQL\10_Commonwealth_Text.sql</UpdateDatabase>
     </OnModActivated>

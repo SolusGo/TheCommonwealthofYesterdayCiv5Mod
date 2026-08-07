@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.18 — Event conversation data
+
+### Added
+
+- Added dedicated conversations for new eras, unit upgrades, near-death survival, enemy defeats, Reminiscence activations, and reunions after at least 15 turns apart.
+- Added a 35% event-conversation chance while preserving the global and per-pair cooldowns.
+- Added event labels to the conversation panel so the cause of each exchange is clear.
+- Added `Data/CommonwealthConversations.xml` with 36 total exchanges in a custom Civ V `GameInfo` table.
+
+### Changed
+
+- Moved all conversation text and categories out of Lua and into the external database XML file.
+- Kept Lua responsible only for event detection, probability, persistence, cooldowns, and UI delivery.
+
 ## Repository version 1.0.17 — Old Friends conversations
 
 ### Added
