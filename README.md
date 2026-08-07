@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.16** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.17** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -33,6 +33,8 @@ The Old Friend replaces the Warrior at the same base strength and 40 Production.
 - receives +10% Combat Strength while beside another Old Friend.
 
 Old Friend identities are randomly selected from 54 generated names and 72 gamertags. Trent, Gabriel, Dion, Harrison, Lachlan, and Ben retain their tribute gamertags and are each eight times more likely to appear than a generated identity. Names are not repeated until the available pool is exhausted. The in-game **Friends** button opens a persistent archive with Online, Offline, and All views; profiles show form, age, level, combat and survival records, lineage, closest friend, location, timeline, and earned epithet. Records transfer across upgrades and remain after death.
+
+Adjacent Old Friends have a 4% chance per pair each turn to share a brief conversation. Reminiscences and nearby Childhood Bedrooms increase that chance. A global 12-turn cooldown, a 25-turn pair cooldown, and per-pair dialogue history prevent interruptions or repeated lines. Conversations are recorded in both Ledger timelines and can be disabled from the Ledger.
 
 ### Childhood Bedroom
 
@@ -69,7 +71,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.13 | `f6892a5` | Added the advanced Old Friends Ledger. |
 | 1.0.14 | `68214d8` | Randomized Old Friend identities and fixed the Ledger font. |
 | 1.0.15 | `9753950` | Added repository version tracking to this README. |
-| 1.0.16 | Current | Removed the inherited Dawn of Man audio. |
+| 1.0.16 | `490342a` | Removed the inherited Dawn of Man audio. |
+| 1.0.17 | Current | Added contextual adjacent Old Friend conversations. |
 
 ## ModBuddy development
 

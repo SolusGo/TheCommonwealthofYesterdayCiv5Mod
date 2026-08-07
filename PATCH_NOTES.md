@@ -1,5 +1,21 @@
 # Patch Notes
 
+## Repository version 1.0.17 — Old Friends conversations
+
+### Added
+
+- Added a 4% per-turn conversation chance for each adjacent Old Friend pair.
+- Added 21 conversation exchanges covering general memories, Reminiscences, Childhood Bedrooms, veteran friends, near-death survivors, and journeys away from Home.
+- Added a compact non-blocking conversation panel showing both friends' names, gamertags, dialogue, turn, and location.
+- Added conversation counts and conversation events to persistent Ledger profiles and timelines.
+- Added a Ledger control that enables or disables spontaneous conversations per player.
+
+### Balance
+
+- Limited conversations to one every 12 turns globally and one every 25 turns for the same pair.
+- Prevented each dialogue exchange from repeating for the same pair.
+- Increased the conversation chance during a Reminiscence and near a Childhood Bedroom.
+
 ## Repository version 1.0.16 — Silent Dawn of Man
 
 ### Changed

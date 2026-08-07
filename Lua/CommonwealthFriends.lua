@@ -3,8 +3,32 @@ print('CommonwealthFriends loaded')
 
 local CIV = GameInfoTypes.CIVILIZATION_COMMONWEALTH_YESTERDAY
 local SINCE = GameInfoTypes.PROMOTION_COMMONWEALTH_SINCE_BEGINNING
+local BEDROOM = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM
 local save = Modding.OpenSaveData()
 local combatCredit = {}
+local conversationLines = {
+  {id='river', kind='general', a='Remember when the map ended at the river?', b='It still does. We just learned how to cross it.'},
+  {id='online', kind='general', a='I thought everyone else had logged off.', b='Not everyone.'},
+  {id='save', kind='general', a='Do you still have the old save?', b='Of course. I could never bring myself to overwrite it.'},
+  {id='sunrise', kind='general', a='We said one more turn.', b='We always did. Then the sun came up.'},
+  {id='quiet', kind='general', a='It is quieter than it used to be.', b='Maybe. But you are still here.'},
+  {id='quest', kind='general', a='Do you remember what we were supposed to be doing?', b='No. That was never really the point.'},
+  {id='joke', kind='general', a='You are going to tell the same joke again, right?', b='You laughed the first hundred times.'},
+  {id='road', kind='general', a='Every road looks different now.', b='They all still lead home eventually.'},
+  {id='lobby', kind='general', a='The lobby used to fill up so quickly.', b='It only ever needed two of us.'},
+  {id='pause', kind='general', a='Are we lost?', b='No. We are exploring without a quest marker.'},
+  {id='bedroom_desk', kind='bedroom', a='That desk looks smaller than I remember.', b='We were smaller too.'},
+  {id='bedroom_screen', kind='bedroom', a='I can almost hear the old computer starting up.', b='Give it a minute. It always took a while.'},
+  {id='bedroom_light', kind='bedroom', a='The light through that window has not changed.', b='Maybe that is why we kept coming back.'},
+  {id='reminiscence_moment', kind='reminiscence', a='This feels exactly like it used to.', b='Do not look too closely. Just let it.'},
+  {id='reminiscence_time', kind='reminiscence', a='How long do you think this moment will last?', b='Long enough to remember it.'},
+  {id='scar', kind='scarred', a='You nearly logged off back there.', b='Nearly is doing a lot of work in that sentence.'},
+  {id='scar_save', kind='scarred', a='You had me worried.', b='I knew you would keep the save running.'},
+  {id='veteran_eras', kind='veteran', a='How many eras has it been now?', b='Enough that I have stopped counting.'},
+  {id='veteran_forms', kind='veteran', a='You look different again.', b='New armour. Same account.'},
+  {id='away_map', kind='away', a='We are a long way from Home.', b='Good thing we brought some of it with us.'},
+  {id='away_return', kind='away', a='Think we will find the way back?', b='We always have before.'}
+}
 local function isCommonwealth(player)
   return player and player:IsAlive() and player:GetCivilizationType() == CIV
 end
@@ -100,22 +124,93 @@ local function pairKey(p,a,b)
   if a > b then a,b = b,a end
   return 'COY2_PAIR_'..p..'_'..a..'_'..b
 end
+local function conversationPairKey(p,a,b,suffix)
+  if a > b then a,b = b,a end
+  return 'COY2_CONV_'..p..'_'..a..'_'..b..'_'..suffix
+end
+local function conversationsEnabled(p)
+  return tonumber(save.GetValue('COY2_CONV_ENABLED_'..p) or 1) ~= 0
+end
+local function nearBedroom(unit)
+  local plot=unit and unit:GetPlot(); if not plot then return false end
+  local function hasBedroom(checkPlot)
+    local city=checkPlot and checkPlot:GetPlotCity()
+    return city and city:GetNumRealBuilding(BEDROOM) > 0
+  end
+  if hasBedroom(plot) then return true end
+  for direction=0,DirectionTypes.NUM_DIRECTION_TYPES-1 do
+    if hasBedroom(Map.PlotDirection(plot:GetX(),plot:GetY(),direction)) then return true end
+  end
+  return false
+end
+local function unusedConversationLines(p,a,b,unitA,unitB)
+  local contextual, general = {}, {}
+  local active=(tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0) > 0
+  local bedroom=nearBedroom(unitA) or nearBedroom(unitB)
+  local scarred=(unitA:GetMaxHitPoints()-unitA:GetDamage() <= 25) or (unitB:GetMaxHitPoints()-unitB:GetDamage() <= 25)
+  local veteran=math.min(tonumber(getr(p,a,'YEARS',0)) or 0,tonumber(getr(p,b,'YEARS',0)) or 0) >= 3
+  local away=getr(p,a,'STATUS','') == 'Away From Home' or getr(p,b,'STATUS','') == 'Away From Home'
+  for _,line in ipairs(conversationLines) do
+    if tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) == 0 then
+      if line.kind == 'general' then general[#general+1]=line
+      elseif (line.kind == 'reminiscence' and active) or (line.kind == 'bedroom' and bedroom)
+        or (line.kind == 'scarred' and scarred) or (line.kind == 'veteran' and veteran)
+        or (line.kind == 'away' and away) then contextual[#contextual+1]=line end
+    end
+  end
+  return #contextual > 0 and contextual or general,active,bedroom
+end
+local function tryConversation(p,pairs)
+  local player=Players[p]
+  if not player:IsHuman() or not conversationsEnabled(p) or #pairs == 0 then return end
+  local turn=Game.GetGameTurn(); local lastGlobal=tonumber(save.GetValue('COY2_CONV_LAST_'..p)) or -1000
+  if turn-lastGlobal < 12 then return end
+  local successes={}
+  for _,pair in ipairs(pairs) do
+    local lastPair=tonumber(save.GetValue(conversationPairKey(p,pair.a,pair.b,'LAST'))) or -1000
+    if turn-lastPair >= 25 then
+      local lines,active,bedroom=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB)
+      local chance=4+(active and 4 or 0)+(bedroom and 2 or 0)
+      if #lines > 0 and Game.Rand(100,'Commonwealth adjacent Old Friends conversation') < chance then
+        successes[#successes+1]={pair=pair,lines=lines}
+      end
+    end
+  end
+  if #successes == 0 then return end
+  local result=successes[Game.Rand(#successes,'Commonwealth conversation pair')+1]
+  local pair=result.pair; local line=result.lines[Game.Rand(#result.lines,'Commonwealth conversation line')+1]
+  local nameA,tagA=getr(p,pair.a,'NAME','Old Friend'),getr(p,pair.a,'TAG','')
+  local nameB,tagB=getr(p,pair.b,'NAME','Old Friend'),getr(p,pair.b,'TAG','')
+  local location=plotLocation(pair.unitA:GetPlot())
+  save.SetValue('COY2_CONV_LAST_'..p,turn)
+  save.SetValue(conversationPairKey(p,pair.a,pair.b,'LAST'),turn)
+  save.SetValue(conversationPairKey(p,pair.a,pair.b,'USED_'..line.id),1)
+  setr(p,pair.a,'CONVERSATIONS',(tonumber(getr(p,pair.a,'CONVERSATIONS',0)) or 0)+1)
+  setr(p,pair.b,'CONVERSATIONS',(tonumber(getr(p,pair.b,'CONVERSATIONS',0)) or 0)+1)
+  appendTimeline(p,pair.a,'Shared a quiet conversation with '..nameB..' at '..location..'.')
+  appendTimeline(p,pair.b,'Shared a quiet conversation with '..nameA..' at '..location..'.')
+  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,line.a,nameB,tagB,line.b,location)
+end
 local function updateFriendships(p, units)
+  local pairs={}
   for i=1,#units do for j=i+1,#units do
     if Map.PlotDistance(units[i]:GetX(),units[i]:GetY(),units[j]:GetX(),units[j]:GetY()) <= 1 then
       local a,b = registerFriend(units[i]),registerFriend(units[j])
       local key = pairKey(p,a,b); save.SetValue(key,(tonumber(save.GetValue(key)) or 0)+1)
+      pairs[#pairs+1]={a=a,b=b,unitA=units[i],unitB=units[j]}
     end
   end end
+  return pairs
 end
 
-local function friendsTurn(p)
+local function friendsTurn(p,allowConversation)
   local player=Players[p]; if not isCommonwealth(player) then return end
   local units={}
   for unit in player:Units() do if unit:IsHasPromotion(SINCE) then updateUnitRecord(p,unit); units[#units+1]=unit end end
-  updateFriendships(p,units)
+  local pairs=updateFriendships(p,units)
+  if allowConversation then tryConversation(p,pairs) end
 end
-GameEvents.PlayerDoTurn.Add(friendsTurn)
+GameEvents.PlayerDoTurn.Add(function(p) friendsTurn(p,true) end)
 
 GameEvents.UnitSetXY.Add(function(p,unitID,x,y)
   local player=Players[p]; if not isCommonwealth(player) then return end
@@ -204,7 +299,7 @@ end
 
 LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
   local player=Players[p]; if not isCommonwealth(player) then LuaEvents.CommonwealthAdvancedLedgerResponse(p,{}); return end
-  friendsTurn(p)
+  friendsTurn(p,false)
   local rows={}; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
   for id=1,count do
     local closest,together=closestFriend(p,id,count); local timeline={}; local tc=tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
@@ -214,7 +309,7 @@ LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
       form=currentType>=0 and unitName(currentType) or 'Unknown',bornEra=eraName(tonumber(getr(p,id,'BORN_ERA',0)) or 0),bornTurn=tonumber(getr(p,id,'BORN',0)) or 0,
       years=tonumber(getr(p,id,'YEARS',0)) or 0,eras=tonumber(getr(p,id,'ERAS',0)) or 0,level=tonumber(getr(p,id,'LEVEL',1)) or 1,xp=tonumber(getr(p,id,'XP',0)) or 0,
       battles=tonumber(getr(p,id,'BATTLES',0)) or 0,kills=tonumber(getr(p,id,'KILLS',0)) or 0,distance=tonumber(getr(p,id,'DISTANCE',0)) or 0,
-      upgrades=tonumber(getr(p,id,'UPGRADES',0)) or 0,lowHP=tonumber(getr(p,id,'LOW_HP',100)) or 100,memories=tonumber(getr(p,id,'MEMORIES',0)) or 0,
+      upgrades=tonumber(getr(p,id,'UPGRADES',0)) or 0,lowHP=tonumber(getr(p,id,'LOW_HP',100)) or 100,memories=tonumber(getr(p,id,'MEMORIES',0)) or 0,conversations=tonumber(getr(p,id,'CONVERSATIONS',0)) or 0,
       closest=closest,together=together,location=getr(p,id,'LOCATION','Unknown'),lineage=displayLineage(getr(p,id,'LINEAGE','')),timeline=table.concat(timeline,'[NEWLINE][NEWLINE]'),
       deathTurn=tonumber(getr(p,id,'DEATH_TURN',-1)) or -1,currentUnit=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1}
   end
@@ -224,4 +319,14 @@ end)
 LuaEvents.CommonwealthLocateFriend.Add(function(p,id)
   local unitID=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1; local unit=Players[p] and Players[p]:GetUnitByID(unitID)
   if unit then UI.LookAt(unit:GetPlot(),0); UI.SelectUnit(unit) end
+end)
+
+LuaEvents.CommonwealthConversationStatusRequest.Add(function(p)
+  LuaEvents.CommonwealthConversationStatusResponse(p,conversationsEnabled(p) and 1 or 0)
+end)
+LuaEvents.CommonwealthConversationToggle.Add(function(p,enabled)
+  if isCommonwealth(Players[p]) then
+    save.SetValue('COY2_CONV_ENABLED_'..p,tonumber(enabled) == 1 and 1 or 0)
+    LuaEvents.CommonwealthConversationStatusResponse(p,conversationsEnabled(p) and 1 or 0)
+  end
 end)

@@ -3,6 +3,7 @@ local state = {mem=0,used=0,active=0,activeTurns=0,mel=0,melTurns=0}
 local labels = {'','The Boys Are Online','One More World Before Bed','The Summer That Never Ended'}
 local melancholy = {'','Everyone Logged Off','The Sun Is Coming Up','September Morning'}
 local ledgerRows, selectedFriend, ledgerFilter = {}, nil, 'online'
+local conversationsEnabled = true
 local quotes = {
   'We used to speak every night.',
   'Nobody really left. Life just became busier.',
@@ -12,7 +13,10 @@ local quotes = {
 
 local function playerID() return Game.GetActivePlayer() end
 local function eligible() local p=Players[playerID()]; return p and p:GetCivilizationType()==CIV end
-local function refresh() ContextPtr:SetHide(not eligible()); if eligible() then LuaEvents.CommonwealthGetState(playerID()) end end
+local function refresh()
+  ContextPtr:SetHide(not eligible())
+  if eligible() then LuaEvents.CommonwealthGetState(playerID()); LuaEvents.CommonwealthConversationStatusRequest(playerID()) end
+end
 local function redraw()
   local cost=25+state.used*10; Controls.MemoryButton:SetText('MEMORIES: '..state.mem..' / 100')
   if state.activeTurns>0 then Controls.StatusLabel:SetText(labels[state.active]..' - '..state.activeTurns..' turns remain')
@@ -39,7 +43,7 @@ local function selectFriend(row)
   Controls.CombatStats:SetText('[ICON_STRENGTH] COMBAT RECORD[NEWLINE]Battles: '..row.battles..'   Enemies Defeated: '..row.kills)
   Controls.SurvivalStats:SetText('[ICON_HEALTH] PERSONAL RECORD[NEWLINE]Lowest HP: '..row.lowHP..'   Distance: '..row.distance..'   Upgrades: '..row.upgrades)
   Controls.LineageText:SetText(row.lineage ~= '' and row.lineage or row.form)
-  Controls.RelationshipText:SetText('Closest Friend: '..row.closest..'   |   Turns Together: '..row.together..'[NEWLINE]Eras Survived: '..row.eras..'   |   Memories Generated: '..row.memories)
+  Controls.RelationshipText:SetText('Closest: '..row.closest..'   |   Together: '..row.together..' turns   |   Conversations: '..row.conversations..'[NEWLINE]Eras Survived: '..row.eras..'   |   Memories Generated: '..row.memories)
   Controls.TimelineText:SetText(row.timeline ~= '' and row.timeline or 'No archived events yet.')
   Controls.LocateButton:SetDisabled(row.status=='Offline' or row.currentUnit<0)
   Controls.RememberButton:SetDisabled(false)
@@ -81,6 +85,11 @@ Controls.LedgerClose:RegisterCallback(Mouse.eLClick,function() Controls.Ledger:S
 Controls.LivingFilter:RegisterCallback(Mouse.eLClick,function() setFilter('online') end)
 Controls.OfflineFilter:RegisterCallback(Mouse.eLClick,function() setFilter('offline') end)
 Controls.AllFilter:RegisterCallback(Mouse.eLClick,function() setFilter('all') end)
+Controls.ConversationToggle:RegisterCallback(Mouse.eLClick,function()
+  conversationsEnabled=not conversationsEnabled
+  if not conversationsEnabled then Controls.ConversationPanel:SetHide(true) end
+  LuaEvents.CommonwealthConversationToggle(playerID(),conversationsEnabled and 1 or 0)
+end)
 Controls.LocateButton:RegisterCallback(Mouse.eLClick,function() if selectedFriend then LuaEvents.CommonwealthLocateFriend(playerID(),selectedFriend.id) end end)
 Controls.RememberButton:RegisterCallback(Mouse.eLClick,function()
   if selectedFriend then Controls.RememberQuote:SetText('"'..quotes[((selectedFriend.id+Game.GetGameTurn()) % #quotes)+1]..'"') end
@@ -91,4 +100,19 @@ LuaEvents.CommonwealthAdvancedLedgerResponse.Add(function(p,rows)
   Controls.LedgerCount:SetText(alive..' online   |   '..offline..' no longer online   |   '..#ledgerRows..' archived profiles')
   renderLedgerList()
 end)
+LuaEvents.CommonwealthConversationStatusResponse.Add(function(p,enabled)
+  if p~=playerID() then return end
+  conversationsEnabled=tonumber(enabled)==1
+  Controls.ConversationToggle:SetText(conversationsEnabled and 'Conversations: On (4% base)' or 'Conversations: Off')
+end)
+LuaEvents.CommonwealthConversationShown.Add(function(p,nameA,tagA,lineA,nameB,tagB,lineB,location)
+  if p~=playerID() or not conversationsEnabled then return end
+  Controls.ConversationContext:SetText('Turn '..Game.GetGameTurn()..'   |   '..location)
+  Controls.ConversationSpeakerOne:SetText(nameA..' - '..tagA)
+  Controls.ConversationLineOne:SetText('"'..lineA..'"')
+  Controls.ConversationSpeakerTwo:SetText(nameB..' - '..tagB)
+  Controls.ConversationLineTwo:SetText('"'..lineB..'"')
+  Controls.ConversationPanel:SetHide(false)
+end)
+Controls.ConversationClose:RegisterCallback(Mouse.eLClick,function() Controls.ConversationPanel:SetHide(true) end)
 Events.ActivePlayerTurnStart.Add(refresh); Events.LoadScreenClose.Add(refresh); refresh()

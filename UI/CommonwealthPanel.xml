@@ -45,9 +45,25 @@
       <Label Anchor="L,T" Offset="18,371" Size="120,20" Font="TwCenMT16" FontStyle="Shadow" String="TIMELINE" Color="255,202,112,255" />
       <ScrollPanel Anchor="L,T" Offset="14,394" Size="552,102" Vertical="1"><Label ID="TimelineText" Anchor="L,T" Offset="6,4" Size="516,2048" WrapWidth="516" Font="TwCenMT16" FontStyle="Shadow" /></ScrollPanel>
     </Grid>
+    <GridButton ID="ConversationToggle" Anchor="L,B" Offset="25,22" Size="260,38" Style="BaseButton" String="Conversations: On" ToolTip="Enable or disable spontaneous adjacent Old Friend conversations." />
     <Label ID="RememberQuote" Anchor="L,B" Offset="310,24" Size="410,40" WrapWidth="410" Font="TwCenMT16" FontStyle="Shadow" Color="255,202,112,255" />
     <GridButton ID="LocateButton" Anchor="R,B" Offset="248,22" Size="94,38" Style="BaseButton" String="Locate" />
     <GridButton ID="RememberButton" Anchor="R,B" Offset="148,22" Size="94,38" Style="BaseButton" String="Remember" />
     <GridButton ID="LedgerClose" Anchor="R,B" Offset="30,22" Size="110,38" Style="BaseButton" String="Close" />
+  </Grid>
+
+  <Grid ID="ConversationPanel" Anchor="C,C" Size="640,278" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
+    <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
+    <Label Anchor="C,T" Offset="0,14" Size="590,28" Font="TwCenMT22" FontStyle="Shadow" String="OLD FRIENDS" ColorSet="Beige_Black_Alpha" />
+    <Label ID="ConversationContext" Anchor="C,T" Offset="0,42" Size="590,22" Font="TwCenMT16" FontStyle="Shadow" Color="255,202,112,255" />
+    <Grid Anchor="C,T" Offset="0,70" Size="590,70" Style="GridBlackIndent8">
+      <Label ID="ConversationSpeakerOne" Anchor="L,T" Offset="12,8" Size="566,22" Font="TwCenMT18" FontStyle="Shadow" ColorSet="Beige_Black_Alpha" />
+      <Label ID="ConversationLineOne" Anchor="L,T" Offset="12,31" Size="566,32" WrapWidth="566" Font="TwCenMT16" FontStyle="Shadow" />
+    </Grid>
+    <Grid Anchor="C,T" Offset="0,148" Size="590,70" Style="GridBlackIndent8">
+      <Label ID="ConversationSpeakerTwo" Anchor="L,T" Offset="12,8" Size="566,22" Font="TwCenMT18" FontStyle="Shadow" ColorSet="Beige_Black_Alpha" />
+      <Label ID="ConversationLineTwo" Anchor="L,T" Offset="12,31" Size="566,32" WrapWidth="566" Font="TwCenMT16" FontStyle="Shadow" />
+    </Grid>
+    <GridButton ID="ConversationClose" Anchor="C,B" Offset="0,18" Size="120,36" Style="BaseButton" String="Continue" />
   </Grid>
 </Context>
