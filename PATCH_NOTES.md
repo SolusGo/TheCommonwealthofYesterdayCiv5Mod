@@ -1,5 +1,14 @@
 # Patch Notes
 
+## Version 1 hotfix — Icon framing and scale
+
+### Improved
+
+- Scaled The Child We Were's leader portrait inward so it has breathing room inside Civ V's leader-selection frame.
+- Added matching layered gold borders to the Old Friend and Childhood Bedroom icons.
+- Inset the Old Friend and Bedroom artwork within transparent margins so their borders remain visible at every atlas size.
+- Regenerated all three DXT5 atlases at 256, 128, 80, 64, 45, and 32 pixels.
+
 ## Version 1 hotfix — Restore trait name
 
 ### Changed
