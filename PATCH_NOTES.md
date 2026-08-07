@@ -1,5 +1,13 @@
 # Patch Notes
 
+## Repository version 1.0.22 — Gameplay texture compatibility
+
+### Fixed
+
+- Removed the conflicting 32-bit RGB declaration from every FourCC-compressed custom DDS header.
+- Matched the production-list textures to the pixel-format metadata used by known-working Civilization V DXT5 unit and building atlases.
+- Fixed the gameplay UI rejecting the Old Friend and Childhood Bedroom `45px` textures even though the front-end UI could display their larger atlas variants.
+
 ## Repository version 1.0.21 — City-view icons
 
 ### Fixed
