@@ -1,5 +1,12 @@
 # Patch Notes
 
+## Repository version 1.0.16 — Silent Dawn of Man
+
+### Changed
+
+- Removed the American Dawn of Man audio previously inherited by the Commonwealth.
+- Preserved the custom Dawn of Man artwork, introduction text, and normal gameplay soundtrack.
+
 ## Version 1 hotfix — Random Old Friend identities
 
 ### Added
