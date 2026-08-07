@@ -1,5 +1,14 @@
 # Patch Notes
 
+## Repository version 1.0.20 — Refined icon framing
+
+### Improved
+
+- Reduced the visible scale of the Old Friend and Childhood Bedroom icons so they align more naturally with the civilization emblem in civilization selection.
+- Rebuilt both unique-component atlases with a consistent antique-gold and midnight-blue layered border.
+- Reduced the leader portrait and refined its gold border so it sits cleanly inside Civilization V's setup-screen frame.
+- Regenerated every 256, 128, 80, 64, 45, and 32 pixel icon atlas as transparent-corner DXT5 artwork.
+
 ## Repository version 1.0.19 — Expanded conversations
 
 ### Added

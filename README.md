@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.19** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.20** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -76,7 +76,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.16 | `490342a` | Removed the inherited Dawn of Man audio. |
 | 1.0.17 | `047d7f1` | Added contextual adjacent Old Friend conversations. |
 | 1.0.18 | `b34da6b` | Added event conversations and external XML dialogue data. |
-| 1.0.19 | Current | Expanded the immersive conversation library to 96 exchanges. |
+| 1.0.19 | `852a6f9` | Expanded the immersive conversation library to 96 exchanges. |
+| 1.0.20 | Current | Refined unique-component and leader icon framing. |
 
 ## ModBuddy development
 
