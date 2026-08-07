@@ -1,5 +1,14 @@
 # Patch Notes
 
+## Repository version 1.0.23 — DirectX 9 component atlases
+
+### Fixed
+
+- Re-encoded every Old Friend and Childhood Bedroom atlas size as uncompressed A8R8G8B8 DDS artwork.
+- Matched the texture layout and header used by Vox Populi's own gameplay UI assets.
+- Removed reliance on BC3 blocks produced by an encoder that Civ V's gameplay renderer rejected.
+- Covered both the `45px` production-list icons and the `128px` selected-production portraits.
+
 ## Repository version 1.0.22 — Gameplay texture compatibility
 
 ### Fixed
