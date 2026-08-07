@@ -8,7 +8,7 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 ('TXT_KEY_CIV_COMMONWEALTH_PEDIA','A commonwealth built from old worlds, old names, and friendships carried forward.'),
 ('TXT_KEY_CIV5_COMMONWEALTH','The Commonwealth of Yesterday'),
 ('TXT_KEY_CIV_COMMONWEALTH_STRATEGY','Preserve Old Friends and build Childhood Bedrooms early. Spend Memories on Reminiscences at decisive moments, then prepare for Melancholy.'),
-('TXT_KEY_TRAIT_COMMONWEALTH_MEMORIES_SHORT','Making Memories'),
+('TXT_KEY_TRAIT_COMMONWEALTH_MEMORIES_SHORT','We Didn''t Know We Were Making Memories'),
 ('TXT_KEY_TRAIT_COMMONWEALTH_MEMORIES_HELP','Earn [COLOR_POSITIVE_TEXT]Memories[ENDCOLOR] from historic moments and spend them on Reminiscences. Old Friends and Bedrooms grow stronger across Eras.'),
 ('TXT_KEY_CIV5_DOM_COMMONWEALTH_TEXT','There was a time, beloved child, when the night seemed endless. Your friends did not disappear; life simply became busier. Now carry every fragment of the past forward, and build something worthy of remembering.'),
 ('TXT_KEY_CITY_HOME','Home'),('TXT_KEY_CITY_NEW_HOME','New Home'),('TXT_KEY_CITY_OLD_SERVER','The Old Server'),

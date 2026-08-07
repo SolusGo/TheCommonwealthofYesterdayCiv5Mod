@@ -1,11 +1,17 @@
 # Patch Notes
 
+## Version 1 hotfix — Restore trait name
+
+### Changed
+
+- Restored the full in-game trait name, `We Didn't Know We Were Making Memories`, at the player's request. The compact civilization name and shortened trait summary remain in place.
+
 ## Version 1 hotfix — Leader-selection layout
 
 ### Fixed
 
 - Shortened the compact civilization name to `The Commonwealth` so Civ V's leader-selection title does not run beneath the unique-component icons.
-- Shortened the selection-screen trait label to `Making Memories`; the full ability name remains documented as `We Didn't Know We Were Making Memories`.
+- Temporarily shortened the selection-screen trait label; this was subsequently reverted so the full official trait name appears in game.
 - Rewrote the trait summary to fit the fixed-height selection row without colliding with the next leader.
 
 ## Version 1 hotfix — Civilization and unique component icons
