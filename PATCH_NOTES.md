@@ -1,5 +1,21 @@
 # Patch Notes
 
+## Version 1 hotfix — Random Old Friend identities
+
+### Added
+
+- Added 54 generated Old Friend names and 72 generated gamertags, selected independently for much greater variety.
+- Added alternate tribute gamertags to the advanced Ledger's profile display.
+
+### Improved
+
+- Randomized Old Friend identities while weighting Trent, Gabriel, Dion, Harrison, Lachlan, and Ben eight times higher than generated names.
+- Prevented generated names and gamertags from repeating until their available pools are exhausted.
+
+### Fixed
+
+- Replaced the unsupported `TwCenMT15` Ledger font with Civ V's `TwCenMT16`, preventing the font XML load dialog.
+
 ## Version 1 hotfix — Advanced Old Friends Ledger
 
 ### Added

@@ -25,9 +25,37 @@ local B_HAPPY = GameInfoTypes.BUILDING_COMMONWEALTH_HAPPINESS
 local B_FOOD = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM_FOOD
 local TECH_ARCH = GameInfoTypes.TECH_ARCHAEOLOGY
 local save = Modding.OpenSaveData()
-local tribute = {
-  {'Trent','Trentrouls'}, {'Gabriel','ThatOneYi'}, {'Dion','Elkittyoverlord'},
-  {'Harrison','Hazzad911'}, {'Lachlan','RomanGladius'}, {'Ben','BobTheNinja'}
+local friendIdentities = {
+  tribute = {
+    {name='Trent', tags={'Trentrouls'}},
+    {name='Gabriel', tags={'ThatOneYi','Shadow77281','antfinder'}},
+    {name='Dion', tags={'Elkittyoverlord','SneakyMcMeowpants'}},
+    {name='Harrison', tags={'Hazzad911'}},
+    {name='Lachlan', tags={'RomanGladius','ShermanMaster','CrimsonKnight57'}},
+    {name='Ben', tags={'BobTheNinja','Lynkrieger'}}
+  },
+  names = {
+    'Alex','Avery','Aaron','Adrian','Archie','Bailey','Blake','Caleb','Callum','Cameron',
+    'Casey','Charlie','Connor','Dylan','Elliot','Ethan','Felix','Finley','Flynn','Hayden',
+    'Henry','Isaac','Jack','Jamie','Jesse','Joel','Jordan','Julian','Kai','Leo',
+    'Liam','Lucas','Marcus','Mason','Max','Miles','Morgan','Nathan','Noah','Oliver',
+    'Oscar','Owen','Parker','Quinn','Reece','Rhys','Riley','Rowan','Sam','Sebastian',
+    'Taylor','Theo','Toby','Xavier'
+  },
+  tags = {
+    'AfterSchool','ArcadeGhost','AutumnServer','BackyardHero','BitCrusader','BlockBuilder',
+    'BlueTorch','BonusLevel','BossKey','ByteKnight','CabinetWizard','CampfireSave',
+    'CartridgeKid','CheckpointZero','CloudRunner','CoOpComet','ControllerTwo','CRTGlow',
+    'DialUpDreamer','DungeonSnack','DustyDisc','EarlyAccess','FinalContinue','FireflyPing',
+    'FirstSpawn','ForestLobby','GameNight','GoldenSave','GreenPotion','HomeByDinner',
+    'KeyboardMage','LANLegend','LastCheckpoint','LoadingPlease','LobbyLurker','LostManual',
+    'MemoryCard','MidnightModem','MoonlitQuest','MysteryPlayer','NightOwl','NoScopeNostalgia',
+    'OldMap','OneMoreRound','OrangePortal','PatchNotes','PauseMenu','PixelNomad',
+    'PocketHealer','QuestMarker','QuietCarry','RareDrop','RespawnReady','RetroRanger',
+    'SaveSlotThree','SecretLevel','SideQuest','SilentServer','SnackBreak','SplitScreen',
+    'StarryLobby','StartButton','SunsetServer','TapeDeck','TheLastLife','TownPortal',
+    'TradeWindow','TutorialSkip','VictoryJingle','WeekendRaid','WoodenSword','WorldSelect'
+  }
 }
 
 local function key(p, suffix) return 'COY_' .. p .. '_' .. suffix end
@@ -37,6 +65,49 @@ local function get(p, suffix, default)
   return value
 end
 local function set(p, suffix, value) save.SetValue(key(p, suffix), value) end
+
+-- Tribute identities are weighted eight times more heavily than generated names.
+-- Used identities are avoided until the available pool is exhausted.
+function CommonwealthChooseFriendIdentity(p)
+  local candidates, totalWeight = {}, 0
+  for i, identity in ipairs(friendIdentities.tribute) do
+    if tonumber(get(p, 'USED_TRIBUTE_'..i, 0)) == 0 then
+      candidates[#candidates+1] = {kind='tribute', index=i, weight=8}
+      totalWeight = totalWeight + 8
+    end
+  end
+  for i, name in ipairs(friendIdentities.names) do
+    if tonumber(get(p, 'USED_NAME_'..i, 0)) == 0 then
+      candidates[#candidates+1] = {kind='generated', index=i, weight=1}
+      totalWeight = totalWeight + 1
+    end
+  end
+  if totalWeight == 0 then
+    for i, identity in ipairs(friendIdentities.tribute) do candidates[#candidates+1] = {kind='tribute', index=i, weight=8}; totalWeight = totalWeight + 8 end
+    for i, name in ipairs(friendIdentities.names) do candidates[#candidates+1] = {kind='generated', index=i, weight=1}; totalWeight = totalWeight + 1 end
+  end
+  local roll = Game.Rand(totalWeight, 'Commonwealth Old Friend identity') + 1
+  local chosen = candidates[#candidates]
+  for _, candidate in ipairs(candidates) do
+    roll = roll - candidate.weight
+    if roll <= 0 then chosen = candidate; break end
+  end
+  if chosen.kind == 'tribute' then
+    local identity = friendIdentities.tribute[chosen.index]
+    set(p, 'USED_TRIBUTE_'..chosen.index, 1)
+    local tagIndex = Game.Rand(#identity.tags, 'Commonwealth tribute gamertag') + 1
+    local alternates = {}
+    for i, tag in ipairs(identity.tags) do if i ~= tagIndex then alternates[#alternates+1] = tag end end
+    return identity.name, identity.tags[tagIndex], table.concat(alternates, ', ')
+  end
+  set(p, 'USED_NAME_'..chosen.index, 1)
+  local availableTags = {}
+  for i, tag in ipairs(friendIdentities.tags) do if tonumber(get(p, 'USED_TAG_'..i, 0)) == 0 then availableTags[#availableTags+1] = i end end
+  if #availableTags == 0 then for i, tag in ipairs(friendIdentities.tags) do availableTags[#availableTags+1] = i end end
+  local tagIndex = availableTags[Game.Rand(#availableTags, 'Commonwealth generated gamertag') + 1]
+  set(p, 'USED_TAG_'..tagIndex, 1)
+  return friendIdentities.names[chosen.index], friendIdentities.tags[tagIndex], ''
+end
 local function isCommonwealth(player)
   return player and player:IsAlive() and player:GetCivilizationType() == CIV
 end
@@ -62,15 +133,14 @@ local function registerFriend(unit)
   local p = unit:GetOwner()
   local field = friendField(unit, 'NAME')
   if save.GetValue(field) ~= nil then return end
-  local index = tonumber(get(p, 'NEXT_FRIEND', 1)) or 1
-  local identity = tribute[((index - 1) % #tribute) + 1]
-  save.SetValue(field, identity[1]); save.SetValue(friendField(unit, 'TAG'), identity[2])
+  local name, tag, aliases = CommonwealthChooseFriendIdentity(p)
+  save.SetValue(field, name); save.SetValue(friendField(unit, 'TAG'), tag)
+  save.SetValue(friendField(unit, 'ALIASES'), aliases)
   save.SetValue(friendField(unit, 'BORN'), Game.GetGameTurn())
   save.SetValue(friendField(unit, 'ERA'), Players[p]:GetCurrentEra())
   save.SetValue(friendField(unit, 'YEARS'), 0); save.SetValue(friendField(unit, 'UPGRADES'), 0)
   save.SetValue(friendField(unit, 'LINEAGE'), GameInfo.Units[unit:GetUnitType()].Type)
-  set(p, 'NEXT_FRIEND', index + 1)
-  unit:SetName(identity[1] .. ' — ' .. identity[2])
+  unit:SetName(name .. ' — ' .. tag)
 end
 
 local function applyYears(unit, level)

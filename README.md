@@ -30,7 +30,7 @@ The Old Friend replaces the Warrior at the same base strength and 40 Production.
 - gains a level of **Years Together**, up to +12% Combat Strength;
 - receives +10% Combat Strength while beside another Old Friend.
 
-The first six Old Friends are named Trent, Gabriel, Dion, Harrison, Lachlan, and Ben with their tribute gamertags. The in-game **Friends** button opens a persistent archive with Online, Offline, and All views; profiles show form, age, level, combat and survival records, lineage, closest friend, location, timeline, and earned epithet. Records transfer across upgrades and remain after death.
+Old Friend identities are randomly selected from 54 generated names and 72 gamertags. Trent, Gabriel, Dion, Harrison, Lachlan, and Ben retain their tribute gamertags and are each eight times more likely to appear than a generated identity. Names are not repeated until the available pool is exhausted. The in-game **Friends** button opens a persistent archive with Online, Offline, and All views; profiles show form, age, level, combat and survival records, lineage, closest friend, location, timeline, and earned epithet. Records transfer across upgrades and remain after death.
 
 ### Childhood Bedroom
 

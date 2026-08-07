@@ -43,7 +43,7 @@
       <Label ID="LineageText" Anchor="L,T" Offset="18,274" Size="540,48" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" />
       <Label ID="RelationshipText" Anchor="L,T" Offset="18,326" Size="540,42" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" />
       <Label Anchor="L,T" Offset="18,371" Size="120,20" Font="TwCenMT16" FontStyle="Shadow" String="TIMELINE" Color="255,202,112,255" />
-      <ScrollPanel Anchor="L,T" Offset="14,394" Size="552,102" Vertical="1"><Label ID="TimelineText" Anchor="L,T" Offset="6,4" Size="516,2048" WrapWidth="516" Font="TwCenMT15" FontStyle="Shadow" /></ScrollPanel>
+      <ScrollPanel Anchor="L,T" Offset="14,394" Size="552,102" Vertical="1"><Label ID="TimelineText" Anchor="L,T" Offset="6,4" Size="516,2048" WrapWidth="516" Font="TwCenMT16" FontStyle="Shadow" /></ScrollPanel>
     </Grid>
     <Label ID="RememberQuote" Anchor="L,B" Offset="310,24" Size="410,40" WrapWidth="410" Font="TwCenMT16" FontStyle="Shadow" Color="255,202,112,255" />
     <GridButton ID="LocateButton" Anchor="R,B" Offset="248,22" Size="94,38" Style="BaseButton" String="Locate" />

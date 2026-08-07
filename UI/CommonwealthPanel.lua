@@ -31,7 +31,8 @@ local function selectFriend(row)
     Controls.LocateButton:SetDisabled(true); Controls.RememberButton:SetDisabled(true); return
   end
   Controls.ProfileName:SetText('[COLOR_POSITIVE_TEXT]'..row.name..'[ENDCOLOR] - '..row.epithet)
-  Controls.ProfileTag:SetText('Known Online As: '..row.tag)
+  local aliases = row.aliases and row.aliases ~= '' and ('   |   Aliases: '..row.aliases) or ''
+  Controls.ProfileTag:SetText('Known Online As: '..row.tag..aliases)
   local lastOnline = row.status=='Offline' and row.deathTurn>=0 and ('   |   Last Online: Turn '..row.deathTurn) or ''
   Controls.ProfileStatus:SetText('Status: '..row.status..'   |   Current Location: '..row.location..lastOnline)
   Controls.ProfileSummary:SetText('Current Form: '..row.form..'[NEWLINE]Created: '..row.bornEra..', Turn '..row.bornTurn..'   |   Years Together: '..row.years..'/6   |   Level '..row.level..' ('..row.xp..' XP)')
