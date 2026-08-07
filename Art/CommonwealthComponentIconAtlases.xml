@@ -18,6 +18,7 @@
     <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>64</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon64.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
     <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>45</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon45.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
     <Row><Atlas>COMMONWEALTH_OLD_FRIEND_ATLAS</Atlas><IconSize>32</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendIcon32.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
+    <Row><Atlas>COMMONWEALTH_OLD_FRIEND_FLAG_ATLAS</Atlas><IconSize>32</IconSize><Filename>Art/OldFriend/CommonwealthOldFriendFlag32.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
     <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>256</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon256.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
     <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>128</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon128.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>
     <Row><Atlas>COMMONWEALTH_BEDROOM_ATLAS</Atlas><IconSize>80</IconSize><Filename>Art/Bedroom/CommonwealthBedroomIcon80.dds</Filename><IconsPerRow>1</IconsPerRow><IconsPerColumn>1</IconsPerColumn></Row>

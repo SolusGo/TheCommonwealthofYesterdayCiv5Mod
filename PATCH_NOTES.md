@@ -1,5 +1,13 @@
 # Patch Notes
 
+## Repository version 1.0.24 — Old Friend unit flag
+
+### Added
+
+- Added a custom tintable overhead flag for the Old Friend, replacing the Warrior's inherited axe symbol.
+- Adapted the supplied two-friends artwork into a compact linked-shoulders, shield, and axe silhouette readable at `32px`.
+- Added a dedicated `COMMONWEALTH_OLD_FRIEND_FLAG_ATLAS` and connected it to the Old Friend database row.
+
 ## Repository version 1.0.23 — DirectX 9 component atlases
 
 ### Fixed

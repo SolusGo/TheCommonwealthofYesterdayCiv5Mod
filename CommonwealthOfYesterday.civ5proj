@@ -93,6 +93,7 @@
     <Content Include="Art\OldFriend\CommonwealthOldFriendIcon64.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="Art\OldFriend\CommonwealthOldFriendIcon45.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="Art\OldFriend\CommonwealthOldFriendIcon32.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
+    <Content Include="Art\OldFriend\CommonwealthOldFriendFlag32.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="Art\Bedroom\CommonwealthBedroomIcon256.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="Art\Bedroom\CommonwealthBedroomIcon128.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>
     <Content Include="Art\Bedroom\CommonwealthBedroomIcon80.dds"><ImportIntoVFS>True</ImportIntoVFS></Content>

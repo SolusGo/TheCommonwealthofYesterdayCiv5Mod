@@ -61,8 +61,8 @@ SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND','TXT_KEY_UNIT_OLD_FRIEND','TXT_KEY_UNIT_OL
  'TXT_KEY_UNIT_OLD_FRIEND_STRATEGY','TXT_KEY_UNIT_OLD_FRIEND_HELP',Combat,40,FaithCost,
  RequiresFaithPurchaseEnabled,Moves,BaseSightRange,Class,CombatClass,Domain,DefaultUnitAI,MilitarySupport,
  MilitaryProduction,Pillage,PrereqTech,ObsoleteTech,GoodyHutUpgradeUnitClass,HurryCostModifier,
- ExtraMaintenanceCost,UnitArtInfo,UnitArtInfoCulturalVariation,UnitArtInfoEraVariation,UnitFlagIconOffset,
- 0,'COMMONWEALTH_OLD_FRIEND_ATLAS',UnitFlagAtlas,1 FROM Units WHERE Type='UNIT_WARRIOR';
+ ExtraMaintenanceCost,UnitArtInfo,UnitArtInfoCulturalVariation,UnitArtInfoEraVariation,0,
+ 0,'COMMONWEALTH_OLD_FRIEND_ATLAS','COMMONWEALTH_OLD_FRIEND_FLAG_ATLAS',1 FROM Units WHERE Type='UNIT_WARRIOR';
 INSERT INTO Unit_AITypes SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND', UnitAIType FROM Unit_AITypes WHERE UnitType='UNIT_WARRIOR';
 INSERT INTO Unit_Flavors SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND', FlavorType, Flavor FROM Unit_Flavors WHERE UnitType='UNIT_WARRIOR';
 

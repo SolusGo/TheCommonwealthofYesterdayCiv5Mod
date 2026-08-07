@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.23** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.24** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -25,7 +25,7 @@ Durations scale with game speed. Only one effect can be active, and a new Remini
 
 ### Old Friend
 
-The Old Friend replaces the Warrior at the same base strength and 40 Production. Its **Since the Beginning** promotion survives upgrades. At every new era, each surviving Old Friend:
+The Old Friend replaces the Warrior at the same base strength and 40 Production. Its **Since the Beginning** promotion survives upgrades, and its overhead flag uses a custom linked-friends emblem. At every new era, each surviving Old Friend:
 
 - heals 25 HP;
 - produces 1 Memory;
@@ -80,7 +80,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.20 | `d792c11` | Refined unique-component and leader icon framing. |
 | 1.0.21 | `d7e3098` | Fixed custom DDS linear-size and mip metadata. |
 | 1.0.22 | `4b2d903` | Removed conflicting RGB metadata from compressed DDS textures. |
-| 1.0.23 | Current | Re-encoded gameplay component atlases for DirectX 9 compatibility. |
+| 1.0.23 | `c5af112` | Re-encoded gameplay component atlases for DirectX 9 compatibility. |
+| 1.0.24 | Current | Added the custom Old Friend unit flag. |
 
 ## ModBuddy development
 
