@@ -1,5 +1,15 @@
 # Patch Notes
 
+## Repository version 1.0.25 - Detailed Civilopedia
+
+### Added
+
+- Added nine headed Civilopedia sections for The Commonwealth of Yesterday, covering its lore, Memory economy, Reminiscences, unique components, Ledger, strategy, cities, and symbolism.
+- Added six headed sections for The Child We Were, including the leader's identity, philosophy, founding story, diplomatic character, legacy, and Dawn of Man passage.
+- Expanded the Old Friend and Childhood Bedroom articles with complete mechanics, progression, historical flavour, and strategic guidance.
+- Documented the exact implemented Reminiscence bonuses, game-speed scaling, escalating same-era costs, 100-Memory cap, and current Melancholy behaviour.
+- Expanded promotion, trait, unit, and building help text while keeping the ModBuddy project version at `1`.
+
 ## Repository version 1.0.24 — Old Friend unit flag
 
 ### Added

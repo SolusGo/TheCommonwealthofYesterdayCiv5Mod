@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.24** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.25** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -17,7 +17,7 @@ The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces
 
 ### Reminiscences
 
-- **The Boys Are Online:** a military timing window with stronger formations.
+- **The Boys Are Online:** a military timing window with +15% Production in every city and +10% Combat Strength for units beside another friendly military unit.
 - **One More World Before Bed:** a development window that gives Workers +1 Movement and +25% work rate.
 - **The Summer That Never Ended:** a cultural window with +15% Culture, +2 Happiness per city, and +1 Food in each Childhood Bedroom city.
 
@@ -40,7 +40,7 @@ The conversation library contains 96 exchanges. Dialogue is stored separately fr
 
 ### Childhood Bedroom
 
-The Childhood Bedroom replaces the Monument. It costs 40 Production, has no maintenance, and provides +2 Culture and +1 local Happiness. A Bedroom gains one Keepsake at each era transition after the era in which it was built, up to four. Each Keepsake adds +1 Culture and generates 2 Memories.
+The Childhood Bedroom replaces the Monument. It costs 40 Production, has no maintenance, and provides +2 Culture and +1 local Happiness. A Bedroom gains one Keepsake at each era transition after the era in which it was built, up to four. Each Keepsake adds +1 Culture and generates 2 Memories. After Archaeology, every two Keepsakes also add +1 Tourism.
 
 ## Installation
 
@@ -81,7 +81,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.21 | `d7e3098` | Fixed custom DDS linear-size and mip metadata. |
 | 1.0.22 | `4b2d903` | Removed conflicting RGB metadata from compressed DDS textures. |
 | 1.0.23 | `c5af112` | Re-encoded gameplay component atlases for DirectX 9 compatibility. |
-| 1.0.24 | Current | Added the custom Old Friend unit flag. |
+| 1.0.24 | `ef034a5` | Added the custom Old Friend unit flag. |
+| 1.0.25 | Current | Expanded every custom Civilopedia article. |
 
 ## ModBuddy development
 
