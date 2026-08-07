@@ -1,5 +1,13 @@
 # Patch Notes
 
+## Repository version 1.0.21 — City-view icons
+
+### Fixed
+
+- Corrected the DDS linear-size and mip-count metadata used by the Old Friend and Childhood Bedroom production-list icons.
+- Normalized the same metadata across every compressed custom texture so all Civ V interface loaders receive valid DXT headers.
+- Preserved the existing artwork, atlas dimensions, transparent corners, and ModBuddy version.
+
 ## Repository version 1.0.20 — Refined icon framing
 
 ### Improved
