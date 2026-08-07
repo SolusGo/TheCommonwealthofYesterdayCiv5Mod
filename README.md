@@ -43,7 +43,7 @@ The Childhood Bedroom replaces the Monument. It costs 40 Production, has no main
 3. Clear the Civ V mod cache after replacing an older build.
 4. Enable **The Commonwealth of Yesterday (v 1)** in the Mods menu and start a new game.
 
-The mod includes a custom 1024×768 DXT1 Dawn of Man scene and complete DXT5 atlases for the leader, civilization, Old Friend, and Childhood Bedroom. A separate tintable house emblem is supplied for the civilization alpha atlas.
+The mod includes a custom 1024×768 DXT1 Dawn of Man scene, a 360×412 DXT1 civilization map, and complete DXT5 atlases for the leader, civilization, Old Friend, and Childhood Bedroom. A separate tintable house emblem is supplied for the civilization alpha atlas.
 
 ## ModBuddy development
 

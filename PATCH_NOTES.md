@@ -1,5 +1,13 @@
 # Patch Notes
 
+## Version 1 hotfix — Civilization map artwork
+
+### Added
+
+- Added the supplied crossroads artwork as the Commonwealth's civilization map image.
+- Downsampled the source directly from 720×824 to Civ V's required 360×412 dimensions without cropping or stretching.
+- Exported the map as DXT1 DDS and enabled VFS import in the ModBuddy project and checked-in manifest.
+
 ## Version 1 hotfix — Full-name civilization selection
 
 ### Improved

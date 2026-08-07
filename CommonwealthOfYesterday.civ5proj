@@ -139,6 +139,9 @@
     <Content Include="Art\DawnOfMan\CommonwealthDawnOfMan.dds">
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
+    <Content Include="Art\DawnOfMan\CommonwealthMap.dds">
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
     <Content Include="README.md"><ImportIntoVFS>False</ImportIntoVFS></Content>
     <Content Include="PATCH_NOTES.md"><ImportIntoVFS>False</ImportIntoVFS></Content>
   </ItemGroup>
