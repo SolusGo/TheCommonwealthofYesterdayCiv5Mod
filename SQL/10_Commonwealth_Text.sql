@@ -1,6 +1,6 @@
 INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 ('TXT_KEY_CIV_COMMONWEALTH_DESC','The Commonwealth of Yesterday'),
-('TXT_KEY_CIV_COMMONWEALTH_SHORT_DESC','The Commonwealth of Yesterday'),
+('TXT_KEY_CIV_COMMONWEALTH_SHORT_DESC','The Commonwealth'),
 ('TXT_KEY_CIV_COMMONWEALTH_ADJECTIVE','Nostalgic'),
 ('TXT_KEY_LEADER_CHILD_WE_WERE','The Child We Were'),
 ('TXT_KEY_LEADER_CHILD_WE_WERE_PEDIA','The child who remembers when every night belonged to the group.'),
@@ -8,8 +8,8 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 ('TXT_KEY_CIV_COMMONWEALTH_PEDIA','A commonwealth built from old worlds, old names, and friendships carried forward.'),
 ('TXT_KEY_CIV5_COMMONWEALTH','The Commonwealth of Yesterday'),
 ('TXT_KEY_CIV_COMMONWEALTH_STRATEGY','Preserve Old Friends and build Childhood Bedrooms early. Spend Memories on Reminiscences at decisive moments, then prepare for Melancholy.'),
-('TXT_KEY_TRAIT_COMMONWEALTH_MEMORIES_SHORT','We Didn''t Know We Were Making Memories'),
-('TXT_KEY_TRAIT_COMMONWEALTH_MEMORIES_HELP','Progress creates [COLOR_POSITIVE_TEXT]Memories[ENDCOLOR] that can temporarily relive a simpler time. Old Friends and Childhood Bedrooms become more valuable as they survive across eras.'),
+('TXT_KEY_TRAIT_COMMONWEALTH_MEMORIES_SHORT','Making Memories'),
+('TXT_KEY_TRAIT_COMMONWEALTH_MEMORIES_HELP','Earn [COLOR_POSITIVE_TEXT]Memories[ENDCOLOR] from historic moments and spend them on Reminiscences. Old Friends and Bedrooms grow stronger across Eras.'),
 ('TXT_KEY_CIV5_DOM_COMMONWEALTH_TEXT','There was a time, beloved child, when the night seemed endless. Your friends did not disappear; life simply became busier. Now carry every fragment of the past forward, and build something worthy of remembering.'),
 ('TXT_KEY_CITY_HOME','Home'),('TXT_KEY_CITY_NEW_HOME','New Home'),('TXT_KEY_CITY_OLD_SERVER','The Old Server'),
 ('TXT_KEY_CITY_SUMMER_END','Summer''s End'),('TXT_KEY_CITY_AFTER_SCHOOL','After School'),('TXT_KEY_CITY_LAST_LIGHT','Last Light'),
