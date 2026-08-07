@@ -53,6 +53,8 @@
     <File import="1">Lua\CommonwealthCore.lua</File>
     <File import="1">UI\CommonwealthPanel.lua</File>
     <File import="1">UI\CommonwealthPanel.xml</File>
+    <File import="1">UI\FrontEnd\GameSetup\SelectCivilization.xml</File>
+    <File import="1">UI\FrontEnd\GameSetup\SelectCivilization.lua</File>
     <File import="1">Art\DawnOfMan\CommonwealthDawnOfMan.dds</File>
   </Files>
   <Actions>

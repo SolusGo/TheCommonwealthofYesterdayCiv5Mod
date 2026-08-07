@@ -51,6 +51,8 @@ Open `CommonwealthOfYesterday.civ5proj` in the Civilization V SDK's ModBuddy. Th
 
 The project and checked-in `.modinfo` intentionally share the same mod GUID. ModBuddy's default output path is the project directory, matching the existing repository layout.
 
+The mod includes a front-end `SelectCivilization` override that places the full trait name on its own line beneath the full leader and civilization names. Because Civ V loads front-end overrides globally while a mod is enabled, another mod that replaces the same screen may conflict with this layout.
+
 ## Technical notes
 
 State is stored with `Modding.OpenSaveData`, so Memories, era counters, Bedroom construction eras, and living Old Friend records survive saves. Multiplayer and hotseat are intentionally disabled because the interface and persistence layer target single-player.

@@ -1,6 +1,6 @@
 INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 ('TXT_KEY_CIV_COMMONWEALTH_DESC','The Commonwealth of Yesterday'),
-('TXT_KEY_CIV_COMMONWEALTH_SHORT_DESC','The Commonwealth'),
+('TXT_KEY_CIV_COMMONWEALTH_SHORT_DESC','The Commonwealth of Yesterday'),
 ('TXT_KEY_CIV_COMMONWEALTH_ADJECTIVE','Nostalgic'),
 ('TXT_KEY_LEADER_CHILD_WE_WERE','The Child We Were'),
 ('TXT_KEY_LEADER_CHILD_WE_WERE_PEDIA','The child who remembers when every night belonged to the group.'),

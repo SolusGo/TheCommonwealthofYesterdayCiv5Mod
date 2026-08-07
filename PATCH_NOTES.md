@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Version 1 hotfix — Full-name civilization selection
+
+### Improved
+
+- Added a front-end civilization-selection override with separate lines for the full leader/civilization heading, full trait name, and trait description.
+- Increased selection rows from 100 to 128 pixels so long names and multi-line descriptions no longer overlap adjacent civilizations.
+- Restored `The Commonwealth of Yesterday` in compact civilization contexts now that the selection screen can display the full name safely.
+- Preserved scenario selection, random civilization selection, sorting, unique-component icons, and tooltips from the stock screen.
+
+### Compatibility
+
+- This VFS override affects the civilization-selection screen while the mod is enabled and may conflict with another enabled mod that replaces `UI/FrontEnd/GameSetup/SelectCivilization`.
+
 ## Version 1 hotfix — Icon framing and scale
 
 ### Improved

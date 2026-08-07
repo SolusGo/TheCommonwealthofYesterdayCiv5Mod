@@ -128,6 +128,14 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="UI\FrontEnd\GameSetup\SelectCivilization.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="UI\FrontEnd\GameSetup\SelectCivilization.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
     <Content Include="Art\DawnOfMan\CommonwealthDawnOfMan.dds">
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
@@ -138,6 +146,8 @@
     <Folder Include="SQL\" />
     <Folder Include="Lua\" />
     <Folder Include="UI\" />
+    <Folder Include="UI\FrontEnd\" />
+    <Folder Include="UI\FrontEnd\GameSetup\" />
     <Folder Include="Art\" />
     <Folder Include="Art\DawnOfMan\" />
     <Folder Include="Art\Leader\" />
