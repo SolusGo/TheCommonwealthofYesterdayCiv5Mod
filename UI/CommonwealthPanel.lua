@@ -1,7 +1,15 @@
 local CIV = GameInfoTypes.CIVILIZATION_COMMONWEALTH_YESTERDAY
 local state = {mem=0,used=0,active=0,activeTurns=0,mel=0,melTurns=0}
-local labels = {'','The Boys Are Online','One More World Before Bed','The Summer That Never Ended'}
-local melancholy = {'','Everyone Logged Off','The Sun Is Coming Up','September Morning'}
+local labels = {
+  [1]='The Boys Are Online',
+  [2]='One More World Before Bed',
+  [3]='The Summer That Never Ended'
+}
+local melancholy = {
+  [1]='Everyone Logged Off',
+  [2]='The Sun Is Coming Up',
+  [3]='September Morning'
+}
 local ledgerRows, selectedFriend, ledgerFilter = {}, nil, 'online'
 local conversationsEnabled = true
 local conversationEvents = {
@@ -25,7 +33,7 @@ end
 local function redraw()
   local cost=25+state.used*10; Controls.MemoryButton:SetText('MEMORIES: '..state.mem..' / 100')
   if state.activeTurns>0 then Controls.StatusLabel:SetText(labels[state.active]..' - '..state.activeTurns..' turns remain')
-  elseif state.melTurns>0 then Controls.StatusLabel:SetText(melancholy[state.mel]..' - '..state.melTurns..' turns remain')
+  elseif state.melTurns>0 then Controls.StatusLabel:SetText('Melancholy: '..melancholy[state.mel]..' - '..state.melTurns..' turns remain')
   else Controls.StatusLabel:SetText('Next Reminiscence: '..cost..' Memories') end
   local disabled=state.activeTurns>0 or state.melTurns>0 or state.mem<cost
   Controls.BoysButton:SetDisabled(disabled); Controls.WorldButton:SetDisabled(disabled); Controls.SummerButton:SetDisabled(disabled)

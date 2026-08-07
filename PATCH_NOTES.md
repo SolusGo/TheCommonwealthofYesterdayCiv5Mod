@@ -1,5 +1,13 @@
 # Patch Notes
 
+## Repository version 1.0.27 - Reminiscence status names
+
+### Fixed
+
+- Fixed an off-by-one Lua table index that displayed the previous Reminiscence name despite activating the correct gameplay effect.
+- Corrected each corresponding Melancholy name, so One More World Before Bed now leads to The Sun Is Coming Up instead of Everyone Logged Off.
+- Prefixed cooldown status text with `Melancholy:` to distinguish it clearly from an active Reminiscence.
+
 ## Repository version 1.0.26 - Expanded city names
 
 ### Added
