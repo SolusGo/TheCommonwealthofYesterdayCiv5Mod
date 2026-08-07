@@ -18,33 +18,93 @@
     <Row><ID>road</ID><EventType>general</EventType><SpeakerOne>Every road looks different now.</SpeakerOne><SpeakerTwo>They all still lead home eventually.</SpeakerTwo></Row>
     <Row><ID>lobby</ID><EventType>general</EventType><SpeakerOne>The lobby used to fill up so quickly.</SpeakerOne><SpeakerTwo>It only ever needed two of us.</SpeakerTwo></Row>
     <Row><ID>pause</ID><EventType>general</EventType><SpeakerOne>Are we lost?</SpeakerOne><SpeakerTwo>No. We are exploring without a quest marker.</SpeakerTwo></Row>
+    <Row><ID>controller</ID><EventType>general</EventType><SpeakerOne>You still blame the controller when things go wrong.</SpeakerOne><SpeakerTwo>Only because it keeps happening.</SpeakerTwo></Row>
+    <Row><ID>loading_tip</ID><EventType>general</EventType><SpeakerOne>Did you read the loading-screen tip?</SpeakerOne><SpeakerTwo>No. I assumed you did.</SpeakerTwo></Row>
+    <Row><ID>map_corner</ID><EventType>general</EventType><SpeakerOne>I used to think the corner of the map was the whole world.</SpeakerOne><SpeakerTwo>It was, for a while.</SpeakerTwo></Row>
+    <Row><ID>comfortable_silence</ID><EventType>general</EventType><SpeakerOne>We have not said anything for a while.</SpeakerOne><SpeakerTwo>We never needed to fill every silence.</SpeakerTwo></Row>
+    <Row><ID>same_plan</ID><EventType>general</EventType><SpeakerOne>Are we following the plan?</SpeakerOne><SpeakerTwo>We had a plan?</SpeakerTwo></Row>
+    <Row><ID>old_username</ID><EventType>general</EventType><SpeakerOne>{OTHER}, I still remember your first username.</SpeakerOne><SpeakerTwo>We agreed never to mention that again.</SpeakerTwo></Row>
+    <Row><ID>snacks</ID><EventType>general</EventType><SpeakerOne>Did anyone remember the snacks?</SpeakerOne><SpeakerTwo>Some traditions survived longer than others.</SpeakerTwo></Row>
+    <Row><ID>shortcut</ID><EventType>general</EventType><SpeakerOne>I know a shortcut.</SpeakerOne><SpeakerTwo>That sentence has cost us entire evenings.</SpeakerTwo></Row>
+    <Row><ID>turn_timer</ID><EventType>general</EventType><SpeakerOne>You are taking a long time with this turn.</SpeakerOne><SpeakerTwo>I am appreciating the scenery.</SpeakerTwo></Row>
+    <Row><ID>screenshots</ID><EventType>general</EventType><SpeakerOne>Do you still keep all those old screenshots?</SpeakerOne><SpeakerTwo>Someone had to prove we were here.</SpeakerTwo></Row>
+    <Row><ID>victory_condition</ID><EventType>general</EventType><SpeakerOne>What is the victory condition again?</SpeakerOne><SpeakerTwo>Making it to the next turn together.</SpeakerTwo></Row>
+    <Row><ID>respawn</ID><EventType>general</EventType><SpeakerOne>Do you think there is a respawn point nearby?</SpeakerOne><SpeakerTwo>Let us avoid finding out.</SpeakerTwo></Row>
+    <Row><ID>fog</ID><EventType>general</EventType><SpeakerOne>The fog used to scare me.</SpeakerOne><SpeakerTwo>Now it just means there is more map left.</SpeakerTwo></Row>
+    <Row><ID>memory_card</ID><EventType>general</EventType><SpeakerOne>I can still picture the old memory card.</SpeakerOne><SpeakerTwo>Everything important fit inside something so small.</SpeakerTwo></Row>
+    <Row><ID>voice_chat</ID><EventType>general</EventType><SpeakerOne>Can you hear me?</SpeakerOne><SpeakerTwo>Loud and clear, {OTHER}.</SpeakerTwo></Row>
+    <Row><ID>game_music</ID><EventType>general</EventType><SpeakerOne>This part always had the best music.</SpeakerOne><SpeakerTwo>You said that about every part.</SpeakerTwo></Row>
+    <Row><ID>wrong_road</ID><EventType>general</EventType><SpeakerOne>I think we took the wrong road.</SpeakerOne><SpeakerTwo>Then we will have a new story for the Ledger.</SpeakerTwo></Row>
+    <Row><ID>location_check</ID><EventType>general</EventType><SpeakerOne>So this is {LOCATION}.</SpeakerOne><SpeakerTwo>It looked bigger on the map.</SpeakerTwo></Row>
 
     <Row><ID>bedroom_desk</ID><EventType>bedroom</EventType><SpeakerOne>That desk looks smaller than I remember.</SpeakerOne><SpeakerTwo>We were smaller too.</SpeakerTwo></Row>
     <Row><ID>bedroom_screen</ID><EventType>bedroom</EventType><SpeakerOne>I can almost hear the old computer starting up.</SpeakerOne><SpeakerTwo>Give it a minute. It always took a while.</SpeakerTwo></Row>
     <Row><ID>bedroom_light</ID><EventType>bedroom</EventType><SpeakerOne>The light through that window has not changed.</SpeakerOne><SpeakerTwo>Maybe that is why we kept coming back.</SpeakerTwo></Row>
+    <Row><ID>bedroom_posters</ID><EventType>bedroom</EventType><SpeakerOne>I remember every poster on that wall.</SpeakerOne><SpeakerTwo>Even the one you pretended not to like?</SpeakerTwo></Row>
+    <Row><ID>bedroom_floor</ID><EventType>bedroom</EventType><SpeakerOne>We spent whole evenings sitting on that floor.</SpeakerOne><SpeakerTwo>There was never enough room on the chair.</SpeakerTwo></Row>
+    <Row><ID>bedroom_bedtime</ID><EventType>bedroom</EventType><SpeakerOne>Weren't we supposed to be asleep?</SpeakerOne><SpeakerTwo>That never stopped us before.</SpeakerTwo></Row>
+    <Row><ID>bedroom_boot</ID><EventType>bedroom</EventType><SpeakerOne>Press the power button.</SpeakerOne><SpeakerTwo>Only if you are ready to lose the rest of the night.</SpeakerTwo></Row>
+    <Row><ID>bedroom_door</ID><EventType>bedroom</EventType><SpeakerOne>Leave the door open a little.</SpeakerOne><SpeakerTwo>Just enough to hear if someone is coming.</SpeakerTwo></Row>
     <Row><ID>reminiscence_moment</ID><EventType>reminiscence</EventType><SpeakerOne>This feels exactly like it used to.</SpeakerOne><SpeakerTwo>Do not look too closely. Just let it.</SpeakerTwo></Row>
     <Row><ID>reminiscence_time</ID><EventType>reminiscence</EventType><SpeakerOne>How long do you think this moment will last?</SpeakerOne><SpeakerTwo>Long enough to remember it.</SpeakerTwo></Row>
+    <Row><ID>reminiscence_colours</ID><EventType>reminiscence</EventType><SpeakerOne>The colours even look the way I remember them.</SpeakerOne><SpeakerTwo>Memory was always better at lighting the scene.</SpeakerTwo></Row>
+    <Row><ID>reminiscence_rules</ID><EventType>reminiscence</EventType><SpeakerOne>For a moment, I remember all the old rules.</SpeakerOne><SpeakerTwo>Good. I was making them up as we went.</SpeakerTwo></Row>
+    <Row><ID>reminiscence_names</ID><EventType>reminiscence</EventType><SpeakerOne>Everyone's names feel close again.</SpeakerOne><SpeakerTwo>Say them while the moment lasts.</SpeakerTwo></Row>
+    <Row><ID>reminiscence_summer</ID><EventType>reminiscence</EventType><SpeakerOne>Was the summer really this warm?</SpeakerOne><SpeakerTwo>It is now.</SpeakerTwo></Row>
+    <Row><ID>reminiscence_clock</ID><EventType>reminiscence</EventType><SpeakerOne>The clock has stopped.</SpeakerOne><SpeakerTwo>Do not remind it that we are here.</SpeakerTwo></Row>
+    <Row><ID>reminiscence_again</ID><EventType>reminiscence</EventType><SpeakerOne>Could we stay in this turn forever?</SpeakerOne><SpeakerTwo>Then it would stop being special.</SpeakerTwo></Row>
     <Row><ID>scar</ID><EventType>scarred</EventType><SpeakerOne>You nearly logged off back there.</SpeakerOne><SpeakerTwo>Nearly is doing a lot of work in that sentence.</SpeakerTwo></Row>
     <Row><ID>scar_save</ID><EventType>scarred</EventType><SpeakerOne>You had me worried.</SpeakerOne><SpeakerTwo>I knew you would keep the save running.</SpeakerTwo></Row>
+    <Row><ID>scar_bandage</ID><EventType>scarred</EventType><SpeakerOne>You should probably rest.</SpeakerOne><SpeakerTwo>After one more tile.</SpeakerTwo></Row>
+    <Row><ID>scar_healthbar</ID><EventType>scarred</EventType><SpeakerOne>Your health bar is making me nervous.</SpeakerOne><SpeakerTwo>Then stop staring at it.</SpeakerTwo></Row>
+    <Row><ID>scar_limp</ID><EventType>scarred</EventType><SpeakerOne>You are limping.</SpeakerOne><SpeakerTwo>I am walking dramatically.</SpeakerTwo></Row>
+    <Row><ID>scar_home</ID><EventType>scarred</EventType><SpeakerOne>We can turn back.</SpeakerOne><SpeakerTwo>Not while you are still beside me.</SpeakerTwo></Row>
     <Row><ID>veteran_eras</ID><EventType>veteran</EventType><SpeakerOne>How many eras has it been now?</SpeakerOne><SpeakerTwo>Enough that I have stopped counting.</SpeakerTwo></Row>
     <Row><ID>veteran_forms</ID><EventType>veteran</EventType><SpeakerOne>You look different again.</SpeakerOne><SpeakerTwo>New armour. Same account.</SpeakerTwo></Row>
+    <Row><ID>veteran_first_turn</ID><EventType>veteran</EventType><SpeakerOne>Do you remember our first turn?</SpeakerOne><SpeakerTwo>Better than I remember the last one.</SpeakerTwo></Row>
+    <Row><ID>veteran_history</ID><EventType>veteran</EventType><SpeakerOne>We are in the history books now.</SpeakerOne><SpeakerTwo>I preferred the friends list.</SpeakerTwo></Row>
+    <Row><ID>veteran_form</ID><EventType>veteran</EventType><SpeakerOne>How are you finding life as a {OTHER_FORM}?</SpeakerOne><SpeakerTwo>I still reach for the old controls.</SpeakerTwo></Row>
+    <Row><ID>veteran_era_name</ID><EventType>veteran</EventType><SpeakerOne>The {ERA} sounds important.</SpeakerOne><SpeakerTwo>Every era did when it was new.</SpeakerTwo></Row>
+    <Row><ID>veteran_stories</ID><EventType>veteran</EventType><SpeakerOne>We have more stories than movement points.</SpeakerOne><SpeakerTwo>That was true a long time ago.</SpeakerTwo></Row>
+    <Row><ID>veteran_names</ID><EventType>veteran</EventType><SpeakerOne>The unit names keep changing.</SpeakerOne><SpeakerTwo>Ours do not.</SpeakerTwo></Row>
     <Row><ID>away_map</ID><EventType>away</EventType><SpeakerOne>We are a long way from Home.</SpeakerOne><SpeakerTwo>Good thing we brought some of it with us.</SpeakerTwo></Row>
     <Row><ID>away_return</ID><EventType>away</EventType><SpeakerOne>Think we will find the way back?</SpeakerOne><SpeakerTwo>We always have before.</SpeakerTwo></Row>
+    <Row><ID>away_signal</ID><EventType>away</EventType><SpeakerOne>The signal feels weaker out here.</SpeakerOne><SpeakerTwo>Stay close. I can still hear you.</SpeakerTwo></Row>
+    <Row><ID>away_border</ID><EventType>away</EventType><SpeakerOne>Home is somewhere beyond that border.</SpeakerOne><SpeakerTwo>Then we know which way to face.</SpeakerTwo></Row>
+    <Row><ID>away_camp</ID><EventType>away</EventType><SpeakerOne>Should we make camp at {LOCATION}?</SpeakerOne><SpeakerTwo>Only if you promise not to call it a permanent base.</SpeakerTwo></Row>
+    <Row><ID>away_stars</ID><EventType>away</EventType><SpeakerOne>The stars look different this far out.</SpeakerOne><SpeakerTwo>No. We are the ones who moved.</SpeakerTwo></Row>
 
     <Row><ID>era_changed</ID><EventType>new_era</EventType><SpeakerOne>Everything changed again.</SpeakerOne><SpeakerTwo>Not everything.</SpeakerTwo></Row>
     <Row><ID>era_map</ID><EventType>new_era</EventType><SpeakerOne>A whole new era. New roads, new rules.</SpeakerOne><SpeakerTwo>Same two names in the corner of the screen.</SpeakerTwo></Row>
     <Row><ID>era_old_days</ID><EventType>new_era</EventType><SpeakerOne>Do you think these will become the old days too?</SpeakerOne><SpeakerTwo>They already are. We just cannot see it yet.</SpeakerTwo></Row>
+    <Row><ID>era_first_light</ID><EventType>new_era</EventType><SpeakerOne>The {ERA} begins here.</SpeakerOne><SpeakerTwo>Then let us make sure it remembers us.</SpeakerTwo></Row>
+    <Row><ID>era_old_map</ID><EventType>new_era</EventType><SpeakerOne>Do we need a new map now?</SpeakerOne><SpeakerTwo>No. Just more notes in the margins.</SpeakerTwo></Row>
+    <Row><ID>era_together</ID><EventType>new_era</EventType><SpeakerOne>Another age survived.</SpeakerOne><SpeakerTwo>Another age together.</SpeakerTwo></Row>
     <Row><ID>upgrade_armour</ID><EventType>upgrade</EventType><SpeakerOne>New armour. Same account.</SpeakerOne><SpeakerTwo>I was going to ask if it was still you.</SpeakerTwo></Row>
     <Row><ID>upgrade_weapon</ID><EventType>upgrade</EventType><SpeakerOne>They gave me a better weapon.</SpeakerOne><SpeakerTwo>Try not to lose this one.</SpeakerTwo></Row>
     <Row><ID>upgrade_form</ID><EventType>upgrade</EventType><SpeakerOne>Different name for the unit. Same name above it.</SpeakerOne><SpeakerTwo>That is the part that matters.</SpeakerTwo></Row>
+    <Row><ID>upgrade_controls</ID><EventType>upgrade</EventType><SpeakerOne>These controls feel different.</SpeakerOne><SpeakerTwo>You will still press the wrong button.</SpeakerTwo></Row>
+    <Row><ID>upgrade_old_gear</ID><EventType>upgrade</EventType><SpeakerOne>Do you think they kept my old gear?</SpeakerOne><SpeakerTwo>The Bedroom probably did.</SpeakerTwo></Row>
+    <Row><ID>upgrade_recognise</ID><EventType>upgrade</EventType><SpeakerOne>Would you have recognised me?</SpeakerOne><SpeakerTwo>{OTHER}, I recognised the way you walked.</SpeakerTwo></Row>
     <Row><ID>near_death_one_hp</ID><EventType>near_death</EventType><SpeakerOne>I am fine.</SpeakerOne><SpeakerTwo>You had one foot on the logout button.</SpeakerTwo></Row>
     <Row><ID>near_death_save</ID><EventType>near_death</EventType><SpeakerOne>That was closer than I planned.</SpeakerOne><SpeakerTwo>I was already looking for the last autosave.</SpeakerTwo></Row>
     <Row><ID>near_death_still_here</ID><EventType>near_death</EventType><SpeakerOne>Still here.</SpeakerOne><SpeakerTwo>I noticed. I was waiting for you.</SpeakerTwo></Row>
+    <Row><ID>near_death_breathe</ID><EventType>near_death</EventType><SpeakerOne>Give me a second.</SpeakerOne><SpeakerTwo>Take the whole turn.</SpeakerTwo></Row>
+    <Row><ID>near_death_warning</ID><EventType>near_death</EventType><SpeakerOne>I had it under control.</SpeakerOne><SpeakerTwo>Your flashing health bar disagrees.</SpeakerTwo></Row>
+    <Row><ID>near_death_promise</ID><EventType>near_death</EventType><SpeakerOne>I promised I would not disappear.</SpeakerOne><SpeakerTwo>Keep promising.</SpeakerTwo></Row>
     <Row><ID>victory_quiet</ID><EventType>victory</EventType><SpeakerOne>That went better than expected.</SpeakerOne><SpeakerTwo>You say that after every impossible fight.</SpeakerTwo></Row>
     <Row><ID>victory_carry</ID><EventType>victory</EventType><SpeakerOne>Was that the last one?</SpeakerOne><SpeakerTwo>Do not worry. The map always finds another.</SpeakerTwo></Row>
     <Row><ID>victory_credit</ID><EventType>victory</EventType><SpeakerOne>You saw that, right?</SpeakerOne><SpeakerTwo>I will tell everyone you carried us.</SpeakerTwo></Row>
+    <Row><ID>victory_score</ID><EventType>victory</EventType><SpeakerOne>Does the Ledger keep score?</SpeakerOne><SpeakerTwo>Only of the parts worth remembering.</SpeakerTwo></Row>
+    <Row><ID>victory_lucky</ID><EventType>victory</EventType><SpeakerOne>That was skill.</SpeakerOne><SpeakerTwo>Of course it was. The luck was just helping.</SpeakerTwo></Row>
+    <Row><ID>victory_home</ID><EventType>victory</EventType><SpeakerOne>One less thing between us and Home.</SpeakerOne><SpeakerTwo>Then let us keep moving.</SpeakerTwo></Row>
     <Row><ID>reunion_online</ID><EventType>reunion</EventType><SpeakerOne>There you are. I thought you had gone offline.</SpeakerOne><SpeakerTwo>I just took the long way around.</SpeakerTwo></Row>
     <Row><ID>reunion_distance</ID><EventType>reunion</EventType><SpeakerOne>How long has it been?</SpeakerOne><SpeakerTwo>Long enough that this counts as a reunion.</SpeakerTwo></Row>
     <Row><ID>reunion_lobby</ID><EventType>reunion</EventType><SpeakerOne>Same lobby?</SpeakerOne><SpeakerTwo>Same lobby. Different century.</SpeakerTwo></Row>
+    <Row><ID>reunion_name</ID><EventType>reunion</EventType><SpeakerOne>{OTHER}?</SpeakerOne><SpeakerTwo>You still recognise the username.</SpeakerTwo></Row>
+    <Row><ID>reunion_story</ID><EventType>reunion</EventType><SpeakerOne>You missed a lot.</SpeakerOne><SpeakerTwo>Start from the last thing we both remember.</SpeakerTwo></Row>
+    <Row><ID>reunion_quiet</ID><EventType>reunion</EventType><SpeakerOne>I was not sure what to say when I found you.</SpeakerOne><SpeakerTwo>You did not have to say anything.</SpeakerTwo></Row>
+    <Row><ID>reunion_location</ID><EventType>reunion</EventType><SpeakerOne>Of all places, {LOCATION}.</SpeakerOne><SpeakerTwo>We always did meet in strange lobbies.</SpeakerTwo></Row>
+    <Row><ID>reunion_again</ID><EventType>reunion</EventType><SpeakerOne>Promise we will not lose each other again.</SpeakerOne><SpeakerTwo>Promise we will keep finding each other.</SpeakerTwo></Row>
   </Commonwealth_Conversations>
 </GameData>

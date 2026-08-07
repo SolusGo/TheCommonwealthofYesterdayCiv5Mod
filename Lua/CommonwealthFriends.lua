@@ -164,6 +164,16 @@ local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
   if #eventLines > 0 then return eventLines,active,bedroom,eventType end
   return #contextual > 0 and contextual or general,active,bedroom,nil
 end
+local function expandConversationLine(text,p,selfName,otherName,location,selfUnit,otherUnit)
+  local result=tostring(text or '')
+  local replacements={
+    SELF=selfName,OTHER=otherName,LOCATION=location,
+    ERA=eraName(Players[p]:GetCurrentEra()),FORM=unitName(selfUnit:GetUnitType()),
+    OTHER_FORM=unitName(otherUnit:GetUnitType())
+  }
+  for token,value in pairs(replacements) do result=result:gsub('{'..token..'}',function() return value end) end
+  return result
+end
 local function tryConversation(p,pairs)
   local player=Players[p]
   if not player:IsHuman() or not conversationsEnabled(p) or #pairs == 0 then return end
@@ -186,6 +196,8 @@ local function tryConversation(p,pairs)
   local nameA,tagA=getr(p,pair.a,'NAME','Old Friend'),getr(p,pair.a,'TAG','')
   local nameB,tagB=getr(p,pair.b,'NAME','Old Friend'),getr(p,pair.b,'TAG','')
   local location=plotLocation(pair.unitA:GetPlot())
+  local lineA=expandConversationLine(line.a,p,nameA,nameB,location,pair.unitA,pair.unitB)
+  local lineB=expandConversationLine(line.b,p,nameB,nameA,location,pair.unitB,pair.unitA)
   save.SetValue('COY2_CONV_LAST_'..p,turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'LAST'),turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'USED_'..line.id),1)
@@ -197,7 +209,7 @@ local function tryConversation(p,pairs)
   setr(p,pair.b,'CONVERSATIONS',(tonumber(getr(p,pair.b,'CONVERSATIONS',0)) or 0)+1)
   appendTimeline(p,pair.a,'Shared a quiet conversation with '..nameB..' at '..location..'.')
   appendTimeline(p,pair.b,'Shared a quiet conversation with '..nameA..' at '..location..'.')
-  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,line.a,nameB,tagB,line.b,location,result.eventType or 'general')
+  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,lineA,nameB,tagB,lineB,location,result.eventType or 'general')
 end
 local function updateFriendships(p, units)
   local pairs={}; local turn=Game.GetGameTurn()

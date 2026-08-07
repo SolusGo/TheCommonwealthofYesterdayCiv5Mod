@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.19 — Expanded conversations
+
+### Added
+
+- Expanded the Old Friends conversation library from 36 to 96 exchanges.
+- Added more general banter plus new Bedroom, Reminiscence, wounded, veteran, away-from-Home, era, upgrade, close-call, victory, and reunion dialogue.
+- Added dynamic `{SELF}`, `{OTHER}`, `{LOCATION}`, `{ERA}`, `{FORM}`, and `{OTHER_FORM}` dialogue tokens.
+
+### Improved
+
+- Made exchanges refer directly to the participating friends, their current unit forms, the current era, and their location where appropriate.
+- Preserved per-pair no-repeat history, allowing substantially longer campaigns before a pair exhausts its available dialogue.
+
 ## Repository version 1.0.18 — Event conversation data
 
 ### Added

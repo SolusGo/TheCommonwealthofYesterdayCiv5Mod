@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.18** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.19** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -36,7 +36,7 @@ Old Friend identities are randomly selected from 54 generated names and 72 gamer
 
 Adjacent Old Friends have a 4% chance per pair each turn to share a brief conversation. Reminiscences and nearby Childhood Bedrooms increase that chance. New eras, upgrades, near-death survival, victories, Reminiscence activations, and reunions after at least 15 turns apart can prompt dedicated event conversations. A global 12-turn cooldown, a 25-turn pair cooldown, and per-pair dialogue history prevent interruptions or repeated lines. Conversations are recorded in both Ledger timelines and can be disabled from the Ledger.
 
-Dialogue is stored separately from the Lua logic in `Data/CommonwealthConversations.xml`. The file defines a custom `GameInfo.Commonwealth_Conversations` database table, making it possible to add or revise exchanges without editing the conversation system itself.
+The conversation library contains 96 exchanges. Dialogue is stored separately from the Lua logic in `Data/CommonwealthConversations.xml`. The file defines a custom `GameInfo.Commonwealth_Conversations` database table, making it possible to add or revise exchanges without editing the conversation system itself. Lines can use `{SELF}`, `{OTHER}`, `{LOCATION}`, `{ERA}`, `{FORM}`, and `{OTHER_FORM}` tokens for contextual details.
 
 ### Childhood Bedroom
 
@@ -75,7 +75,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.15 | `9753950` | Added repository version tracking to this README. |
 | 1.0.16 | `490342a` | Removed the inherited Dawn of Man audio. |
 | 1.0.17 | `047d7f1` | Added contextual adjacent Old Friend conversations. |
-| 1.0.18 | Current | Added event conversations and external XML dialogue data. |
+| 1.0.18 | `b34da6b` | Added event conversations and external XML dialogue data. |
+| 1.0.19 | Current | Expanded the immersive conversation library to 96 exchanges. |
 
 ## ModBuddy development
 
