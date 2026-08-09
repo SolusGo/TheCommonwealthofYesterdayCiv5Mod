@@ -1,5 +1,20 @@
 # Patch Notes
 
+## Repository version 1.0.45 - Spy roster
+
+### Fixed
+
+- Added a complete Commonwealth spy-name roster, resolving the Community Patch assertion that every playable civilization must provide at least one spy name.
+
+### Added
+
+- Added twelve themed spy codenames: The Nightlight, Player Two, Porchlight, Old Save, Quiet Login, The Spare Key, After Midnight, Last Online, Paper Star, Home Signal, Second Controller, and Forgotten Password.
+
+### Compatibility
+
+- Rebuild the mod and fully restart Civilization V so the database reloads the new roster. Existing saves do not require a new game.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.44 - Upgrade duplicate cleanup
 
 ### Fixed
