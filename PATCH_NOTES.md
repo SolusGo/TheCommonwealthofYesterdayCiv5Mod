@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.36 - Cozy corner-safe Ledger
+
+### Improved
+
+- Shifted the full Ledger toward warm ivory text, amber headings, muted copper accents, and dark brown-slate panels.
+- Inset the custom header and background treatment so square color blocks no longer clip through the ornate rounded corners.
+- Removed the redundant lower divider and moved remembrance quotes into the profile panel above the outer frame.
+- Applied the warmer text palette to summaries, records, lineage, relationships, and timelines for a more cohesive presentation.
+
+### Compatibility
+
+- This remains a UI-only change with no effect on database order, saves, or gameplay.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.35 - Softer Ledger colors
 
 ### Improved
