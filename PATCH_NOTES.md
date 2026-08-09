@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.40 - Ledger identity and scrolling repair
+
+### Fixed
+
+- Prevented newly created Old Friends from inheriting a dead Friend's identity when Civilization V reuses the dead unit's numeric ID.
+- Added a one-time existing-save repair that gives later duplicate profiles a fresh unused identity while preserving the original profile and both Friends' histories.
+- Synchronized the identity cache across upgrades so the upgraded unit keeps the same person rather than consuming a new identity internally.
+- Added the missing Ledger scroll-panel recalculation and reset, allowing Online, Offline, and All lists longer than the visible area to scroll correctly.
+
+### Compatibility
+
+- Existing saves are repaired automatically the first time the Commonwealth systems update after rebuilding.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.39 - Old Friend upgrade path
 
 ### Fixed

@@ -84,6 +84,7 @@ local function friendID(p, unitID)
   return id > 0 and id or nil
 end
 local function setFriendID(p, unitID, id) save.SetValue(mkey(p,unitID), id or -1) end
+local function legacyFriendField(p,unitID,field) return 'FRIEND_'..p..'_'..unitID..'_'..field end
 local function eraName(era)
   local row = GameInfo.Eras[era]; return row and Locale.ConvertTextKey(row.Description) or ('Era '..tostring(era))
 end
@@ -137,6 +138,35 @@ local function registerFriend(unit)
   unit:SetName(name..' - '..tag)
   appendTimeline(p,id,name..' joined the Commonwealth during the '..eraName(Players[p]:GetCurrentEra())..'.')
   return id
+end
+
+local function repairDuplicateIdentities(p)
+  local repairKey='COY2_IDENTITY_REPAIR_1_'..p
+  if tonumber(save.GetValue(repairKey) or 0) == 1 then return end
+  local seen={}; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
+  for id=1,count do
+    local name=getr(p,id,'NAME','')
+    local identityKey=string.lower(tostring(name))
+    if identityKey ~= '' and seen[identityKey] then
+      local newName,newTag,newAliases,attempts
+      repeat
+        newName,newTag,newAliases=CommonwealthChooseFriendIdentity(p); attempts=(attempts or 0)+1
+      until not seen[string.lower(tostring(newName))] or attempts >= 64
+      setr(p,id,'NAME',newName); setr(p,id,'TAG',newTag); setr(p,id,'ALIASES',newAliases)
+      local unitID=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1
+      local unit=Players[p] and Players[p]:GetUnitByID(unitID)
+      if unit then
+        unit:SetName(newName..' - '..newTag)
+        save.SetValue(legacyFriendField(p,unitID,'NAME'),newName)
+        save.SetValue(legacyFriendField(p,unitID,'TAG'),newTag)
+        save.SetValue(legacyFriendField(p,unitID,'ALIASES'),newAliases)
+        save.SetValue(legacyFriendField(p,unitID,'ACTIVE'),1)
+      end
+      appendTimeline(p,id,'The archive corrected a reused identity; this profile is now remembered as '..newName..' - '..newTag..'.')
+      seen[string.lower(tostring(newName))]=id
+    elseif identityKey ~= '' then seen[identityKey]=id end
+  end
+  save.SetValue(repairKey,1)
 end
 
 local function updateUnitRecord(p, unit)
@@ -320,6 +350,7 @@ local function friendsTurn(p,allowConversation)
   local units={}; local active=tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0
   local previousActive=tonumber(save.GetValue('COY2_CONV_ACTIVE_'..p)) or 0
   for unit in player:Units() do if unit:IsHasPromotion(SINCE) then updateUnitRecord(p,unit); units[#units+1]=unit end end
+  repairDuplicateIdentities(p)
   if active > 0 and previousActive == 0 then for _,unit in ipairs(units) do markFriendEvent(p,registerFriend(unit),'reminiscence') end end
   save.SetValue('COY2_CONV_ACTIVE_'..p,active)
   local pairs=updateFriendships(p,units)
@@ -395,6 +426,7 @@ if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(function(killedP,kille
   setr(killedP,id,'STATUS','Offline'); setr(killedP,id,'DEATH_TURN',Game.GetGameTurn())
   setr(killedP,id,'DEATH_X',x); setr(killedP,id,'DEATH_Y',y); setr(killedP,id,'LOCATION','Tile '..x..', '..y)
   setr(killedP,id,'CURRENT_UNIT',-1); setFriendID(killedP,killedID,nil)
+  save.SetValue(legacyFriendField(killedP,killedID,'ACTIVE'),0)
   appendTimeline(killedP,id,getr(killedP,id,'NAME','An Old Friend')..' went offline at tile '..x..', '..y..'.')
 end) end
 

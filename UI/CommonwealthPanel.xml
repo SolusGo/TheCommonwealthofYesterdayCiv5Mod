@@ -36,7 +36,7 @@
     <Grid Anchor="L,T" Offset="25,106" Size="270,476" Style="GridBlackIndent8">
       <Box Anchor="C,C" Size="254,460" Color="24,45,45,105" />
       <Box Anchor="L,C" Offset="8,0" Size="2,452" Color="229,109,40,135" />
-      <ScrollPanel Anchor="C,C" Size="254,460" Vertical="1"><Stack ID="LedgerStack" StackGrowth="Bottom" Padding="5" /></ScrollPanel>
+      <ScrollPanel ID="LedgerScroll" Anchor="C,C" Size="254,460" Vertical="1"><Stack ID="LedgerStack" StackGrowth="Bottom" Padding="5" /></ScrollPanel>
       <Label ID="NoFriendsLabel" Anchor="C,C" Size="230,60" WrapWidth="230" Font="TwCenMT16" FontStyle="Shadow" String="No friends in this section." Color="232,219,194,255" Hidden="1" />
     </Grid>
     <Grid Anchor="L,T" Offset="310,70" Size="584,512" Style="GridBlackIndent8">

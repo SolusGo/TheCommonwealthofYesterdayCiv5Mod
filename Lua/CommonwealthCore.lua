@@ -129,22 +129,44 @@ local function addMemories(p, amount, reason)
   LuaEvents.CommonwealthStateChanged(p)
 end
 
-local function friendKey(unit) return unit:GetOwner() .. '_' .. unit:GetID() end
-local function friendField(unit, field) return 'FRIEND_' .. friendKey(unit) .. '_' .. field end
+local function friendFieldByID(p, unitID, field) return 'FRIEND_' .. p .. '_' .. unitID .. '_' .. field end
+local function friendField(unit, field) return friendFieldByID(unit:GetOwner(), unit:GetID(), field) end
 local function isFriend(unit) return unit and unit:IsHasPromotion(SINCE) end
 local function registerFriend(unit)
   if not isFriend(unit) then return end
   local p = unit:GetOwner()
   local field = friendField(unit, 'NAME')
-  if save.GetValue(field) ~= nil then return end
+  local storedName = save.GetValue(field)
+  local active = tonumber(save.GetValue(friendField(unit, 'ACTIVE')))
+  local archiveID = tonumber(save.GetValue('COY2_MAP_'..p..'_'..unit:GetID())) or 0
+  local currentName = tostring(unit:GetName() or '')
+  -- Civ V eventually reuses dead unit IDs. Only an active marker, current
+  -- archive mapping, or matching custom name proves this cache belongs to the
+  -- present unit; otherwise replace the stale identity for the new generation.
+  if storedName ~= nil and (active == 1 or archiveID > 0 or string.find(currentName,tostring(storedName),1,true)) then
+    save.SetValue(friendField(unit, 'ACTIVE'), 1)
+    return
+  end
   local name, tag, aliases = CommonwealthChooseFriendIdentity(p)
   save.SetValue(field, name); save.SetValue(friendField(unit, 'TAG'), tag)
   save.SetValue(friendField(unit, 'ALIASES'), aliases)
+  save.SetValue(friendField(unit, 'ACTIVE'), 1)
   save.SetValue(friendField(unit, 'BORN'), Game.GetGameTurn())
   save.SetValue(friendField(unit, 'ERA'), Players[p]:GetCurrentEra())
   save.SetValue(friendField(unit, 'YEARS'), 0); save.SetValue(friendField(unit, 'UPGRADES'), 0)
   save.SetValue(friendField(unit, 'LINEAGE'), GameInfo.Units[unit:GetUnitType()].Type)
   unit:SetName(name .. ' — ' .. tag)
+end
+
+local legacyFriendFields = {'NAME','TAG','ALIASES','BORN','ERA','YEARS','UPGRADES','LINEAGE'}
+local function transferLegacyFriend(p, oldID, newID)
+  if oldID == newID then return end
+  for _, field in ipairs(legacyFriendFields) do
+    local value = save.GetValue(friendFieldByID(p,oldID,field))
+    if value ~= nil then save.SetValue(friendFieldByID(p,newID,field),value) end
+  end
+  save.SetValue(friendFieldByID(p,oldID,'ACTIVE'),0)
+  save.SetValue(friendFieldByID(p,newID,'ACTIVE'),1)
 end
 
 local function applyYears(unit, level)
@@ -304,7 +326,9 @@ end)
 if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p, oldID, newID)
   local player, unit = Players[p], Players[p] and Players[p]:GetUnitByID(newID)
   if not isCommonwealth(player) or not unit then return end
-  if unit:IsHasPromotion(SINCE) then registerFriend(unit); addMemories(p, 4, 'an Old Friend was upgraded') else addMemories(p, 2, 'a unit was upgraded') end
+  if unit:IsHasPromotion(SINCE) then
+    transferLegacyFriend(p,oldID,newID); registerFriend(unit); addMemories(p, 4, 'an Old Friend was upgraded')
+  else addMemories(p, 2, 'a unit was upgraded') end
 end) end
 if GameEvents.GreatPersonExpended then GameEvents.GreatPersonExpended.Add(function(p) if isCommonwealth(Players[p]) then addMemories(p, 3, 'a Great Person was expended') end end) end
 if GameEvents.CityConstructed then GameEvents.CityConstructed.Add(function(p, cityID, buildingType)

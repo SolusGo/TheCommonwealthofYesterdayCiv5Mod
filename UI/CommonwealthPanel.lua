@@ -83,6 +83,7 @@ local function renderLedgerList()
     control.FriendButton:RegisterCallback(Mouse.eLClick,function() selectFriend(row) end)
   end end
   Controls.NoFriendsLabel:SetHide(shown>0); Controls.LedgerStack:CalculateSize(); Controls.LedgerStack:ReprocessAnchoring()
+  Controls.LedgerScroll:CalculateInternalSize(); Controls.LedgerScroll:SetScrollValue(0)
   if not selectedFriend or not includeRow(selectedFriend) then selectFriend(first) else selectFriend(selectedFriend) end
 end
 local function setFilter(value) ledgerFilter=value; selectedFriend=nil; renderLedgerList() end
