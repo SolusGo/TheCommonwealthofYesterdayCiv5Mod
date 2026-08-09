@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.47 - Commonwealth-wide conversation memory
+
+### Fixed
+
+- Conversation history now tracks each exchange across the whole Commonwealth as well as per pair, preventing different pairs from immediately replaying the same dialogue.
+- Existing per-pair history is migrated automatically, so exchanges already heard in the current save enter the global cooldown immediately.
+- A dialogue line must remain unused Commonwealth-wide for 120 turns before another pair can hear it; event dialogue waits for an unused line instead of discarding its queued context.
+
+### Compatibility
+
+- Existing saves migrate their conversation history when the Commonwealth next updates or the Ledger opens.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.46 - Transition-safe Old Friend upgrades
 
 ### Fixed

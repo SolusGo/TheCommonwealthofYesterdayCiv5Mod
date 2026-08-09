@@ -12,6 +12,7 @@ local EVENT_LIFETIME = 40
 local MAX_PENDING_EVENTS = 6
 local GLOBAL_CONVERSATION_COOLDOWN = 8
 local PAIR_CONVERSATION_COOLDOWN = 15
+local GLOBAL_LINE_REPEAT_COOLDOWN = 120
 local BASE_CONVERSATION_CHANCE = 8
 local REMINISCENCE_CHANCE_BONUS = 6
 local BEDROOM_CHANCE_BONUS = 4
@@ -310,6 +311,27 @@ local function conversationPairKey(p,a,b,suffix)
   if a > b then a,b = b,a end
   return 'COY2_CONV_'..p..'_'..a..'_'..b..'_'..suffix
 end
+local function globalConversationKey(p,lineID)
+  return 'COY2_CONV_GLOBAL_'..p..'_LAST_'..tostring(lineID)
+end
+local function migrateGlobalConversationHistory(p)
+  local migrationKey='COY2_CONV_GLOBAL_HISTORY_V1_'..p
+  if tonumber(save.GetValue(migrationKey)) == 1 then return end
+  local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0; local turn=Game.GetGameTurn()
+  for _,line in ipairs(conversationLines) do
+    local used=false
+    for a=1,count-1 do
+      for b=a+1,count do
+        if tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) ~= 0 then used=true; break end
+      end
+      if used then break end
+    end
+    if used and save.GetValue(globalConversationKey(p,line.id)) == nil then
+      save.SetValue(globalConversationKey(p,line.id),turn)
+    end
+  end
+  save.SetValue(migrationKey,1)
+end
 local function conversationsEnabled(p)
   return tonumber(save.GetValue('COY2_CONV_ENABLED_'..p) or 1) ~= 0
 end
@@ -342,13 +364,17 @@ local function pendingPairEvent(p,a,b)
 end
 local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
   local eventLines,contextual,general = {}, {}, {}
+  local turn=Game.GetGameTurn(); local eventPairHasUnused=false
   local active=(tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0) > 0
   local bedroom=nearBedroom(unitA) or nearBedroom(unitB)
   local scarred=(unitA:GetMaxHitPoints()-unitA:GetDamage() <= 25) or (unitB:GetMaxHitPoints()-unitB:GetDamage() <= 25)
   local veteran=math.min(tonumber(getr(p,a,'YEARS',0)) or 0,tonumber(getr(p,b,'YEARS',0)) or 0) >= 3
   local away=getr(p,a,'STATUS','') == 'Away From Home' or getr(p,b,'STATUS','') == 'Away From Home'
   for _,line in ipairs(conversationLines) do
-    if tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) == 0 then
+    local pairUnused=tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) == 0
+    local globalLast=tonumber(save.GetValue(globalConversationKey(p,line.id))) or -1000
+    if eventType and line.kind == eventType and pairUnused then eventPairHasUnused=true end
+    if pairUnused and turn-globalLast >= GLOBAL_LINE_REPEAT_COOLDOWN then
       if eventType and line.kind == eventType then eventLines[#eventLines+1]=line
       elseif line.kind == 'general' then general[#general+1]=line
       elseif (line.kind == 'reminiscence' and active) or (line.kind == 'bedroom' and bedroom)
@@ -356,13 +382,18 @@ local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
         or (line.kind == 'away' and away) then contextual[#contextual+1]=line end
     end
   end
-  -- Once a pair has heard every line for a recurring event category, recycle
-  -- that category instead of discarding the queued event or showing unrelated
-  -- general chatter beneath an event heading.
-  if eventType and #eventLines == 0 then
-    for _,line in ipairs(conversationLines) do if line.kind == eventType then eventLines[#eventLines+1]=line end end
+  -- Once this pair has heard every line for a recurring event category, use
+  -- the globally least-recent exchange. If another pair used the remaining
+  -- unseen lines recently, keep the event queued instead of repeating them.
+  if eventType and #eventLines == 0 and not eventPairHasUnused then
+    local oldestLine=nil; local oldestTurn=math.huge
+    for _,line in ipairs(conversationLines) do if line.kind == eventType then
+      local globalLast=tonumber(save.GetValue(globalConversationKey(p,line.id))) or -1000
+      if globalLast < oldestTurn then oldestLine,oldestTurn=line,globalLast end
+    end end
+    if oldestLine then eventLines[1]=oldestLine end
   end
-  if #eventLines > 0 then return eventLines,active,bedroom,eventType end
+  if eventType then return eventLines,active,bedroom,eventType end
   return #contextual > 0 and contextual or general,active,bedroom,nil
 end
 local function expandConversationLine(text,p,selfName,otherName,location,selfUnit,otherUnit)
@@ -411,6 +442,7 @@ local function tryConversation(p,pairs)
   save.SetValue('COY2_CONV_LAST_'..p,turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'LAST'),turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'USED_'..line.id),1)
+  save.SetValue(globalConversationKey(p,line.id),turn)
   if result.eventType then
     if pair.eventFriend then clearFriendEvent(p,pair.eventFriend,pair.eventIndex)
     else
@@ -454,6 +486,7 @@ end
 
 local function friendsTurn(p,allowConversation)
   local player=Players[p]; if not isCommonwealth(player) then return end
+  migrateGlobalConversationHistory(p)
   finalizePendingDeaths(p)
   local units={}; local active=tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0
   local previousActive=tonumber(save.GetValue('COY2_CONV_ACTIVE_'..p)) or 0
