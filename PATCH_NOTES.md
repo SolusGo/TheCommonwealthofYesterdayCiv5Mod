@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.37 - City-banner interface theme
+
+### Improved
+
+- Unified the Memories panel, Old Friends Ledger, profile cards, friend rows, and conversation popup around the city banner's slate-teal, Commonwealth-orange, and antique-gold palette.
+- Added inset teal enamel headers, darker teal interiors, warm cream body copy, and orange emphasis throughout the complete custom interface.
+- Retained Civ V's standard green-and-gold buttons so the custom interface remains visually integrated with the base game.
+- Preserved the corner-safe insets and relocated remembrance quote from repository version 1.0.36.
+
+### Compatibility
+
+- This is a UI-only change with no effect on database order, saves, or gameplay.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.36 - Cozy corner-safe Ledger
 
 ### Improved

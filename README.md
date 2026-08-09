@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.36** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.37** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -97,7 +97,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.33 | `900d225` | Removed unsafe save repair and stabilized cross-mod load order. |
 | 1.0.34 | `9f294bf` | Restyled the Old Friends Ledger in Commonwealth colors. |
 | 1.0.35 | `0704ae4` | Softened the Ledger palette and corrected quote spacing. |
-| 1.0.36 | Current | Added a cozier Ledger palette and inset corner-safe panels. |
+| 1.0.36 | `5bfcf70` | Added a cozier Ledger palette and inset corner-safe panels. |
+| 1.0.37 | Current | Unified all Commonwealth panels with the city-banner theme. |
 
 ## ModBuddy development
 
