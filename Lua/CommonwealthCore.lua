@@ -154,6 +154,8 @@ local function registerFriend(unit)
   -- present unit; otherwise replace the stale identity for the new generation.
   if storedName ~= nil and (active == 1 or archiveID > 0 or string.find(currentName,tostring(storedName),1,true)) then
     save.SetValue(friendField(unit, 'ACTIVE'), 1)
+    local storedTag = tostring(save.GetValue(friendField(unit, 'TAG')) or '')
+    unit:SetName(tostring(storedName) .. (storedTag ~= '' and ' - ' .. storedTag or ''))
     return
   end
   local name, tag, aliases = CommonwealthChooseFriendIdentity(p)
@@ -182,7 +184,10 @@ local function applyYears(unit, level)
   for i, promo in ipairs(YEARS) do unit:SetHasPromotion(promo, i == level) end
 end
 local function adjacentMilitary(unit, requireFriend)
-  local plot = unit:GetPlot()
+  local plot = unit and unit:GetPlot()
+  -- Upgrades briefly expose the replacement unit before it has a plot. Treat
+  -- that transition as non-adjacent instead of aborting the identity handoff.
+  if not plot then return false end
   for direction = 0, DirectionTypes.NUM_DIRECTION_TYPES - 1 do
     local otherPlot = Map.PlotDirection(plot:GetX(), plot:GetY(), direction)
     if otherPlot then

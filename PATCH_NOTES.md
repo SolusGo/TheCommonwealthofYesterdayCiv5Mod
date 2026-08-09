@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.46 - Transition-safe Old Friend upgrades
+
+### Fixed
+
+- Prevented adjacency refreshes from raising a Lua error while an upgraded unit temporarily has no map plot.
+- Reapplied the stored Old Friend name and gamertag whenever the legacy identity cache is restored, preventing replacement units from retaining generated names such as Leo.
+- Upgrade recovery now matches the replacement against the original profile's captured pre-upgrade tile and turn rather than potentially stale movement coordinates.
+- Added recovery hooks when the replacement unit is created or first placed, allowing already-affected saves to reunite a uniquely matching replacement with its original profile.
+
+### Compatibility
+
+- Existing saves with a recently split Jack/replacement profile are repaired when the replacement is updated or the Ledger opens, provided the archived and replacement records share their upgrade turn.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.45 - Spy roster
 
 ### Fixed

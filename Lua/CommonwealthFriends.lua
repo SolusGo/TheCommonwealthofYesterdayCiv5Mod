@@ -213,13 +213,25 @@ local function repairOrphanedUpgrade(p,unit)
     return
   end
   local player=Players[p]; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0; local target=nil
+  local unitBorn=tonumber(getr(p,id,'BORN',-1000)) or -1000
+  local turnMatch=nil; local turnMatchCount=0
   for candidate=1,count do if candidate ~= id and tonumber(getr(p,candidate,'MERGED_INTO',0)) == 0
     and lineageContains(getr(p,candidate,'LINEAGE',''),'UNIT_COMMONWEALTH_OLD_FRIEND') then
     local oldUnitID=tonumber(getr(p,candidate,'CURRENT_UNIT',-1)) or -1
     local oldUnit=player:GetUnitByID(oldUnitID)
-    if not oldUnit and tonumber(getr(p,candidate,'X',-1000)) == unit:GetX()
-      and tonumber(getr(p,candidate,'Y',-1000)) == unit:GetY() then target=candidate; break end
+    if not oldUnit then
+      local oldX=tonumber(getr(p,candidate,'PENDING_DEATH_X',getr(p,candidate,'DEATH_X',getr(p,candidate,'X',-1000)))) or -1000
+      local oldY=tonumber(getr(p,candidate,'PENDING_DEATH_Y',getr(p,candidate,'DEATH_Y',getr(p,candidate,'Y',-1000)))) or -1000
+      local oldTurn=tonumber(getr(p,candidate,'PENDING_DEATH_TURN',-1000)) or -1000
+      if oldTurn <= -1000 then oldTurn=tonumber(getr(p,candidate,'DEATH_TURN',-1000)) or -1000 end
+      local sameGeneration=unitBorn > -1000 and oldTurn == unitBorn
+      if sameGeneration then
+        turnMatch=turnMatch or candidate; turnMatchCount=turnMatchCount+1
+        if oldX == unit:GetX() and oldY == unit:GetY() then target=candidate; break end
+      end
+    end
   end end
+  if not target and turnMatchCount == 1 then target=turnMatch end
   if not target then return end
   for _,field in ipairs({'BATTLES','KILLS','DISTANCE','MEMORIES','CONVERSATIONS'}) do
     setr(p,target,field,(tonumber(getr(p,target,field,0)) or 0)+(tonumber(getr(p,id,field,0)) or 0))
@@ -237,6 +249,9 @@ local function repairOrphanedUpgrade(p,unit)
   unit:SetName(name..' - '..tag)
   save.SetValue(legacyFriendField(p,unit:GetID(),'NAME'),name); save.SetValue(legacyFriendField(p,unit:GetID(),'TAG'),tag)
   save.SetValue(legacyFriendField(p,unit:GetID(),'ALIASES'),aliases); save.SetValue(legacyFriendField(p,unit:GetID(),'ACTIVE'),1)
+  local pendingOldID=tonumber(getr(p,target,'PENDING_OLD_UNIT',-1)) or -1
+  if pendingOldID >= 0 then save.SetValue('COY2_PENDING_UNIT_'..p..'_'..pendingOldID,-1) end
+  setr(p,target,'PENDING_OLD_UNIT',-1)
   markFriendEvent(p,target,'upgrade')
   appendTimeline(p,target,name..' became '..unitName(unit:GetUnitType())..'.')
   if CommonwealthAddMemories then CommonwealthAddMemories(p,4,'an Old Friend upgrade was recovered') end
@@ -443,7 +458,7 @@ local function friendsTurn(p,allowConversation)
   local units={}; local active=tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0
   local previousActive=tonumber(save.GetValue('COY2_CONV_ACTIVE_'..p)) or 0
   for unit in player:Units() do if unit:IsHasPromotion(SINCE) then
-    repairOrphanedUpgrade(p,unit); updateUnitRecord(p,unit); units[#units+1]=unit
+    registerFriend(unit); repairOrphanedUpgrade(p,unit); updateUnitRecord(p,unit); units[#units+1]=unit
   end end
   repairDuplicateIdentities(p)
   if active > 0 and previousActive == 0 then for _,unit in ipairs(units) do markFriendEvent(p,registerFriend(unit),'reminiscence') end end
@@ -456,14 +471,19 @@ GameEvents.PlayerDoTurn.Add(function(p) friendsTurn(p,true) end)
 GameEvents.UnitSetXY.Add(function(p,unitID,x,y)
   local player=Players[p]; if not isCommonwealth(player) then return end
   local unit=player:GetUnitByID(unitID); if not unit or not unit:IsHasPromotion(SINCE) then return end
-  local id=registerFriend(unit); local oldX,oldY=tonumber(getr(p,id,'X',x)),tonumber(getr(p,id,'Y',y))
+  if x < 0 or y < 0 or not unit:GetPlot() then return end
+  registerFriend(unit); repairOrphanedUpgrade(p,unit)
+  local id=friendID(p,unitID); if not id then return end
+  local oldX,oldY=tonumber(getr(p,id,'X',x)),tonumber(getr(p,id,'Y',y))
   if oldX ~= x or oldY ~= y then setr(p,id,'DISTANCE',(tonumber(getr(p,id,'DISTANCE',0)) or 0)+1) end
   setr(p,id,'X',x); setr(p,id,'Y',y); setr(p,id,'LOCATION',plotLocation(unit:GetPlot()))
 end)
 
 GameEvents.UnitCreated.Add(function(p,unitID)
   local player=Players[p]; local unit=player and player:GetUnitByID(unitID)
-  if isCommonwealth(player) and unit and unit:GetUnitType() == OLD_FRIEND then registerFriend(unit) end
+  if isCommonwealth(player) and unit and unit:IsHasPromotion(SINCE) then
+    registerFriend(unit); repairOrphanedUpgrade(p,unit)
+  end
 end)
 
 if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,newID)
@@ -480,7 +500,7 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,new
     print('CommonwealthFriends: retired temporary upgrade profile '..temporaryID..' in favour of '..id)
   end
   setFriendID(p,oldID,nil); setFriendID(p,newID,id)
-  save.SetValue(pendingKey,-1); setr(p,id,'PENDING_DEATH_TURN',-1000)
+  save.SetValue(pendingKey,-1); setr(p,id,'PENDING_DEATH_TURN',-1000); setr(p,id,'PENDING_OLD_UNIT',-1)
   local unitType=GameInfo.Units[newUnit:GetUnitType()].Type; local lineage=getr(p,id,'LINEAGE','')
   if not lineageContains(lineage,unitType) then setr(p,id,'LINEAGE',lineage..'|'..unitType) end
   setr(p,id,'UPGRADES',(tonumber(getr(p,id,'UPGRADES',0)) or 0)+1)
@@ -530,6 +550,7 @@ if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(function(killedP,kille
   if not id then return end
   setr(killedP,id,'PENDING_DEATH_TURN',Game.GetGameTurn())
   setr(killedP,id,'PENDING_DEATH_X',x); setr(killedP,id,'PENDING_DEATH_Y',y)
+  setr(killedP,id,'PENDING_OLD_UNIT',killedID)
   save.SetValue('COY2_PENDING_UNIT_'..killedP..'_'..killedID,id)
   setFriendID(killedP,killedID,nil)
   save.SetValue(legacyFriendField(killedP,killedID,'ACTIVE'),0)
