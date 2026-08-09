@@ -14,9 +14,7 @@ local conversationLines = {}
 local whiteRoomOnlyPromotions = {}
 for promotion in GameInfo.UnitPromotions() do
   local promotionType = tostring(promotion.Type or '')
-  if promotionType == 'PROMOTION_WR_DOUBLE_XP'
-    or promotionType == 'PROMOTION_WR_PERFECT_ADAPTATION'
-    or string.find(promotionType,'^PROMOTION_WR_KIYOTAKA_') then
+  if string.find(promotionType,'^PROMOTION_WR_') then
     whiteRoomOnlyPromotions[#whiteRoomOnlyPromotions+1] = promotion.ID
   end
 end

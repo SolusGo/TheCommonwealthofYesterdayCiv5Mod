@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.32 - Complete White Room cleanup
+
+### Fixed
+
+- Expanded restored Old Friend cleanup from selected Kiyotaka promotions to every White Room-owned `PROMOTION_WR_*` effect.
+- Removed Controlled Environment and any White Room city-loss, training, operative, or adaptation promotion that may have crossed the save remapping.
+- Continued preserving ordinary Civilization V promotions and all Commonwealth-specific promotions.
+
+### Compatibility
+
+- Cleanup applies to Old Friends already restored and saved by repository versions 1.0.30 or 1.0.31.
+- Preserved all IDs and ModBuddy/.modinfo version `1`.
+
 ## Repository version 1.0.31 - Restored promotion cleanup
 
 ### Fixed
