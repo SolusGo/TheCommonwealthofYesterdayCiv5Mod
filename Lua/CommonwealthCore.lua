@@ -183,6 +183,15 @@ end
 local function applyYears(unit, level)
   for i, promo in ipairs(YEARS) do unit:SetHasPromotion(promo, i == level) end
 end
+local function friendYears(unit)
+  local p,unitID=unit:GetOwner(),unit:GetID()
+  local legacy=tonumber(save.GetValue(friendField(unit,'YEARS'))) or 0
+  local archiveID=tonumber(save.GetValue('COY2_MAP_'..p..'_'..unitID)) or 0
+  local archived=archiveID > 0 and tonumber(save.GetValue('COY2_REC_'..p..'_'..archiveID..'_YEARS')) or 0
+  local level=math.min(6,math.max(legacy,archived or 0))
+  if legacy ~= level then save.SetValue(friendField(unit,'YEARS'),level) end
+  return level
+end
 local function adjacentMilitary(unit, requireFriend)
   local plot = unit and unit:GetPlot()
   -- Upgrades briefly expose the replacement unit before it has a plot. Treat
@@ -207,8 +216,7 @@ local function refreshUnits(p)
   for unit in player:Units() do
     if isFriend(unit) then
       registerFriend(unit)
-      local level = tonumber(save.GetValue(friendField(unit, 'YEARS'))) or 0
-      applyYears(unit, math.min(6, level))
+      applyYears(unit,friendYears(unit))
       unit:SetHasPromotion(FRIEND_ADJ, adjacentMilitary(unit, true))
     end
     unit:SetHasPromotion(REM_ADJ, active == 1 and unit:IsCombatUnit() and adjacentMilitary(unit, false))
@@ -280,7 +288,7 @@ local function eraChanged(p, newEra)
   for unit in player:Units() do
     if isFriend(unit) then
       registerFriend(unit)
-      local level = math.min(6, (tonumber(save.GetValue(friendField(unit, 'YEARS'))) or 0) + 1)
+      local level = math.min(6, friendYears(unit) + 1)
       save.SetValue(friendField(unit, 'YEARS'), level)
       save.SetValue(friendField(unit, 'ERAS'), (tonumber(save.GetValue(friendField(unit, 'ERAS'))) or 0) + 1)
       unit:ChangeDamage(-25); addMemories(p, 1, nil); applyYears(unit, level)
@@ -366,7 +374,7 @@ LuaEvents.CommonwealthLedgerRequest.Add(function(p)
     for unit in Players[p]:Units() do if isFriend(unit) then
       registerFriend(unit)
       rows[#rows+1] = {name=save.GetValue(friendField(unit,'NAME')) or 'Old Friend', tag=save.GetValue(friendField(unit,'TAG')) or '',
-        form=Locale.ConvertTextKey(GameInfo.Units[unit:GetUnitType()].Description), years=tonumber(save.GetValue(friendField(unit,'YEARS'))) or 0,
+        form=Locale.ConvertTextKey(GameInfo.Units[unit:GetUnitType()].Description), years=friendYears(unit),
         level=unit:GetLevel(), experience=unit:GetExperience(), status='Still With Us'}
     end end
   end

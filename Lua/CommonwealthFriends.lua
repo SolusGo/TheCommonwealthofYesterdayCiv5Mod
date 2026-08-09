@@ -5,6 +5,11 @@ local CIV = GameInfoTypes.CIVILIZATION_COMMONWEALTH_YESTERDAY
 local OLD_FRIEND = GameInfoTypes.UNIT_COMMONWEALTH_OLD_FRIEND
 local SINCE = GameInfoTypes.PROMOTION_COMMONWEALTH_SINCE_BEGINNING
 local BEDROOM = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM
+local YEARS = {
+  GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_1, GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_2,
+  GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_3, GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_4,
+  GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_5, GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_6
+}
 local save = Modding.OpenSaveData()
 local combatCredit = {}
 local conversationLines = {}
@@ -142,6 +147,24 @@ local function registerFriend(unit)
   return id
 end
 
+local function syncLegacyFriendRecord(p,id,unit)
+  if not unit or not id then return end
+  local unitID=unit:GetID()
+  save.SetValue(legacyFriendField(p,unitID,'NAME'),getr(p,id,'NAME','Old Friend'))
+  save.SetValue(legacyFriendField(p,unitID,'TAG'),getr(p,id,'TAG',''))
+  save.SetValue(legacyFriendField(p,unitID,'ALIASES'),getr(p,id,'ALIASES',''))
+  save.SetValue(legacyFriendField(p,unitID,'BORN'),getr(p,id,'BORN',Game.GetGameTurn()))
+  save.SetValue(legacyFriendField(p,unitID,'ERA'),getr(p,id,'BORN_ERA',Players[p]:GetCurrentEra()))
+  local profileYears=tonumber(getr(p,id,'YEARS',0)) or 0
+  local legacyYears=tonumber(save.GetValue(legacyFriendField(p,unitID,'YEARS'))) or 0
+  local years=math.min(6,math.max(profileYears,legacyYears))
+  setr(p,id,'YEARS',years); save.SetValue(legacyFriendField(p,unitID,'YEARS'),years)
+  for index,promotion in ipairs(YEARS) do unit:SetHasPromotion(promotion,index == years) end
+  save.SetValue(legacyFriendField(p,unitID,'UPGRADES'),tonumber(getr(p,id,'UPGRADES',0)) or 0)
+  save.SetValue(legacyFriendField(p,unitID,'LINEAGE'),getr(p,id,'LINEAGE',''))
+  save.SetValue(legacyFriendField(p,unitID,'ACTIVE'),1)
+end
+
 local function repairDuplicateIdentities(p)
   local groups={}; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
   for id=1,count do
@@ -197,8 +220,7 @@ local function repairDuplicateIdentities(p)
       setFriendID(p,liveUnit:GetID(),target)
       local name,tag,aliases=getr(p,target,'NAME','Old Friend'),getr(p,target,'TAG',''),getr(p,target,'ALIASES','')
       liveUnit:SetName(name..' - '..tag)
-      save.SetValue(legacyFriendField(p,liveUnit:GetID(),'NAME'),name); save.SetValue(legacyFriendField(p,liveUnit:GetID(),'TAG'),tag)
-      save.SetValue(legacyFriendField(p,liveUnit:GetID(),'ALIASES'),aliases); save.SetValue(legacyFriendField(p,liveUnit:GetID(),'ACTIVE'),1)
+      syncLegacyFriendRecord(p,target,liveUnit)
     end
     appendTimeline(p,target,'Duplicate archive entries for this Old Friend were consolidated into one profile.')
   end end
@@ -248,8 +270,7 @@ local function repairOrphanedUpgrade(p,unit)
   setr(p,id,'MERGED_INTO',target); setr(p,id,'STATUS','Merged'); setr(p,id,'CURRENT_UNIT',-1)
   local name,tag,aliases=getr(p,target,'NAME','Old Friend'),getr(p,target,'TAG',''),getr(p,target,'ALIASES','')
   unit:SetName(name..' - '..tag)
-  save.SetValue(legacyFriendField(p,unit:GetID(),'NAME'),name); save.SetValue(legacyFriendField(p,unit:GetID(),'TAG'),tag)
-  save.SetValue(legacyFriendField(p,unit:GetID(),'ALIASES'),aliases); save.SetValue(legacyFriendField(p,unit:GetID(),'ACTIVE'),1)
+  syncLegacyFriendRecord(p,target,unit)
   local pendingOldID=tonumber(getr(p,target,'PENDING_OLD_UNIT',-1)) or -1
   if pendingOldID >= 0 then save.SetValue('COY2_PENDING_UNIT_'..p..'_'..pendingOldID,-1) end
   setr(p,target,'PENDING_OLD_UNIT',-1)
@@ -301,6 +322,7 @@ local function updateUnitRecord(p, unit)
   local capital = Players[p]:GetCapitalCity()
   local distance = capital and Map.PlotDistance(unit:GetX(),unit:GetY(),capital:GetX(),capital:GetY()) or 0
   setr(p,id,'STATUS',distance > 12 and 'Away From Home' or 'Still With Us')
+  syncLegacyFriendRecord(p,id,unit)
 end
 
 local function pairKey(p,a,b)
@@ -540,6 +562,7 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,new
   setr(p,id,'MEMORIES',(tonumber(getr(p,id,'MEMORIES',0)) or 0)+4)
   setr(p,id,'CURRENT_UNIT',newID); setr(p,id,'CURRENT_TYPE',newUnit:GetUnitType())
   newUnit:SetName(getr(p,id,'NAME','Old Friend')..' - '..getr(p,id,'TAG',''))
+  syncLegacyFriendRecord(p,id,newUnit)
   appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' became '..unitName(newUnit:GetUnitType())..'.')
   markFriendEvent(p,id,'upgrade')
   print('CommonwealthFriends: transferred profile '..id..' from unit '..oldID..' to '..newID..' as '..unitType)

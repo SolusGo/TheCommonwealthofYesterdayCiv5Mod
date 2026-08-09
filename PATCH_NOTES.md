@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.48 - Years Together synchronization
+
+### Fixed
+
+- Synchronized each living Old Friend's profile-level Years Together value with the replacement unit-ID cache that applies the combat promotion.
+- Core promotion refreshes now use the higher valid value from the Ledger profile and legacy cache, automatically restoring missing +2% to +12% Years Together promotions in existing saves.
+- Normal upgrades, recovered upgrades, and duplicate-profile consolidation now all copy Years Together, upgrade count, lineage, and identity data back to the live unit record.
+
+### Compatibility
+
+- Existing affected units repair automatically on the next Commonwealth turn, movement update, Reminiscence refresh, or Ledger refresh after rebuilding.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.47 - Commonwealth-wide conversation memory
 
 ### Fixed
