@@ -7,11 +7,20 @@ local BEDROOM = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM
 local save = Modding.OpenSaveData()
 local combatCredit = {}
 local conversationLines = {}
+local EVENT_LIFETIME = 40
+local MAX_PENDING_EVENTS = 6
+local GLOBAL_CONVERSATION_COOLDOWN = 8
+local PAIR_CONVERSATION_COOLDOWN = 15
+local BASE_CONVERSATION_CHANCE = 8
+local REMINISCENCE_CHANCE_BONUS = 6
+local BEDROOM_CHANCE_BONUS = 4
+local EVENT_CONVERSATION_CHANCE = 60
 if GameInfo.Commonwealth_Conversations then
   for row in GameInfo.Commonwealth_Conversations() do
     conversationLines[#conversationLines+1]={id=row.ID,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo}
   end
 end
+print('CommonwealthFriends: loaded '..tostring(#conversationLines)..' conversation exchanges')
 if #conversationLines == 0 then print('CommonwealthFriends: no conversation data was loaded') end
 local function isCommonwealth(player)
   return player and player:IsAlive() and player:GetCivilizationType() == CIV
@@ -22,8 +31,53 @@ local function getr(p, id, field, default)
   local value = save.GetValue(rkey(p,id,field)); if value == nil then return default end; return value
 end
 local function setr(p, id, field, value) save.SetValue(rkey(p,id,field), value) end
+local function storeFriendEvents(p,id,events,previousCount)
+  previousCount=math.max(tonumber(previousCount) or 0,tonumber(getr(p,id,'EVENT_QUEUE_COUNT',0)) or 0)
+  setr(p,id,'EVENT_QUEUE_COUNT',#events)
+  for i=1,math.max(previousCount,#events) do
+    local event=events[i]
+    setr(p,id,'EVENT_QUEUE_'..i..'_TYPE',event and event.kind or '')
+    setr(p,id,'EVENT_QUEUE_'..i..'_TURN',event and event.turn or -1000)
+  end
+  -- Clear the legacy one-slot event after migrating it into the queue.
+  setr(p,id,'EVENT_TYPE',''); setr(p,id,'EVENT_TURN',-1000)
+end
+local function loadFriendEvents(p,id)
+  local turn=Game.GetGameTurn(); local storedCount=tonumber(getr(p,id,'EVENT_QUEUE_COUNT',0)) or 0
+  local events,seen,changed={},{},false
+  for i=1,storedCount do
+    local kind=getr(p,id,'EVENT_QUEUE_'..i..'_TYPE','')
+    local eventTurn=tonumber(getr(p,id,'EVENT_QUEUE_'..i..'_TURN',-1000)) or -1000
+    if kind ~= '' and turn-eventTurn <= EVENT_LIFETIME and not seen[kind] then
+      events[#events+1]={kind=kind,turn=eventTurn}; seen[kind]=true
+    else changed=true end
+  end
+  local legacyKind=getr(p,id,'EVENT_TYPE','')
+  local legacyTurn=tonumber(getr(p,id,'EVENT_TURN',-1000)) or -1000
+  if legacyKind ~= '' then
+    if turn-legacyTurn <= EVENT_LIFETIME and not seen[legacyKind] then
+      events[#events+1]={kind=legacyKind,turn=legacyTurn}; seen[legacyKind]=true
+    end
+    changed=true
+  end
+  if changed or #events ~= storedCount then storeFriendEvents(p,id,events,storedCount) end
+  return events
+end
 local function markFriendEvent(p,id,eventType)
-  setr(p,id,'EVENT_TYPE',eventType); setr(p,id,'EVENT_TURN',Game.GetGameTurn())
+  local events=loadFriendEvents(p,id)
+  for i,event in ipairs(events) do
+    if event.kind == eventType then table.remove(events,i); break end
+  end
+  -- Coalesce repeated events of one kind while moving the refreshed event to
+  -- the back, so older different events retain FIFO priority.
+  events[#events+1]={kind=eventType,turn=Game.GetGameTurn()}
+  while #events > MAX_PENDING_EVENTS do table.remove(events,1) end
+  storeFriendEvents(p,id,events)
+end
+local function clearFriendEvent(p,id,index)
+  local events=loadFriendEvents(p,id)
+  if index and events[index] then table.remove(events,index) end
+  storeFriendEvents(p,id,events)
 end
 local function friendID(p, unitID)
   local id = tonumber(save.GetValue(mkey(p,unitID))) or 0
@@ -135,14 +189,18 @@ local function nearBedroom(unit)
   return false
 end
 local function pendingFriendEvent(p,id)
-  local eventType=getr(p,id,'EVENT_TYPE',''); local eventTurn=tonumber(getr(p,id,'EVENT_TURN',-1000)) or -1000
-  if eventType ~= '' and Game.GetGameTurn()-eventTurn <= 15 then return eventType,eventTurn end
-  return nil,-1000
+  local events=loadFriendEvents(p,id); local event=events[1]
+  if event then return event.kind,event.turn,1 end
+  return nil,-1000,nil
 end
 local function pendingPairEvent(p,a,b)
   local eventType=save.GetValue(conversationPairKey(p,a,b,'EVENT_TYPE')) or ''
   local eventTurn=tonumber(save.GetValue(conversationPairKey(p,a,b,'EVENT_TURN'))) or -1000
-  if eventType ~= '' and Game.GetGameTurn()-eventTurn <= 15 then return eventType,eventTurn end
+  if eventType ~= '' and Game.GetGameTurn()-eventTurn <= EVENT_LIFETIME then return eventType,eventTurn end
+  if eventType ~= '' then
+    save.SetValue(conversationPairKey(p,a,b,'EVENT_TYPE'),'')
+    save.SetValue(conversationPairKey(p,a,b,'EVENT_TURN'),-1000)
+  end
   return nil,-1000
 end
 local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
@@ -161,6 +219,12 @@ local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
         or (line.kind == 'away' and away) then contextual[#contextual+1]=line end
     end
   end
+  -- Once a pair has heard every line for a recurring event category, recycle
+  -- that category instead of discarding the queued event or showing unrelated
+  -- general chatter beneath an event heading.
+  if eventType and #eventLines == 0 then
+    for _,line in ipairs(conversationLines) do if line.kind == eventType then eventLines[#eventLines+1]=line end end
+  end
   if #eventLines > 0 then return eventLines,active,bedroom,eventType end
   return #contextual > 0 and contextual or general,active,bedroom,nil
 end
@@ -178,17 +242,26 @@ local function tryConversation(p,pairs)
   local player=Players[p]
   if not player:IsHuman() or not conversationsEnabled(p) or #pairs == 0 then return end
   local turn=Game.GetGameTurn(); local lastGlobal=tonumber(save.GetValue('COY2_CONV_LAST_'..p)) or -1000
-  if turn-lastGlobal < 12 then return end
-  local successes={}
+  if turn-lastGlobal < GLOBAL_CONVERSATION_COOLDOWN then return end
+  local successes={}; local pendingEventExists=false
   for _,pair in ipairs(pairs) do
     local lastPair=tonumber(save.GetValue(conversationPairKey(p,pair.a,pair.b,'LAST'))) or -1000
-    if turn-lastPair >= 25 then
+    if turn-lastPair >= PAIR_CONVERSATION_COOLDOWN then
       local lines,active,bedroom,eventType=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB,pair.eventType)
-      local chance=eventType and 35 or (4+(active and 4 or 0)+(bedroom and 2 or 0))
+      if eventType then pendingEventExists=true end
+      local chance=eventType and EVENT_CONVERSATION_CHANCE or
+        (BASE_CONVERSATION_CHANCE+(active and REMINISCENCE_CHANCE_BONUS or 0)+(bedroom and BEDROOM_CHANCE_BONUS or 0))
       if #lines > 0 and Game.Rand(100,'Commonwealth adjacent Old Friends conversation') < chance then
         successes[#successes+1]={pair=pair,lines=lines,eventType=eventType}
       end
     end
+  end
+  -- A normal exchange must not consume the global cooldown while a queued
+  -- event has an eligible adjacent pair waiting to speak.
+  if pendingEventExists then
+    local eventSuccesses={}
+    for _,success in ipairs(successes) do if success.eventType then eventSuccesses[#eventSuccesses+1]=success end end
+    successes=eventSuccesses
   end
   if #successes == 0 then return end
   local result=successes[Game.Rand(#successes,'Commonwealth conversation pair')+1]
@@ -202,14 +275,17 @@ local function tryConversation(p,pairs)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'LAST'),turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'USED_'..line.id),1)
   if result.eventType then
-    if pair.eventFriend then setr(p,pair.eventFriend,'EVENT_TYPE','')
-    else save.SetValue(conversationPairKey(p,pair.a,pair.b,'EVENT_TYPE'),'') end
+    if pair.eventFriend then clearFriendEvent(p,pair.eventFriend,pair.eventIndex)
+    else
+      save.SetValue(conversationPairKey(p,pair.a,pair.b,'EVENT_TYPE'),'')
+      save.SetValue(conversationPairKey(p,pair.a,pair.b,'EVENT_TURN'),-1000)
+    end
   end
   setr(p,pair.a,'CONVERSATIONS',(tonumber(getr(p,pair.a,'CONVERSATIONS',0)) or 0)+1)
   setr(p,pair.b,'CONVERSATIONS',(tonumber(getr(p,pair.b,'CONVERSATIONS',0)) or 0)+1)
   appendTimeline(p,pair.a,'Shared a quiet conversation with '..nameB..' at '..location..'.')
   appendTimeline(p,pair.b,'Shared a quiet conversation with '..nameA..' at '..location..'.')
-  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,lineA,nameB,tagB,lineB,location,result.eventType or 'general')
+  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,lineA,nameB,tagB,lineB,location,line.kind or result.eventType or 'general')
 end
 local function updateFriendships(p, units)
   local pairs={}; local turn=Game.GetGameTurn()
@@ -223,14 +299,15 @@ local function updateFriendships(p, units)
         save.SetValue(conversationPairKey(p,a,b,'EVENT_TURN'),turn)
       end
       save.SetValue(conversationPairKey(p,a,b,'ADJ_LAST'),turn)
-      local eventType,eventTurn=pendingPairEvent(p,a,b); local eventFriend=nil
+      local eventType,eventTurn=pendingPairEvent(p,a,b); local eventFriend,eventIndex=nil,nil
       if not eventType then
-        local eventA,turnA=pendingFriendEvent(p,a); local eventB,turnB=pendingFriendEvent(p,b)
+        local eventA,turnA,indexA=pendingFriendEvent(p,a); local eventB,turnB,indexB=pendingFriendEvent(p,b)
         if eventA or eventB then
-          if eventB and turnB > turnA then eventType,eventTurn,eventFriend=eventB,turnB,b else eventType,eventTurn,eventFriend=eventA,turnA,a end
+          if eventB and (not eventA or turnB < turnA) then eventType,eventTurn,eventFriend,eventIndex=eventB,turnB,b,indexB
+          else eventType,eventTurn,eventFriend,eventIndex=eventA,turnA,a,indexA end
         end
       end
-      local pair={a=a,b=b,unitA=units[i],unitB=units[j],eventType=eventType,eventFriend=eventFriend}
+      local pair={a=a,b=b,unitA=units[i],unitB=units[j],eventType=eventType,eventFriend=eventFriend,eventIndex=eventIndex}
       if eventFriend == b then pair.a,pair.b=b,a; pair.unitA,pair.unitB=units[j],units[i] end
       pairs[#pairs+1]=pair
     end

@@ -1,5 +1,30 @@
 # Patch Notes
 
+## Repository version 1.0.38 - Reliable conversation queues
+
+### Fixed
+
+- Replaced each Old Friend's single overwritable event slot with a persistent six-entry queue that preserves different era, upgrade, close-call, victory, and Reminiscence events.
+- Migrated pending events from existing saves into the new queue automatically.
+- Extended event lifetime from 15 to 40 turns so queued dialogue cannot expire behind the pair cooldown.
+- Prevented normal chatter from consuming the global cooldown while an eligible queued event is waiting.
+- Gave Bedroom, scarred, veteran, away-from-Home, and Reminiscence dialogue their correct contextual headings instead of always showing **A Quiet Moment**.
+- Recycled a pair's dedicated event category only after every line in that category has been heard, preventing an exhausted category from blocking its queue.
+
+### Improved
+
+- Increased ordinary adjacent conversation chance from 4% to 8%.
+- Increased queued event conversation chance from 35% to 60%.
+- Increased the Reminiscence chance bonus from 4% to 6% and the nearby Bedroom bonus from 2% to 4%.
+- Reduced the global cooldown from 12 to 8 turns and the per-pair cooldown from 25 to 15 turns.
+- Added a permanent Lua-log summary reporting how many conversation exchanges loaded.
+
+### Compatibility
+
+- Existing dialogue history, Friend identities, timelines, and pending events are preserved.
+- This changes only Lua, UI text, Civilopedia text, and save-data keys; unit and promotion database order is unchanged.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.37 - City-banner interface theme
 
 ### Improved

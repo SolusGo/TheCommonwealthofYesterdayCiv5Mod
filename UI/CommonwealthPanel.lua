@@ -20,7 +20,8 @@ local conversationsEnabled = true
 local conversationEvents = {
   general='A QUIET MOMENT', new_era='A NEW ERA', upgrade='AFTER AN UPGRADE',
   near_death='AFTER A CLOSE CALL', victory='AFTER THE BATTLE', reunion='REUNITED',
-  reminiscence='A REMINISCENCE'
+  reminiscence='A REMINISCENCE', bedroom='BACK IN THE BEDROOM', scarred='STILL STANDING',
+  veteran='YEARS TOGETHER', away='FAR FROM HOME'
 }
 local quotes = {
   'We used to speak every night.',
@@ -121,7 +122,7 @@ end)
 LuaEvents.CommonwealthConversationStatusResponse.Add(function(p,enabled)
   if p~=playerID() then return end
   conversationsEnabled=tonumber(enabled)==1
-  Controls.ConversationToggle:SetText(conversationsEnabled and 'Conversations: On (4% base)' or 'Conversations: Off')
+  Controls.ConversationToggle:SetText(conversationsEnabled and 'Conversations: On (8% base)' or 'Conversations: Off')
 end)
 LuaEvents.CommonwealthConversationShown.Add(function(p,nameA,tagA,lineA,nameB,tagB,lineB,location,eventType)
   if p~=playerID() or not conversationsEnabled then return end
