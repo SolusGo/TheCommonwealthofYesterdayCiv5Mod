@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.44 - Upgrade duplicate cleanup
+
+### Fixed
+
+- The upgrade callback now detects and retires any temporary Ledger profile Civ V creates for the replacement unit before transferring the original Old Friend profile.
+- Duplicate-identity consolidation now checks continuously instead of being limited to a one-time save migration, allowing existing and future upgrade collisions such as the extra Ben profile to clean themselves up.
+- The legitimate profile, lineage, unit link, statistics, and timeline remain intact; only the provisional duplicate is hidden.
+
+### Compatibility
+
+- Existing duplicate profiles are consolidated automatically when the Commonwealth updates or the Ledger opens after rebuilding.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.43 - Tribute gamertags
 
 ### Added

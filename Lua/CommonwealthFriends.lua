@@ -142,13 +142,11 @@ local function registerFriend(unit)
 end
 
 local function repairDuplicateIdentities(p)
-  local repairKey='COY2_IDENTITY_REPAIR_2_'..p
-  if tonumber(save.GetValue(repairKey) or 0) == 1 then return end
   local groups={}; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
   for id=1,count do
-    local name=getr(p,id,'NAME','')
-    local identityKey=string.lower(tostring(name))
-    if identityKey ~= '' and tonumber(getr(p,id,'MERGED_INTO',0)) == 0 then
+    local name,tag=getr(p,id,'NAME',''),getr(p,id,'TAG','')
+    local identityKey=string.lower(tostring(name)..'|'..tostring(tag))
+    if tostring(name) ~= '' and tonumber(getr(p,id,'MERGED_INTO',0)) == 0 then
       groups[identityKey]=groups[identityKey] or {}; groups[identityKey][#groups[identityKey]+1]=id
     end
   end
@@ -203,7 +201,6 @@ local function repairDuplicateIdentities(p)
     end
     appendTimeline(p,target,'Duplicate archive entries for this Old Friend were consolidated into one profile.')
   end end
-  save.SetValue(repairKey,1)
 end
 
 local function repairOrphanedUpgrade(p,unit)
@@ -474,8 +471,14 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,new
   local oldUnit,newUnit=player:GetUnitByID(oldID),player:GetUnitByID(newID)
   local pendingKey='COY2_PENDING_UNIT_'..p..'_'..oldID
   local pendingID=tonumber(save.GetValue(pendingKey)); if pendingID and pendingID <= 0 then pendingID=nil end
+  local temporaryID=friendID(p,newID)
   local id=friendID(p,oldID) or pendingID or (oldUnit and registerFriend(oldUnit))
   if not id or not newUnit or not newUnit:IsHasPromotion(SINCE) then return end
+  if temporaryID and temporaryID ~= id then
+    setr(p,temporaryID,'MERGED_INTO',id); setr(p,temporaryID,'STATUS','Merged'); setr(p,temporaryID,'CURRENT_UNIT',-1)
+    storeFriendEvents(p,temporaryID,{})
+    print('CommonwealthFriends: retired temporary upgrade profile '..temporaryID..' in favour of '..id)
+  end
   setFriendID(p,oldID,nil); setFriendID(p,newID,id)
   save.SetValue(pendingKey,-1); setr(p,id,'PENDING_DEATH_TURN',-1000)
   local unitType=GameInfo.Units[newUnit:GetUnitType()].Type; local lineage=getr(p,id,'LINEAGE','')
