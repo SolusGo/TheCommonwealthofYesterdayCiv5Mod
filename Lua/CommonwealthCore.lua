@@ -187,6 +187,9 @@ end
 local function setBedroomAge(city, era)
   save.SetValue('COY_CITY_' .. city:GetOwner() .. '_' .. city:GetID() .. '_BED_ERA', era)
 end
+local function hasBedroom(city)
+  return city and (city:GetNumRealBuilding(BEDROOM) > 0 or city:GetNumFreeBuilding(BEDROOM) > 0)
+end
 local function keepsakes(city)
   local count = 0
   for _, building in ipairs(KEEP) do if city:GetNumRealBuilding(building) > 0 then count = count + 1 end end
@@ -209,7 +212,7 @@ local function applyEmpireEffects(p)
     city:SetNumRealBuilding(B_CULT, active == 3 and 15 or 0)
     city:SetNumRealBuilding(B_SCI, 0)
     city:SetNumRealBuilding(B_HAPPY, active == 3 and 2 or 0)
-    city:SetNumRealBuilding(B_FOOD, active == 3 and city:GetNumRealBuilding(BEDROOM) > 0 and 1 or 0)
+    city:SetNumRealBuilding(B_FOOD, active == 3 and hasBedroom(city) and 1 or 0)
     -- Dedicated signed-effect buildings are toggled only between zero and one.
     -- This avoids unsupported negative building counts and cleans every stale
     -- Melancholy state whenever empire effects are refreshed.
@@ -248,7 +251,7 @@ local function eraChanged(p, newEra)
     end
   end
   for city in player:Cities() do
-    if city:GetNumRealBuilding(BEDROOM) > 0 then
+    if hasBedroom(city) then
       local builtEra = bedroomAge(city)
       if builtEra == nil then setBedroomAge(city, newEra)
       elseif builtEra < newEra then
@@ -264,7 +267,16 @@ local function turnStart(p)
   local player = Players[p]
   if not isCommonwealth(player) then return end
   local era = player:GetCurrentEra()
-  if get(p, 'ERA', nil) == nil then set(p, 'ERA', era) elseif tonumber(get(p, 'ERA', era)) ~= era then eraChanged(p, era) end
+  local previousEra = get(p, 'ERA', nil)
+  -- Register free policy Bedrooms before checking for an era transition. This
+  -- lets a save made just before the next era award the naturally earned
+  -- Keepsake without granting one merely for loading an existing save.
+  for city in player:Cities() do
+    if hasBedroom(city) and bedroomAge(city) == nil then
+      setBedroomAge(city, tonumber(previousEra) or era)
+    end
+  end
+  if previousEra == nil then set(p, 'ERA', era) elseif tonumber(previousEra) ~= era then eraChanged(p, era) end
   local activeTurns = tonumber(get(p, 'ACTIVE_TURNS', 0)) or 0
   local melTurns = tonumber(get(p, 'MEL_TURNS', 0)) or 0
   if activeTurns > 0 then
@@ -276,9 +288,6 @@ local function turnStart(p)
   elseif melTurns > 0 then
     melTurns = melTurns - 1; set(p, 'MEL_TURNS', melTurns)
     if melTurns == 0 then set(p, 'MEL', 0) end
-  end
-  for city in player:Cities() do
-    if city:GetNumRealBuilding(BEDROOM) > 0 and bedroomAge(city) == nil then setBedroomAge(city, era) end
   end
   applyEmpireEffects(p); refreshUnits(p)
   if not player:IsHuman() and memories(p) >= 25 and activeTurns == 0 and melTurns == 0 then

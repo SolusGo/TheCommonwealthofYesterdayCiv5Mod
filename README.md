@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.28** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.29** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -44,7 +44,7 @@ The conversation library contains 96 exchanges. Dialogue is stored separately fr
 
 ### Childhood Bedroom
 
-The Childhood Bedroom replaces the Monument. It costs 40 Production, has no maintenance, and provides +2 Culture and +1 local Happiness. A Bedroom gains one Keepsake at each era transition after the era in which it was built, up to four. Each Keepsake adds +1 Culture and generates 2 Memories. After Archaeology, every two Keepsakes also add +1 Tourism.
+The Childhood Bedroom replaces the Monument. It costs 40 Production, has no maintenance, and provides +2 Culture and +1 local Happiness. Constructed Bedrooms and policy-granted free Bedrooms both gain one Keepsake at each era transition after the era in which they were acquired, up to four. Each Keepsake adds +1 Culture and generates 2 Memories. After Archaeology, every two Keepsakes also add +1 Tourism.
 
 ## Installation
 
@@ -89,7 +89,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.25 | `d841b03` | Expanded every custom Civilopedia article. |
 | 1.0.26 | `d56567a` | Expanded the thematic city-name list. |
 | 1.0.27 | `ca20832` | Fixed shifted Reminiscence UI names. |
-| 1.0.28 | Current | Implemented safe Melancholy debuffs. |
+| 1.0.28 | `8e840dd` | Implemented safe Melancholy debuffs. |
+| 1.0.29 | Current | Fixed Keepsakes for policy-granted free Bedrooms. |
 
 ## ModBuddy development
 

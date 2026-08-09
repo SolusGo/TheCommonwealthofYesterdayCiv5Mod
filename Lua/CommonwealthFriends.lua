@@ -126,7 +126,7 @@ local function nearBedroom(unit)
   local plot=unit and unit:GetPlot(); if not plot then return false end
   local function hasBedroom(checkPlot)
     local city=checkPlot and checkPlot:GetPlotCity()
-    return city and city:GetNumRealBuilding(BEDROOM) > 0
+    return city and (city:GetNumRealBuilding(BEDROOM) > 0 or city:GetNumFreeBuilding(BEDROOM) > 0)
   end
   if hasBedroom(plot) then return true end
   for direction=0,DirectionTypes.NUM_DIRECTION_TYPES-1 do

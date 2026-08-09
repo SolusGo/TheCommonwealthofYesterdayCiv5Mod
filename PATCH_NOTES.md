@@ -1,5 +1,17 @@
 # Patch Notes
 
+## Repository version 1.0.29 - Free Bedroom Keepsakes
+
+### Fixed
+
+- Made Keepsake aging recognize policy-granted free Childhood Bedrooms as well as normally constructed copies.
+- Made The Summer That Never Ended and Bedroom-adjacent Old Friend conversations recognize free Bedrooms.
+- Free Bedrooms now initialize their acquisition era normally and receive their first Keepsake only at the next era transition; no retroactive Keepsake is granted.
+
+### Compatibility
+
+- Preserved all IDs and ModBuddy/.modinfo version `1`.
+
 ## Repository version 1.0.28 - Melancholy debuffs
 
 ### Added
