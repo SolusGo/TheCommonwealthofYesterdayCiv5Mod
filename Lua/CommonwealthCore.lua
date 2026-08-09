@@ -34,8 +34,8 @@ local friendIdentities = {
     {name='Trent', tags={'Trentrouls'}},
     {name='Gabriel', tags={'ThatOneYi','Shadow77281','antfinder'}},
     {name='Dion', tags={'Elkittyoverlord','SneakyMcMeowpants'}},
-    {name='Harrison', tags={'Hazzad911'}},
-    {name='Lachlan', tags={'RomanGladius','ShermanMaster','CrimsonKnight57'}},
+    {name='Harrison', tags={'Hazzad911','Jemkid911'}},
+    {name='Lachlan', tags={'RomanGladius','ShermanMaster','CrimsonKnight57','Vigilanty101','Jemboy911'}},
     {name='Ben', tags={'BobTheNinja','Lynkrieger'}}
   },
   names = {
@@ -111,6 +111,14 @@ function CommonwealthChooseFriendIdentity(p)
   local tagIndex = availableTags[Game.Rand(#availableTags, 'Commonwealth generated gamertag') + 1]
   set(p, 'USED_TAG_'..tagIndex, 1)
   return friendIdentities.names[chosen.index], friendIdentities.tags[tagIndex], ''
+end
+function CommonwealthTributeAliases(name, primaryTag)
+  for _, identity in ipairs(friendIdentities.tribute) do if identity.name == name then
+    local aliases={}
+    for _, tag in ipairs(identity.tags) do if tag ~= primaryTag then aliases[#aliases+1]=tag end end
+    return table.concat(aliases, ', ')
+  end end
+  return nil
 end
 local function isCommonwealth(player)
   return player and player:IsAlive() and player:GetCivilizationType() == CIV

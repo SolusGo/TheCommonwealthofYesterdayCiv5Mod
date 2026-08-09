@@ -1,5 +1,17 @@
 # Patch Notes
 
+## Repository version 1.0.43 - Tribute gamertags
+
+### Added
+
+- Added **Vigilanty101** and **Jemboy911** to Lachlan's tribute gamertags.
+- Added **Jemkid911** to Harrison's tribute gamertags.
+
+### Improved
+
+- Existing Harrison and Lachlan profiles refresh their alias lists when the Ledger opens, so the added gamertags also appear in current saves.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.42 - Upgrade lineage recovery
 
 ### Fixed

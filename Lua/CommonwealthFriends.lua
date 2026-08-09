@@ -560,10 +560,14 @@ LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
   friendsTurn(p,false)
   local rows={}; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
   for id=1,count do if tonumber(getr(p,id,'MERGED_INTO',0)) == 0 then
+    local name,tag=getr(p,id,'NAME','Old Friend'),getr(p,id,'TAG','')
+    local aliases=getr(p,id,'ALIASES','')
+    local tributeAliases=CommonwealthTributeAliases and CommonwealthTributeAliases(name,tag)
+    if tributeAliases then aliases=tributeAliases; setr(p,id,'ALIASES',aliases) end
     local closest,together=closestFriend(p,id,count); local timeline={}; local tc=tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
     for i=1,tc do timeline[#timeline+1]='[COLOR_GREY]Turn '..getr(p,id,'TIME_'..i..'_TURN',0)..'[ENDCOLOR][NEWLINE]'..getr(p,id,'TIME_'..i..'_TEXT','') end
     local currentType=tonumber(getr(p,id,'CURRENT_TYPE',-1)) or -1
-    rows[#rows+1]={id=id,name=getr(p,id,'NAME','Old Friend'),tag=getr(p,id,'TAG',''),aliases=getr(p,id,'ALIASES',''),epithet=epithet(p,id),status=getr(p,id,'STATUS','Offline'),
+    rows[#rows+1]={id=id,name=name,tag=tag,aliases=aliases,epithet=epithet(p,id),status=getr(p,id,'STATUS','Offline'),
       form=currentType>=0 and unitName(currentType) or 'Unknown',bornEra=eraName(tonumber(getr(p,id,'BORN_ERA',0)) or 0),bornTurn=tonumber(getr(p,id,'BORN',0)) or 0,
       years=tonumber(getr(p,id,'YEARS',0)) or 0,eras=tonumber(getr(p,id,'ERAS',0)) or 0,level=tonumber(getr(p,id,'LEVEL',1)) or 1,xp=tonumber(getr(p,id,'XP',0)) or 0,
       battles=tonumber(getr(p,id,'BATTLES',0)) or 0,kills=tonumber(getr(p,id,'KILLS',0)) or 0,distance=tonumber(getr(p,id,'DISTANCE',0)) or 0,
