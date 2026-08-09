@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.35 - Softer Ledger colors
+
+### Improved
+
+- Replaced the saturated navy and orange Ledger treatment with softer slate-blue panels, muted copper accents, warm cream headings, and gentler secondary text.
+- Removed the bright-green profile-name override so selected names follow the unified Ledger palette.
+- Narrowed the remembrance quote area so its text no longer runs beneath the Locate button.
+
+### Compatibility
+
+- This remains a UI-only change with no effect on database order, saves, or gameplay.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.34 - Commonwealth Ledger palette
 
 ### Improved

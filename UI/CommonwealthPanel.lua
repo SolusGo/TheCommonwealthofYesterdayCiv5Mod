@@ -52,7 +52,7 @@ local function selectFriend(row)
     Controls.LineageText:SetText(''); Controls.RelationshipText:SetText(''); Controls.TimelineText:SetText('')
     Controls.LocateButton:SetDisabled(true); Controls.RememberButton:SetDisabled(true); return
   end
-  Controls.ProfileName:SetText('[COLOR_POSITIVE_TEXT]'..row.name..'[ENDCOLOR] - '..row.epithet)
+  Controls.ProfileName:SetText(row.name..' - '..row.epithet)
   local aliases = row.aliases and row.aliases ~= '' and ('   |   Aliases: '..row.aliases) or ''
   Controls.ProfileTag:SetText('Known Online As: '..row.tag..aliases)
   local lastOnline = row.status=='Offline' and row.deathTurn>=0 and ('   |   Last Online: Turn '..row.deathTurn) or ''
