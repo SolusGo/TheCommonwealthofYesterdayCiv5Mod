@@ -2,22 +2,11 @@
 print('CommonwealthFriends loaded')
 
 local CIV = GameInfoTypes.CIVILIZATION_COMMONWEALTH_YESTERDAY
-local OLD_FRIEND = GameInfoTypes.UNIT_COMMONWEALTH_OLD_FRIEND
-local KIYOTAKA = GameInfoTypes.UNIT_WR_KIYOTAKA
 local SINCE = GameInfoTypes.PROMOTION_COMMONWEALTH_SINCE_BEGINNING
 local BEDROOM = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM
 local save = Modding.OpenSaveData()
 local combatCredit = {}
-local recoveringUnits = {}
-CommonwealthFriendRecoveryInProgress = CommonwealthFriendRecoveryInProgress or {}
 local conversationLines = {}
-local whiteRoomOnlyPromotions = {}
-for promotion in GameInfo.UnitPromotions() do
-  local promotionType = tostring(promotion.Type or '')
-  if string.find(promotionType,'^PROMOTION_WR_') then
-    whiteRoomOnlyPromotions[#whiteRoomOnlyPromotions+1] = promotion.ID
-  end
-end
 if GameInfo.Commonwealth_Conversations then
   for row in GameInfo.Commonwealth_Conversations() do
     conversationLines[#conversationLines+1]={id=row.ID,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo}
@@ -95,105 +84,6 @@ local function registerFriend(unit)
   appendTimeline(p,id,name..' joined the Commonwealth during the '..eraName(Players[p]:GetCurrentEra())..'.')
   return id
 end
-
-local function stripWhiteRoomPromotions(unit)
-  local removed = false
-  for _,promotion in ipairs(whiteRoomOnlyPromotions) do
-    if unit:IsHasPromotion(promotion) then unit:SetHasPromotion(promotion,false); removed = true end
-  end
-  return removed
-end
-
--- Civ V serializes database rows by numeric ID. If a save is loaded after the
--- enabled mod database order changes, an Old Friend row can resolve as Kid
--- Kiyotaka. Repair only Commonwealth Kiyotaka units that still carry either
--- the Since the Beginning promotion or an existing Old Friend save record.
-function CommonwealthRecoverOldFriends(p)
-  local player = Players[p]
-  if not isCommonwealth(player) then return 0 end
-  local cleaned = 0
-  for unit in player:Units() do
-    if unit:IsHasPromotion(SINCE) and stripWhiteRoomPromotions(unit) then cleaned = cleaned + 1 end
-  end
-  local candidates = {}
-  if OLD_FRIEND and KIYOTAKA then
-    for unit in player:Units() do
-      if unit:GetUnitType() == KIYOTAKA then
-        local unitID = unit:GetID()
-        local id = friendID(p, unitID)
-        local legacyPrefix = 'FRIEND_'..p..'_'..unitID..'_'
-        if unit:IsHasPromotion(SINCE) or id or save.GetValue(legacyPrefix..'NAME') ~= nil then
-          candidates[#candidates+1] = {unit=unit,id=id,legacyPrefix=legacyPrefix}
-        end
-      end
-    end
-  end
-  local repaired = 0
-  local legacyFields = {'NAME','TAG','ALIASES','BORN','ERA','YEARS','ERAS','UPGRADES','LINEAGE'}
-  for _,candidate in ipairs(candidates) do
-    local unit, oldID = candidate.unit, candidate.unit:GetID()
-    local legacy = {}
-    for _,field in ipairs(legacyFields) do legacy[field] = save.GetValue(candidate.legacyPrefix..field) end
-    if candidate.id then
-      legacy.NAME = legacy.NAME or getr(p,candidate.id,'NAME',nil)
-      legacy.TAG = legacy.TAG or getr(p,candidate.id,'TAG',nil)
-      legacy.ALIASES = legacy.ALIASES or getr(p,candidate.id,'ALIASES',nil)
-      legacy.YEARS = legacy.YEARS or getr(p,candidate.id,'YEARS',nil)
-      legacy.ERAS = legacy.ERAS or getr(p,candidate.id,'ERAS',nil)
-      legacy.UPGRADES = legacy.UPGRADES or getr(p,candidate.id,'UPGRADES',nil)
-      legacy.LINEAGE = legacy.LINEAGE or getr(p,candidate.id,'LINEAGE',nil)
-    end
-    local recoveryKey = p..'_'..oldID
-    CommonwealthFriendRecoveryInProgress[p] = true
-    recoveringUnits[recoveryKey] = true
-    local replacement = player:InitUnit(OLD_FRIEND,unit:GetX(),unit:GetY(),unit:GetUnitAIType())
-    if replacement then replacement:Convert(unit) end
-    recoveringUnits[recoveryKey] = nil
-    CommonwealthFriendRecoveryInProgress[p] = nil
-    if replacement then
-      local newID = replacement:GetID()
-      local newPrefix = 'FRIEND_'..p..'_'..newID..'_'
-      for _,field in ipairs(legacyFields) do
-        if legacy[field] ~= nil then save.SetValue(newPrefix..field,legacy[field]) end
-      end
-      replacement:SetHasPromotion(SINCE,true)
-      if stripWhiteRoomPromotions(replacement) then cleaned = cleaned + 1 end
-      local id = candidate.id
-      setFriendID(p,oldID,nil)
-      if id then
-        setFriendID(p,newID,id)
-      else
-        id = registerFriend(replacement)
-      end
-      if id then
-        setr(p,id,'CURRENT_UNIT',newID); setr(p,id,'CURRENT_TYPE',OLD_FRIEND)
-        setr(p,id,'STATUS','Still With Us'); setr(p,id,'X',replacement:GetX()); setr(p,id,'Y',replacement:GetY())
-        setr(p,id,'LOCATION',plotLocation(replacement:GetPlot()))
-        replacement:SetName(getr(p,id,'NAME',legacy.NAME or 'Old Friend')..' - '..getr(p,id,'TAG',legacy.TAG or ''))
-      elseif legacy.NAME then
-        replacement:SetName(legacy.NAME..' - '..tostring(legacy.TAG or ''))
-      end
-      repaired = repaired + 1
-    end
-  end
-  if repaired > 0 then
-    print('CommonwealthFriends: restored '..repaired..' Old Friend unit(s) from Kiyotaka database remapping')
-    if player:IsHuman() then
-      Events.GameplayAlertMessage('[COLOR_POSITIVE_TEXT]'..repaired..' Old Friend'..(repaired == 1 and ' was' or 's were')..' restored.[ENDCOLOR]')
-    end
-  end
-  if cleaned > 0 then
-    print('CommonwealthFriends: removed White Room-only promotions from '..cleaned..' Old Friend unit(s)')
-    if player:IsHuman() then
-      Events.GameplayAlertMessage('[COLOR_POSITIVE_TEXT]White Room training was removed from '..cleaned..' Old Friend'..(cleaned == 1 and '.' or 's.')..'[ENDCOLOR]')
-    end
-  end
-  return repaired
-end
-Events.LoadScreenClose.Add(function()
-  local p = Game.GetActivePlayer()
-  if p and p >= 0 then CommonwealthRecoverOldFriends(p) end
-end)
 
 local function updateUnitRecord(p, unit)
   local id = registerFriend(unit); if not id then return end
@@ -350,7 +240,6 @@ end
 
 local function friendsTurn(p,allowConversation)
   local player=Players[p]; if not isCommonwealth(player) then return end
-  CommonwealthRecoverOldFriends(p)
   local units={}; local active=tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0
   local previousActive=tonumber(save.GetValue('COY2_CONV_ACTIVE_'..p)) or 0
   for unit in player:Units() do if unit:IsHasPromotion(SINCE) then updateUnitRecord(p,unit); units[#units+1]=unit end end
@@ -363,7 +252,6 @@ GameEvents.PlayerDoTurn.Add(function(p) friendsTurn(p,true) end)
 
 GameEvents.UnitSetXY.Add(function(p,unitID,x,y)
   local player=Players[p]; if not isCommonwealth(player) then return end
-  if CommonwealthFriendRecoveryInProgress[p] then return end
   local unit=player:GetUnitByID(unitID); if not unit or not unit:IsHasPromotion(SINCE) then return end
   local id=registerFriend(unit); local oldX,oldY=tonumber(getr(p,id,'X',x)),tonumber(getr(p,id,'Y',y))
   if oldX ~= x or oldY ~= y then setr(p,id,'DISTANCE',(tonumber(getr(p,id,'DISTANCE',0)) or 0)+1) end
@@ -371,7 +259,6 @@ GameEvents.UnitSetXY.Add(function(p,unitID,x,y)
 end)
 
 GameEvents.UnitCreated.Add(function(p,unitID)
-  if CommonwealthFriendRecoveryInProgress[p] then return end
   local player=Players[p]; local unit=player and player:GetUnitByID(unitID)
   if isCommonwealth(player) and unit and unit:IsHasPromotion(SINCE) then registerFriend(unit) end
 end)
@@ -418,8 +305,6 @@ if Events.EndCombatSim then Events.EndCombatSim.Add(function(ap,au,_,af,amax,dp,
 end) end
 
 if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(function(killedP,killedID,_,x,y,_,killerP)
-  local recoveryKey=killedP..'_'..killedID
-  if recoveringUnits[recoveryKey] then combatCredit[recoveryKey]=nil; return end
   local credit=combatCredit[killedP..'_'..killedID]
   if credit and killerP == credit.p then
     setr(credit.p,credit.id,'KILLS',(tonumber(getr(credit.p,credit.id,'KILLS',0)) or 0)+1)

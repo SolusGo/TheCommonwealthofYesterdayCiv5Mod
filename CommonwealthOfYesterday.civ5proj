@@ -66,7 +66,15 @@
     </ModContent>
     <ModVersion>1</ModVersion>
     <Stability>Alpha</Stability>
-    <ModReferences />
+    <ModReferences>
+      <Association>
+        <Type>Mod</Type>
+        <Name>Kid Kiyotaka White Room</Name>
+        <Id>995265a7-f41f-495b-a753-2688d72cdca3</Id>
+        <MinVersion>1</MinVersion>
+        <MaxVersion>999</MaxVersion>
+      </Association>
+    </ModReferences>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Default' ">
     <OutputPath>.</OutputPath>

@@ -1,4 +1,9 @@
 -- The Commonwealth of Yesterday: database definitions (BNW + Vox Populi)
+-- SAVE-COMPATIBILITY RULE:
+-- Civ V serializes Units and UnitPromotions by numeric database ID. Never
+-- delete, reorder, or insert new rows before the existing Commonwealth unit
+-- and promotion definitions. Append future definitions after them, and start
+-- a new game whenever the enabled mod set or either table's rows change.
 INSERT OR REPLACE INTO Colors (Type, Red, Green, Blue, Alpha) VALUES
 ('COLOR_COMMONWEALTH_YESTERDAY_PRIMARY', 0.90, 0.43, 0.16, 1),
 ('COLOR_COMMONWEALTH_YESTERDAY_SECONDARY', 0.12, 0.18, 0.31, 1);

@@ -13,7 +13,9 @@
     <SupportsMac>0</SupportsMac>
   </Properties>
   <Dependencies />
-  <References />
+  <References>
+    <Mod id="995265a7-f41f-495b-a753-2688d72cdca3" minversion="1" maxversion="999" title="Kid Kiyotaka White Room" />
+  </References>
   <Blocks />
   <Files>
     <File import="0">Art\CommonwealthLeaderIconAtlases.xml</File>

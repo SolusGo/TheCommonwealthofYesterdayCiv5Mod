@@ -1,5 +1,23 @@
 # Patch Notes
 
+## Repository version 1.0.33 - Stable Old Friend definitions
+
+### Removed
+
+- Removed the entire Kid Kiyotaka conversion and White Room promotion-cleanup system.
+- Removed all runtime deletion of non-Commonwealth promotions from Old Friends.
+
+### Improved
+
+- Restored normal Old Friend handling so **Since the Beginning** and all six **Years Together** tiers remain untouched.
+- Added an optional ModBuddy reference to Kid Kiyotaka White Room so the Commonwealth loads after it whenever both mods are enabled.
+- Marked the Commonwealth `Units` and `UnitPromotions` definitions as append-only and documented when a new game is required.
+
+### Compatibility
+
+- This correction is intended for a new game; saves already remapped by a changed database order cannot be repaired reliably.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.32 - Complete White Room cleanup
 
 ### Fixed

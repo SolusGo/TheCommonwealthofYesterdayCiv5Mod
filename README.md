@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.32** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.33** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -35,8 +35,6 @@ The Old Friend replaces the Warrior at the same base strength and 40 Production.
 - produces 1 Memory;
 - gains a level of **Years Together**, up to +12% Combat Strength;
 - receives +10% Combat Strength while beside another Old Friend.
-
-If a changed mod database order causes a saved Old Friend to resolve as Kid Kiyotaka, the mod automatically restores only affected Commonwealth units that retain **Since the Beginning** or an existing Ledger record. Identity, experience, damage, ordinary promotions, and Ledger history are carried into the restored Old Friend, while every White Room-specific `PROMOTION_WR_*` effect—including White Room Training, Controlled Environment, and Perfect Adaptation—is removed.
 
 Old Friend identities are randomly selected from 54 generated names and 72 gamertags. Trent, Gabriel, Dion, Harrison, Lachlan, and Ben retain their tribute gamertags and are each eight times more likely to appear than a generated identity. Names are not repeated until the available pool is exhausted. The in-game **Friends** button opens a persistent archive with Online, Offline, and All views; profiles show form, age, level, combat and survival records, lineage, closest friend, location, timeline, and earned epithet. Records transfer across upgrades and remain after death.
 
@@ -95,13 +93,20 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.29 | `1834f80` | Fixed Keepsakes for policy-granted free Bedrooms. |
 | 1.0.30 | `0c9681e` | Added targeted Old Friend save recovery. |
 | 1.0.31 | `6a96f6a` | Removed Kiyotaka-only promotions from restored Old Friends. |
-| 1.0.32 | Current | Removed every remaining White Room promotion from Old Friends. |
+| 1.0.32 | `43b4747` | Removed every remaining White Room promotion from Old Friends. |
+| 1.0.33 | Current | Removed unsafe save repair and stabilized cross-mod load order. |
 
 ## ModBuddy development
 
 Open `CommonwealthOfYesterday.civ5proj` in the Civilization V SDK's ModBuddy. The project contains the database activation actions, both in-game UI add-ins, VFS settings, metadata, and all source files required to build or deploy the mod.
 
 The project and checked-in `.modinfo` intentionally share the same mod GUID. ModBuddy's default output path is the project directory, matching the existing repository layout.
+
+### Save compatibility
+
+Civ V saves custom units and promotions by numeric database ID, not only by their text `Type`. Changing the enabled mod list or load order—or adding, deleting, or reordering rows in `Units` or `UnitPromotions`—can therefore turn a saved unit or promotion into one belonging to another mod. There is no reliable Lua repair after that remapping has occurred because the original identity has already been lost.
+
+The Commonwealth has an optional ModBuddy reference to **Kid Kiyotaka White Room**, making the Commonwealth load after it whenever both mods are enabled. Future Commonwealth unit and promotion definitions must be appended after the existing rows. Keep the same enabled mods for an entire campaign, and start a new game after any database-row or mod-loadout change. Lua, UI, text, and art edits that leave database rows unchanged are generally safe for an existing save.
 
 The mod includes a front-end `SelectCivilization` override that places the full trait name on its own line beneath the full leader and civilization names. Because Civ V loads front-end overrides globally while a mod is enabled, another mod that replaces the same screen may conflict with this layout.
 
