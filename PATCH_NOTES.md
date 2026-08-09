@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.39 - Old Friend upgrade path
+
+### Fixed
+
+- Added the missing `Unit_ClassUpgrades` entry for the Old Friend, allowing it to upgrade normally once the required technology and resources are available.
+- The upgrade target is copied from the active Warrior definition rather than hard-coded, preserving compatibility with Brave New World, Community Patch, and Vox Populi upgrade trees.
+- Since the Beginning remains retained through the upgrade, so the Friend's identity, Years Together, Ledger history, and lineage continue on the upgraded unit.
+
+### Compatibility
+
+- Existing Old Friends gain their upgrade action after rebuilding and loading the mod; starting a new game is not required solely for this fix.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.38 - Reliable conversation queues
 
 ### Fixed

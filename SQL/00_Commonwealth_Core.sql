@@ -100,6 +100,11 @@ SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND','TXT_KEY_UNIT_OLD_FRIEND','TXT_KEY_UNIT_OL
  0,'COMMONWEALTH_OLD_FRIEND_ATLAS','COMMONWEALTH_OLD_FRIEND_FLAG_ATLAS',1 FROM Units WHERE Type='UNIT_WARRIOR';
 INSERT INTO Unit_AITypes SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND', UnitAIType FROM Unit_AITypes WHERE UnitType='UNIT_WARRIOR';
 INSERT INTO Unit_Flavors SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND', FlavorType, Flavor FROM Unit_Flavors WHERE UnitType='UNIT_WARRIOR';
+-- Unique units do not inherit Unit_ClassUpgrades from the unit they replace.
+-- Copy the active Warrior target so this follows BNW, CP, or VP upgrade rules.
+INSERT INTO Unit_ClassUpgrades
+SELECT 'UNIT_COMMONWEALTH_OLD_FRIEND', UnitClassType
+FROM Unit_ClassUpgrades WHERE UnitType='UNIT_WARRIOR';
 
 INSERT INTO UnitPromotions
 (Type,Description,Help,CannotBeChosen,LostWithUpgrade,CombatPercent,PortraitIndex,IconAtlas,PediaType,PediaEntry,ShowInUnitPanel)
