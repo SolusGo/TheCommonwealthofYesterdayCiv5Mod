@@ -11,6 +11,15 @@ local combatCredit = {}
 local recoveringUnits = {}
 CommonwealthFriendRecoveryInProgress = CommonwealthFriendRecoveryInProgress or {}
 local conversationLines = {}
+local whiteRoomOnlyPromotions = {}
+for promotion in GameInfo.UnitPromotions() do
+  local promotionType = tostring(promotion.Type or '')
+  if promotionType == 'PROMOTION_WR_DOUBLE_XP'
+    or promotionType == 'PROMOTION_WR_PERFECT_ADAPTATION'
+    or string.find(promotionType,'^PROMOTION_WR_KIYOTAKA_') then
+    whiteRoomOnlyPromotions[#whiteRoomOnlyPromotions+1] = promotion.ID
+  end
+end
 if GameInfo.Commonwealth_Conversations then
   for row in GameInfo.Commonwealth_Conversations() do
     conversationLines[#conversationLines+1]={id=row.ID,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo}
@@ -89,21 +98,35 @@ local function registerFriend(unit)
   return id
 end
 
+local function stripWhiteRoomPromotions(unit)
+  local removed = false
+  for _,promotion in ipairs(whiteRoomOnlyPromotions) do
+    if unit:IsHasPromotion(promotion) then unit:SetHasPromotion(promotion,false); removed = true end
+  end
+  return removed
+end
+
 -- Civ V serializes database rows by numeric ID. If a save is loaded after the
 -- enabled mod database order changes, an Old Friend row can resolve as Kid
 -- Kiyotaka. Repair only Commonwealth Kiyotaka units that still carry either
 -- the Since the Beginning promotion or an existing Old Friend save record.
 function CommonwealthRecoverOldFriends(p)
   local player = Players[p]
-  if not isCommonwealth(player) or not OLD_FRIEND or not KIYOTAKA then return 0 end
-  local candidates = {}
+  if not isCommonwealth(player) then return 0 end
+  local cleaned = 0
   for unit in player:Units() do
-    if unit:GetUnitType() == KIYOTAKA then
-      local unitID = unit:GetID()
-      local id = friendID(p, unitID)
-      local legacyPrefix = 'FRIEND_'..p..'_'..unitID..'_'
-      if unit:IsHasPromotion(SINCE) or id or save.GetValue(legacyPrefix..'NAME') ~= nil then
-        candidates[#candidates+1] = {unit=unit,id=id,legacyPrefix=legacyPrefix}
+    if unit:IsHasPromotion(SINCE) and stripWhiteRoomPromotions(unit) then cleaned = cleaned + 1 end
+  end
+  local candidates = {}
+  if OLD_FRIEND and KIYOTAKA then
+    for unit in player:Units() do
+      if unit:GetUnitType() == KIYOTAKA then
+        local unitID = unit:GetID()
+        local id = friendID(p, unitID)
+        local legacyPrefix = 'FRIEND_'..p..'_'..unitID..'_'
+        if unit:IsHasPromotion(SINCE) or id or save.GetValue(legacyPrefix..'NAME') ~= nil then
+          candidates[#candidates+1] = {unit=unit,id=id,legacyPrefix=legacyPrefix}
+        end
       end
     end
   end
@@ -136,6 +159,7 @@ function CommonwealthRecoverOldFriends(p)
         if legacy[field] ~= nil then save.SetValue(newPrefix..field,legacy[field]) end
       end
       replacement:SetHasPromotion(SINCE,true)
+      if stripWhiteRoomPromotions(replacement) then cleaned = cleaned + 1 end
       local id = candidate.id
       setFriendID(p,oldID,nil)
       if id then
@@ -158,6 +182,12 @@ function CommonwealthRecoverOldFriends(p)
     print('CommonwealthFriends: restored '..repaired..' Old Friend unit(s) from Kiyotaka database remapping')
     if player:IsHuman() then
       Events.GameplayAlertMessage('[COLOR_POSITIVE_TEXT]'..repaired..' Old Friend'..(repaired == 1 and ' was' or 's were')..' restored.[ENDCOLOR]')
+    end
+  end
+  if cleaned > 0 then
+    print('CommonwealthFriends: removed White Room-only promotions from '..cleaned..' Old Friend unit(s)')
+    if player:IsHuman() then
+      Events.GameplayAlertMessage('[COLOR_POSITIVE_TEXT]White Room training was removed from '..cleaned..' Old Friend'..(cleaned == 1 and '.' or 's.')..'[ENDCOLOR]')
     end
   end
   return repaired

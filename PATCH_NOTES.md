@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.31 - Restored promotion cleanup
+
+### Fixed
+
+- Removed White Room Training, Perfect Adaptation, and every Kiyotaka-only adaptation promotion from restored Old Friends.
+- Added cleanup for Old Friends that were already restored and saved by repository version 1.0.30.
+- Preserved ordinary promotions, including any promotion that an Old Friend could have legitimately earned.
+
+### Compatibility
+
+- Cleanup runs at load and at the Commonwealth turn check, so an already-repaired save does not need to repeat the unit conversion.
+- Preserved all IDs and ModBuddy/.modinfo version `1`.
+
 ## Repository version 1.0.30 - Old Friend save recovery
 
 ### Fixed
