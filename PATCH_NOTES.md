@@ -1,5 +1,20 @@
 # Patch Notes
 
+## Repository version 1.0.30 - Old Friend save recovery
+
+### Fixed
+
+- Added a targeted repair for saved Commonwealth Old Friends that resolve as Kid Kiyotaka after the active mod database order changes.
+- Restored affected units to the Old Friend type while preserving identity, experience, damage, promotions, position, and Ledger records.
+- Suppressed creation, movement, and death handlers during conversion so the repair cannot generate a new identity or mark the original record Offline.
+- Ran the repair when the load screen closes, with a second safety check at the start of the Commonwealth turn.
+
+### Safety
+
+- Only Commonwealth-owned Kiyotaka units with **Since the Beginning**, a legacy Old Friend identity, or an existing advanced Ledger mapping qualify for conversion.
+- Legitimate Kiyotaka units and all units belonging to other civilizations are left unchanged.
+- Preserved all IDs and ModBuddy/.modinfo version `1`.
+
 ## Repository version 1.0.29 - Free Bedroom Keepsakes
 
 ### Fixed

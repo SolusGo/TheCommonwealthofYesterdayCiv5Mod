@@ -29,6 +29,7 @@ local MEL_CULTURE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_CULTURE
 local MEL_UNHAPPINESS = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_UNHAPPINESS
 local TECH_ARCH = GameInfoTypes.TECH_ARCHAEOLOGY
 local save = Modding.OpenSaveData()
+CommonwealthFriendRecoveryInProgress = CommonwealthFriendRecoveryInProgress or {}
 local friendIdentities = {
   tribute = {
     {name='Trent', tags={'Trentrouls'}},
@@ -266,6 +267,7 @@ end
 local function turnStart(p)
   local player = Players[p]
   if not isCommonwealth(player) then return end
+  if CommonwealthRecoverOldFriends then CommonwealthRecoverOldFriends(p) end
   local era = player:GetCurrentEra()
   local previousEra = get(p, 'ERA', nil)
   -- Register free policy Bedrooms before checking for an era transition. This
@@ -296,10 +298,12 @@ local function turnStart(p)
 end
 
 GameEvents.PlayerDoTurn.Add(turnStart)
-GameEvents.UnitSetXY.Add(function(p) refreshUnits(p) end)
+GameEvents.UnitSetXY.Add(function(p)
+  if not CommonwealthFriendRecoveryInProgress[p] then refreshUnits(p) end
+end)
 GameEvents.UnitCreated.Add(function(p, unitID)
   local player, unit = Players[p], Players[p] and Players[p]:GetUnitByID(unitID)
-  if isCommonwealth(player) and unit and unit:GetUnitType() == OLD_FRIEND then registerFriend(unit) end
+  if not CommonwealthFriendRecoveryInProgress[p] and isCommonwealth(player) and unit and unit:GetUnitType() == OLD_FRIEND then registerFriend(unit) end
 end)
 if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p, oldID, newID)
   local player, unit = Players[p], Players[p] and Players[p]:GetUnitByID(newID)
