@@ -4,6 +4,11 @@
 -- delete, reorder, or insert new rows before the existing Commonwealth unit
 -- and promotion definitions. Append future definitions after them, and start
 -- a new game whenever the enabled mod set or either table's rows change.
+-- The Ledger transfers identity and lineage through these Community Patch
+-- events. They default to disabled in some CP-only installations.
+UPDATE CustomModOptions SET Value=1
+WHERE Name IN ('EVENTS_UNIT_UPGRADES','EVENTS_UNIT_PREKILL');
+
 INSERT OR REPLACE INTO Colors (Type, Red, Green, Blue, Alpha) VALUES
 ('COLOR_COMMONWEALTH_YESTERDAY_PRIMARY', 0.90, 0.43, 0.16, 1),
 ('COLOR_COMMONWEALTH_YESTERDAY_SECONDARY', 0.12, 0.18, 0.31, 1);

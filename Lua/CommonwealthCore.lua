@@ -128,6 +128,7 @@ local function addMemories(p, amount, reason)
   end
   LuaEvents.CommonwealthStateChanged(p)
 end
+function CommonwealthAddMemories(p, amount, reason) addMemories(p, amount, reason) end
 
 local function friendFieldByID(p, unitID, field) return 'FRIEND_' .. p .. '_' .. unitID .. '_' .. field end
 local function friendField(unit, field) return friendFieldByID(unit:GetOwner(), unit:GetID(), field) end

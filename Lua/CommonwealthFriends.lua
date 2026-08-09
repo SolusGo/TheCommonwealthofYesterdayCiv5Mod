@@ -2,6 +2,7 @@
 print('CommonwealthFriends loaded')
 
 local CIV = GameInfoTypes.CIVILIZATION_COMMONWEALTH_YESTERDAY
+local OLD_FRIEND = GameInfoTypes.UNIT_COMMONWEALTH_OLD_FRIEND
 local SINCE = GameInfoTypes.PROMOTION_COMMONWEALTH_SINCE_BEGINNING
 local BEDROOM = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM
 local save = Modding.OpenSaveData()
@@ -205,6 +206,64 @@ local function repairDuplicateIdentities(p)
   save.SetValue(repairKey,1)
 end
 
+local function repairOrphanedUpgrade(p,unit)
+  if unit:GetUnitType() == OLD_FRIEND then return end
+  local id=friendID(p,unit:GetID()); if not id then return end
+  local unitType=GameInfo.Units[unit:GetUnitType()].Type
+  local lineage=getr(p,id,'LINEAGE','')
+  if lineageContains(lineage,'UNIT_COMMONWEALTH_OLD_FRIEND') then
+    if not lineageContains(lineage,unitType) then setr(p,id,'LINEAGE',lineage..'|'..unitType) end
+    return
+  end
+  local player=Players[p]; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0; local target=nil
+  for candidate=1,count do if candidate ~= id and tonumber(getr(p,candidate,'MERGED_INTO',0)) == 0
+    and lineageContains(getr(p,candidate,'LINEAGE',''),'UNIT_COMMONWEALTH_OLD_FRIEND') then
+    local oldUnitID=tonumber(getr(p,candidate,'CURRENT_UNIT',-1)) or -1
+    local oldUnit=player:GetUnitByID(oldUnitID)
+    if not oldUnit and tonumber(getr(p,candidate,'X',-1000)) == unit:GetX()
+      and tonumber(getr(p,candidate,'Y',-1000)) == unit:GetY() then target=candidate; break end
+  end end
+  if not target then return end
+  for _,field in ipairs({'BATTLES','KILLS','DISTANCE','MEMORIES','CONVERSATIONS'}) do
+    setr(p,target,field,(tonumber(getr(p,target,field,0)) or 0)+(tonumber(getr(p,id,field,0)) or 0))
+  end
+  setr(p,target,'UPGRADES',(tonumber(getr(p,target,'UPGRADES',0)) or 0)+1)
+  setr(p,target,'MEMORIES',(tonumber(getr(p,target,'MEMORIES',0)) or 0)+4)
+  lineage=getr(p,target,'LINEAGE','')
+  if not lineageContains(lineage,unitType) then setr(p,target,'LINEAGE',lineage..'|'..unitType) end
+  setr(p,target,'CURRENT_UNIT',unit:GetID()); setr(p,target,'CURRENT_TYPE',unit:GetUnitType())
+  setr(p,target,'STATUS','Still With Us'); setr(p,target,'DEATH_TURN',-1); setr(p,target,'PENDING_DEATH_TURN',-1000)
+  setr(p,target,'X',unit:GetX()); setr(p,target,'Y',unit:GetY()); setr(p,target,'LOCATION',plotLocation(unit:GetPlot()))
+  setFriendID(p,unit:GetID(),target)
+  setr(p,id,'MERGED_INTO',target); setr(p,id,'STATUS','Merged'); setr(p,id,'CURRENT_UNIT',-1)
+  local name,tag,aliases=getr(p,target,'NAME','Old Friend'),getr(p,target,'TAG',''),getr(p,target,'ALIASES','')
+  unit:SetName(name..' - '..tag)
+  save.SetValue(legacyFriendField(p,unit:GetID(),'NAME'),name); save.SetValue(legacyFriendField(p,unit:GetID(),'TAG'),tag)
+  save.SetValue(legacyFriendField(p,unit:GetID(),'ALIASES'),aliases); save.SetValue(legacyFriendField(p,unit:GetID(),'ACTIVE'),1)
+  markFriendEvent(p,target,'upgrade')
+  appendTimeline(p,target,name..' became '..unitName(unit:GetUnitType())..'.')
+  if CommonwealthAddMemories then CommonwealthAddMemories(p,4,'an Old Friend upgrade was recovered') end
+  print('CommonwealthFriends: recovered missed upgrade for '..name..' as '..unitType)
+end
+
+local function finalizePendingDeaths(p)
+  local player=Players[p]; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0; local turn=Game.GetGameTurn()
+  for id=1,count do
+    local pendingTurn=tonumber(getr(p,id,'PENDING_DEATH_TURN',-1000)) or -1000
+    if pendingTurn > -1000 and turn > pendingTurn then
+      local unitID=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1
+      local unit=player:GetUnitByID(unitID)
+      if not unit or not unit:IsHasPromotion(SINCE) or friendID(p,unitID) ~= id then
+        local x=tonumber(getr(p,id,'PENDING_DEATH_X',-1)) or -1; local y=tonumber(getr(p,id,'PENDING_DEATH_Y',-1)) or -1
+        setr(p,id,'STATUS','Offline'); setr(p,id,'DEATH_TURN',pendingTurn); setr(p,id,'DEATH_X',x); setr(p,id,'DEATH_Y',y)
+        setr(p,id,'LOCATION','Tile '..x..', '..y); setr(p,id,'CURRENT_UNIT',-1)
+        appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' went offline at tile '..x..', '..y..'.',pendingTurn)
+      end
+      setr(p,id,'PENDING_DEATH_TURN',-1000)
+    end
+  end
+end
+
 local function updateUnitRecord(p, unit)
   local id = registerFriend(unit); if not id then return end
   local hp = unit:GetMaxHitPoints()-unit:GetDamage(); local oldLow = tonumber(getr(p,id,'LOW_HP',hp)) or hp
@@ -383,9 +442,12 @@ end
 
 local function friendsTurn(p,allowConversation)
   local player=Players[p]; if not isCommonwealth(player) then return end
+  finalizePendingDeaths(p)
   local units={}; local active=tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0
   local previousActive=tonumber(save.GetValue('COY2_CONV_ACTIVE_'..p)) or 0
-  for unit in player:Units() do if unit:IsHasPromotion(SINCE) then updateUnitRecord(p,unit); units[#units+1]=unit end end
+  for unit in player:Units() do if unit:IsHasPromotion(SINCE) then
+    repairOrphanedUpgrade(p,unit); updateUnitRecord(p,unit); units[#units+1]=unit
+  end end
   repairDuplicateIdentities(p)
   if active > 0 and previousActive == 0 then for _,unit in ipairs(units) do markFriendEvent(p,registerFriend(unit),'reminiscence') end end
   save.SetValue('COY2_CONV_ACTIVE_'..p,active)
@@ -404,15 +466,18 @@ end)
 
 GameEvents.UnitCreated.Add(function(p,unitID)
   local player=Players[p]; local unit=player and player:GetUnitByID(unitID)
-  if isCommonwealth(player) and unit and unit:IsHasPromotion(SINCE) then registerFriend(unit) end
+  if isCommonwealth(player) and unit and unit:GetUnitType() == OLD_FRIEND then registerFriend(unit) end
 end)
 
 if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,newID)
   local player=Players[p]; if not isCommonwealth(player) then return end
   local oldUnit,newUnit=player:GetUnitByID(oldID),player:GetUnitByID(newID)
-  local id=friendID(p,oldID) or (oldUnit and registerFriend(oldUnit))
+  local pendingKey='COY2_PENDING_UNIT_'..p..'_'..oldID
+  local pendingID=tonumber(save.GetValue(pendingKey)); if pendingID and pendingID <= 0 then pendingID=nil end
+  local id=friendID(p,oldID) or pendingID or (oldUnit and registerFriend(oldUnit))
   if not id or not newUnit or not newUnit:IsHasPromotion(SINCE) then return end
   setFriendID(p,oldID,nil); setFriendID(p,newID,id)
+  save.SetValue(pendingKey,-1); setr(p,id,'PENDING_DEATH_TURN',-1000)
   local unitType=GameInfo.Units[newUnit:GetUnitType()].Type; local lineage=getr(p,id,'LINEAGE','')
   if not lineageContains(lineage,unitType) then setr(p,id,'LINEAGE',lineage..'|'..unitType) end
   setr(p,id,'UPGRADES',(tonumber(getr(p,id,'UPGRADES',0)) or 0)+1)
@@ -421,6 +486,7 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,new
   newUnit:SetName(getr(p,id,'NAME','Old Friend')..' - '..getr(p,id,'TAG',''))
   appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' became '..unitName(newUnit:GetUnitType())..'.')
   markFriendEvent(p,id,'upgrade')
+  print('CommonwealthFriends: transferred profile '..id..' from unit '..oldID..' to '..newID..' as '..unitType)
 end) end
 
 if Events.RunCombatSim then Events.RunCombatSim.Add(function(ap,au,_,_,_,dp,du)
@@ -457,13 +523,13 @@ if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(function(killedP,kille
   end
   combatCredit[killedP..'_'..killedID]=nil
   local player=Players[killedP]; if not isCommonwealth(player) then return end
-  local unit=player:GetUnitByID(killedID); local id=friendID(killedP,killedID) or (unit and registerFriend(unit))
+  local id=friendID(killedP,killedID)
   if not id then return end
-  setr(killedP,id,'STATUS','Offline'); setr(killedP,id,'DEATH_TURN',Game.GetGameTurn())
-  setr(killedP,id,'DEATH_X',x); setr(killedP,id,'DEATH_Y',y); setr(killedP,id,'LOCATION','Tile '..x..', '..y)
-  setr(killedP,id,'CURRENT_UNIT',-1); setFriendID(killedP,killedID,nil)
+  setr(killedP,id,'PENDING_DEATH_TURN',Game.GetGameTurn())
+  setr(killedP,id,'PENDING_DEATH_X',x); setr(killedP,id,'PENDING_DEATH_Y',y)
+  save.SetValue('COY2_PENDING_UNIT_'..killedP..'_'..killedID,id)
+  setFriendID(killedP,killedID,nil)
   save.SetValue(legacyFriendField(killedP,killedID,'ACTIVE'),0)
-  appendTimeline(killedP,id,getr(killedP,id,'NAME','An Old Friend')..' went offline at tile '..x..', '..y..'.')
 end) end
 
 local function epithet(p,id)

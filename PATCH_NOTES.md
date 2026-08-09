@@ -1,5 +1,21 @@
 # Patch Notes
 
+## Repository version 1.0.42 - Upgrade lineage recovery
+
+### Fixed
+
+- Explicitly enabled the Community Patch `EVENTS_UNIT_UPGRADES` option required by the Old Friend profile-transfer callback. It was disabled in the active database, so upgraded Swordsmen were not appending their new form to Lineage.
+- Enabled `EVENTS_UNIT_PREKILL` and deferred Offline archival until the following turn, allowing an upgrade callback to claim the old profile before the replaced unit is treated as dead.
+- Limited immediate Friend registration to newly created Old Friends; upgraded descendants are now attached through the upgrade transfer instead of briefly creating a second profile.
+- Added a save repair for recently upgraded descendants whose callback was missed. When the original profile and descendant occupy the same recorded tile, the repair restores the original identity, appends the new form, recovers the upgrade record and 4 Memories, and hides the temporary profile.
+- Added a lineage fallback that appends the current form whenever an already-linked descendant is missing it.
+
+### Compatibility
+
+- Restart Civilization V after rebuilding so the newly enabled Community Patch events are active.
+- Existing affected saves can be repaired; a new game is not required.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.41 - Living profile consolidation
 
 ### Fixed
