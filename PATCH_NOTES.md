@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.41 - Living profile consolidation
+
+### Fixed
+
+- Changed the existing-save identity repair so an Offline duplicate is consolidated into the matching living Old Friend instead of being left behind under the original name.
+- A duplicated identity now appears only once in the Ledger. If any matching record still has a live unit, the consolidated profile is Online and points to that unit.
+- Combined combat, travel, survival, upgrade, Memory, conversation, lineage, queued-event, and timeline records from the hidden duplicate entries.
+- Hidden merged records are excluded from Ledger counts, filters, and closest-friend searches.
+
+### Compatibility
+
+- The corrected consolidation uses a new migration key and runs automatically on existing saves after rebuilding.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.40 - Ledger identity and scrolling repair
 
 ### Fixed

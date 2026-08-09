@@ -91,11 +91,11 @@ end
 local function unitName(unitType)
   local row = GameInfo.Units[unitType]; return row and Locale.ConvertTextKey(row.Description) or 'Unknown Unit'
 end
-local function appendTimeline(p, id, text)
+local function appendTimeline(p, id, text, eventTurn)
   local count = tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
   if count >= 30 then return end
   count = count + 1; setr(p,id,'TIMELINE_COUNT',count)
-  setr(p,id,'TIME_'..count..'_TURN',Game.GetGameTurn()); setr(p,id,'TIME_'..count..'_TEXT',text)
+  setr(p,id,'TIME_'..count..'_TURN',eventTurn or Game.GetGameTurn()); setr(p,id,'TIME_'..count..'_TEXT',text)
 end
 local function plotLocation(plot)
   if not plot then return 'Unknown' end
@@ -141,31 +141,67 @@ local function registerFriend(unit)
 end
 
 local function repairDuplicateIdentities(p)
-  local repairKey='COY2_IDENTITY_REPAIR_1_'..p
+  local repairKey='COY2_IDENTITY_REPAIR_2_'..p
   if tonumber(save.GetValue(repairKey) or 0) == 1 then return end
-  local seen={}; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
+  local groups={}; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
   for id=1,count do
     local name=getr(p,id,'NAME','')
     local identityKey=string.lower(tostring(name))
-    if identityKey ~= '' and seen[identityKey] then
-      local newName,newTag,newAliases,attempts
-      repeat
-        newName,newTag,newAliases=CommonwealthChooseFriendIdentity(p); attempts=(attempts or 0)+1
-      until not seen[string.lower(tostring(newName))] or attempts >= 64
-      setr(p,id,'NAME',newName); setr(p,id,'TAG',newTag); setr(p,id,'ALIASES',newAliases)
+    if identityKey ~= '' and tonumber(getr(p,id,'MERGED_INTO',0)) == 0 then
+      groups[identityKey]=groups[identityKey] or {}; groups[identityKey][#groups[identityKey]+1]=id
+    end
+  end
+  for _,ids in pairs(groups) do if #ids > 1 then
+    local target=ids[1]; local liveSource=nil; local liveUnit=nil
+    for _,id in ipairs(ids) do
       local unitID=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1
       local unit=Players[p] and Players[p]:GetUnitByID(unitID)
-      if unit then
-        unit:SetName(newName..' - '..newTag)
-        save.SetValue(legacyFriendField(p,unitID,'NAME'),newName)
-        save.SetValue(legacyFriendField(p,unitID,'TAG'),newTag)
-        save.SetValue(legacyFriendField(p,unitID,'ALIASES'),newAliases)
-        save.SetValue(legacyFriendField(p,unitID,'ACTIVE'),1)
+      if unit and not liveSource then liveSource=id; liveUnit=unit end
+    end
+    for i=2,#ids do
+      local source=ids[i]
+      for _,field in ipairs({'BATTLES','KILLS','DISTANCE','UPGRADES','MEMORIES','CONVERSATIONS'}) do
+        setr(p,target,field,(tonumber(getr(p,target,field,0)) or 0)+(tonumber(getr(p,source,field,0)) or 0))
       end
-      appendTimeline(p,id,'The archive corrected a reused identity; this profile is now remembered as '..newName..' - '..newTag..'.')
-      seen[string.lower(tostring(newName))]=id
-    elseif identityKey ~= '' then seen[identityKey]=id end
-  end
+      setr(p,target,'YEARS',math.max(tonumber(getr(p,target,'YEARS',0)) or 0,tonumber(getr(p,source,'YEARS',0)) or 0))
+      setr(p,target,'ERAS',math.max(tonumber(getr(p,target,'ERAS',0)) or 0,tonumber(getr(p,source,'ERAS',0)) or 0))
+      setr(p,target,'LOW_HP',math.min(tonumber(getr(p,target,'LOW_HP',100)) or 100,tonumber(getr(p,source,'LOW_HP',100)) or 100))
+      setr(p,target,'BORN',math.min(tonumber(getr(p,target,'BORN',Game.GetGameTurn())) or Game.GetGameTurn(),tonumber(getr(p,source,'BORN',Game.GetGameTurn())) or Game.GetGameTurn()))
+      setr(p,target,'BORN_ERA',math.min(tonumber(getr(p,target,'BORN_ERA',Players[p]:GetCurrentEra())) or Players[p]:GetCurrentEra(),tonumber(getr(p,source,'BORN_ERA',Players[p]:GetCurrentEra())) or Players[p]:GetCurrentEra()))
+      local lineage=getr(p,target,'LINEAGE','')
+      for value in string.gmatch(getr(p,source,'LINEAGE','') or '','[^|]+') do
+        if not lineageContains(lineage,value) then lineage=lineage..(lineage ~= '' and '|' or '')..value end
+      end
+      setr(p,target,'LINEAGE',lineage)
+      local timelineCount=tonumber(getr(p,source,'TIMELINE_COUNT',0)) or 0
+      for timelineIndex=1,timelineCount do
+        appendTimeline(p,target,getr(p,source,'TIME_'..timelineIndex..'_TEXT',''),tonumber(getr(p,source,'TIME_'..timelineIndex..'_TURN',Game.GetGameTurn())) or Game.GetGameTurn())
+      end
+      local targetEvents=loadFriendEvents(p,target); local eventKinds={}
+      for _,event in ipairs(targetEvents) do eventKinds[event.kind]=true end
+      for _,event in ipairs(loadFriendEvents(p,source)) do
+        if not eventKinds[event.kind] then targetEvents[#targetEvents+1]=event; eventKinds[event.kind]=true end
+      end
+      while #targetEvents > MAX_PENDING_EVENTS do table.remove(targetEvents,1) end
+      storeFriendEvents(p,target,targetEvents); storeFriendEvents(p,source,{})
+      for other=1,count do if other ~= target and other ~= source then
+        local function rawPairKey(a,b) if a > b then a,b=b,a end; return 'COY2_PAIR_'..p..'_'..a..'_'..b end
+        local combined=(tonumber(save.GetValue(rawPairKey(target,other))) or 0)+(tonumber(save.GetValue(rawPairKey(source,other))) or 0)
+        if combined > 0 then save.SetValue(rawPairKey(target,other),combined) end
+      end end
+      setr(p,source,'MERGED_INTO',target); setr(p,source,'STATUS','Merged'); setr(p,source,'CURRENT_UNIT',-1)
+    end
+    if liveSource and liveUnit then
+      for _,field in ipairs({'CURRENT_TYPE','LOCATION','LEVEL','XP','X','Y','LAST_ERA'}) do setr(p,target,field,getr(p,liveSource,field,getr(p,target,field,''))) end
+      setr(p,target,'CURRENT_UNIT',liveUnit:GetID()); setr(p,target,'STATUS','Still With Us'); setr(p,target,'DEATH_TURN',-1)
+      setFriendID(p,liveUnit:GetID(),target)
+      local name,tag,aliases=getr(p,target,'NAME','Old Friend'),getr(p,target,'TAG',''),getr(p,target,'ALIASES','')
+      liveUnit:SetName(name..' - '..tag)
+      save.SetValue(legacyFriendField(p,liveUnit:GetID(),'NAME'),name); save.SetValue(legacyFriendField(p,liveUnit:GetID(),'TAG'),tag)
+      save.SetValue(legacyFriendField(p,liveUnit:GetID(),'ALIASES'),aliases); save.SetValue(legacyFriendField(p,liveUnit:GetID(),'ACTIVE'),1)
+    end
+    appendTimeline(p,target,'Duplicate archive entries for this Old Friend were consolidated into one profile.')
+  end end
   save.SetValue(repairKey,1)
 end
 
@@ -441,7 +477,7 @@ local function epithet(p,id)
 end
 local function closestFriend(p,id,count)
   local best,bestTurns=nil,0
-  for other=1,count do if other~=id then
+  for other=1,count do if other~=id and tonumber(getr(p,other,'MERGED_INTO',0)) == 0 then
     local turns=tonumber(save.GetValue(pairKey(p,id,other))) or 0
     if turns>bestTurns then best,bestTurns=other,turns end
   end end
@@ -457,7 +493,7 @@ LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
   local player=Players[p]; if not isCommonwealth(player) then LuaEvents.CommonwealthAdvancedLedgerResponse(p,{}); return end
   friendsTurn(p,false)
   local rows={}; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
-  for id=1,count do
+  for id=1,count do if tonumber(getr(p,id,'MERGED_INTO',0)) == 0 then
     local closest,together=closestFriend(p,id,count); local timeline={}; local tc=tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
     for i=1,tc do timeline[#timeline+1]='[COLOR_GREY]Turn '..getr(p,id,'TIME_'..i..'_TURN',0)..'[ENDCOLOR][NEWLINE]'..getr(p,id,'TIME_'..i..'_TEXT','') end
     local currentType=tonumber(getr(p,id,'CURRENT_TYPE',-1)) or -1
@@ -468,7 +504,7 @@ LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
       upgrades=tonumber(getr(p,id,'UPGRADES',0)) or 0,lowHP=tonumber(getr(p,id,'LOW_HP',100)) or 100,memories=tonumber(getr(p,id,'MEMORIES',0)) or 0,conversations=tonumber(getr(p,id,'CONVERSATIONS',0)) or 0,
       closest=closest,together=together,location=getr(p,id,'LOCATION','Unknown'),lineage=displayLineage(getr(p,id,'LINEAGE','')),timeline=table.concat(timeline,'[NEWLINE][NEWLINE]'),
       deathTurn=tonumber(getr(p,id,'DEATH_TURN',-1)) or -1,currentUnit=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1}
-  end
+  end end
   LuaEvents.CommonwealthAdvancedLedgerResponse(p,rows)
 end)
 
