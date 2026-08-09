@@ -2,8 +2,8 @@
 <Context ID="CommonwealthPanel">
   <Instance Name="FriendRow">
     <GridButton ID="FriendButton" Size="246,68" Style="BaseButton">
-      <Label ID="RowName" Anchor="L,T" Offset="10,7" Size="226,24" Font="TwCenMT18" FontStyle="Shadow" />
-      <Label ID="RowDetail" Anchor="L,T" Offset="10,32" Size="226,28" WrapWidth="226" Font="TwCenMT14" FontStyle="Shadow" />
+      <Label ID="RowName" Anchor="L,T" Offset="10,7" Size="226,24" Font="TwCenMT18" FontStyle="Shadow" Color="255,202,112,255" />
+      <Label ID="RowDetail" Anchor="L,T" Offset="10,32" Size="226,28" WrapWidth="226" Font="TwCenMT14" FontStyle="Shadow" Color="202,214,229,255" />
     </GridButton>
   </Instance>
 
@@ -22,20 +22,28 @@
 
   <Grid ID="Ledger" Anchor="C,C" Size="920,660" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
     <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
-    <Label Anchor="C,T" Offset="0,14" Size="860,30" Font="TwCenMT24" FontStyle="Shadow" String="THE OLD FRIENDS LEDGER" ColorSet="Beige_Black_Alpha" />
-    <Label ID="LedgerCount" Anchor="C,T" Offset="0,44" Size="860,20" Font="TwCenMT16" FontStyle="Shadow" String="The people who were there when the world was new." />
+    <Box Anchor="C,C" Size="884,604" Color="20,30,50,180" />
+    <Box Anchor="C,T" Offset="0,8" Size="884,56" Color="31,46,79,230" />
+    <Box Anchor="C,T" Offset="0,64" Size="884,3" Color="230,110,41,255" />
+    <Box Anchor="C,B" Offset="0,67" Size="884,2" Color="230,110,41,220" />
+    <Label Anchor="C,T" Offset="0,14" Size="860,30" Font="TwCenMT24" FontStyle="Shadow" String="THE OLD FRIENDS LEDGER" Color="255,202,112,255" />
+    <Label ID="LedgerCount" Anchor="C,T" Offset="0,44" Size="860,20" Font="TwCenMT16" FontStyle="Shadow" String="The people who were there when the world was new." Color="202,214,229,255" />
     <GridButton ID="LivingFilter" Anchor="L,T" Offset="25,70" Size="84,30" Style="BaseButton" String="Online" />
     <GridButton ID="OfflineFilter" Anchor="L,T" Offset="113,70" Size="84,30" Style="BaseButton" String="Offline" />
     <GridButton ID="AllFilter" Anchor="L,T" Offset="201,70" Size="84,30" Style="BaseButton" String="All" />
     <Grid Anchor="L,T" Offset="25,106" Size="270,476" Style="GridBlackIndent8">
+      <Box Anchor="C,C" Size="254,460" Color="31,46,79,120" />
+      <Box Anchor="L,C" Offset="8,0" Size="3,452" Color="230,110,41,220" />
       <ScrollPanel Anchor="C,C" Size="254,460" Vertical="1"><Stack ID="LedgerStack" StackGrowth="Bottom" Padding="5" /></ScrollPanel>
-      <Label ID="NoFriendsLabel" Anchor="C,C" Size="230,60" WrapWidth="230" Font="TwCenMT16" FontStyle="Shadow" String="No friends in this section." Hidden="1" />
+      <Label ID="NoFriendsLabel" Anchor="C,C" Size="230,60" WrapWidth="230" Font="TwCenMT16" FontStyle="Shadow" String="No friends in this section." Color="202,214,229,255" Hidden="1" />
     </Grid>
     <Grid Anchor="L,T" Offset="310,70" Size="584,512" Style="GridBlackIndent8">
-      <Label ID="ProfileName" Anchor="L,T" Offset="18,12" Size="540,28" Font="TwCenMT22" FontStyle="Shadow" String="Select an Old Friend" ColorSet="Beige_Black_Alpha" />
-      <Label ID="ProfileTag" Anchor="L,T" Offset="18,40" Size="540,22" Font="TwCenMT16" FontStyle="Shadow" />
+      <Box Anchor="C,C" Size="568,496" Color="31,46,79,105" />
+      <Box Anchor="L,C" Offset="8,0" Size="3,488" Color="230,110,41,220" />
+      <Label ID="ProfileName" Anchor="L,T" Offset="18,12" Size="540,28" Font="TwCenMT22" FontStyle="Shadow" String="Select an Old Friend" Color="255,202,112,255" />
+      <Label ID="ProfileTag" Anchor="L,T" Offset="18,40" Size="540,22" Font="TwCenMT16" FontStyle="Shadow" Color="202,214,229,255" />
       <Grid Anchor="C,T" Offset="0,67" Size="548,1" Style="Grid9Bar" />
-      <Label ID="ProfileStatus" Anchor="L,T" Offset="18,76" Size="540,23" Font="TwCenMT18" FontStyle="Shadow" />
+      <Label ID="ProfileStatus" Anchor="L,T" Offset="18,76" Size="540,23" Font="TwCenMT18" FontStyle="Shadow" Color="235,150,80,255" />
       <Label ID="ProfileSummary" Anchor="L,T" Offset="18,104" Size="540,70" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" />
       <Grid Anchor="L,T" Offset="16,178" Size="266,64" Style="Grid9Frame"><Label ID="CombatStats" Anchor="L,C" Offset="12,0" Size="242,52" WrapWidth="242" Font="TwCenMT16" FontStyle="Shadow" /></Grid>
       <Grid Anchor="R,T" Offset="16,178" Size="266,64" Style="Grid9Frame"><Label ID="SurvivalStats" Anchor="L,C" Offset="12,0" Size="242,52" WrapWidth="242" Font="TwCenMT16" FontStyle="Shadow" /></Grid>

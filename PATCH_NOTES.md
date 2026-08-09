@@ -1,5 +1,17 @@
 # Patch Notes
 
+## Repository version 1.0.34 - Commonwealth Ledger palette
+
+### Improved
+
+- Restyled the Old Friends Ledger with deep navy panels, sunset-orange dividers and accents, warm-gold headings, and softer blue-grey secondary text.
+- Preserved Civ V's familiar gold framing, standard controls, layout, and readability.
+
+### Compatibility
+
+- This is a UI-only change and does not alter units, promotions, database order, saved state, or gameplay.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.33 - Stable Old Friend definitions
 
 ### Removed
