@@ -187,6 +187,11 @@ INSERT INTO Buildings (Type,BuildingClass,Description,Cost,FaithCost,PrereqTech,
 INSERT INTO Building_YieldChanges VALUES
 ('BUILDING_COMMONWEALTH_KEEP_1','YIELD_CULTURE',1),('BUILDING_COMMONWEALTH_KEEP_2','YIELD_CULTURE',1),
 ('BUILDING_COMMONWEALTH_KEEP_3','YIELD_CULTURE',1),('BUILDING_COMMONWEALTH_KEEP_4','YIELD_CULTURE',1);
+-- Dedicated CP yield contributions preserve every other source of city Tourism.
+-- The cumulative second and fourth Keepsakes reproduce floor(Keepsakes / 2).
+INSERT INTO Building_TechEnhancedYieldChanges (BuildingType,YieldType,Yield,TechType) VALUES
+('BUILDING_COMMONWEALTH_KEEP_2','YIELD_TOURISM',1,'TECH_ARCHAEOLOGY'),
+('BUILDING_COMMONWEALTH_KEEP_4','YIELD_TOURISM',1,'TECH_ARCHAEOLOGY');
 
 -- Reused by Lua with per-city counts. Each copy is one percentage point.
 INSERT INTO Building_YieldModifiers VALUES

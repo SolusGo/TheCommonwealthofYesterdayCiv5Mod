@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.50 - Safe Keepsake Tourism
+
+### Fixed
+
+- Replaced the unavailable `SetBaseTourism` Lua path with Community Patch's dedicated technology-enhanced building yields.
+- The second Keepsake now adds +1 Tourism after Archaeology, and the fourth adds another +1, exactly matching the documented `floor(Keepsakes / 2)` mechanic and +2 maximum.
+- Keepsake Tourism no longer attempts to set a city's total base Tourism, so Great Works, Wonders, beliefs, and every other Tourism source remain untouched.
+
+### Compatibility
+
+- Existing saves receive the correct Keepsake Tourism after rebuilding; no new game is required.
+- The civilization descriptions and balance values are unchanged.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.49 - Conversation queue availability
 
 ### Fixed

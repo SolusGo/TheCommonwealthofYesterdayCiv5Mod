@@ -27,7 +27,6 @@ local MEL_MILITARY = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_MILITARY
 local MEL_SCIENCE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_SCIENCE
 local MEL_CULTURE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_CULTURE
 local MEL_UNHAPPINESS = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_UNHAPPINESS
-local TECH_ARCH = GameInfoTypes.TECH_ARCHAEOLOGY
 local save = Modding.OpenSaveData()
 local friendIdentities = {
   tribute = {
@@ -239,13 +238,6 @@ local function keepsakes(city)
   for _, building in ipairs(KEEP) do if city:GetNumRealBuilding(building) > 0 then count = count + 1 end end
   return count
 end
-local function refreshTourism(city)
-  if not Teams[Players[city:GetOwner()]:GetTeam()]:IsHasTech(TECH_ARCH) then return end
-  local desired = math.floor(keepsakes(city) / 2)
-  -- Vox Populi exposes SetBuildingGreatWork; tourism is instead granted by
-  -- direct city base tourism when available, guarded for BNW compatibility.
-  if city.SetBaseTourism then city:SetBaseTourism(desired) end
-end
 
 local function applyEmpireEffects(p)
   local player = Players[p]
@@ -264,7 +256,6 @@ local function applyEmpireEffects(p)
     city:SetNumRealBuilding(MEL_SCIENCE, melancholy == 2 and 1 or 0)
     city:SetNumRealBuilding(MEL_CULTURE, melancholy == 3 and 1 or 0)
     city:SetNumRealBuilding(MEL_UNHAPPINESS, melancholy == 3 and city:IsCapital() and 1 or 0)
-    refreshTourism(city)
   end
 end
 
