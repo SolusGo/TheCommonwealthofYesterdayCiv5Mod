@@ -242,15 +242,17 @@ local function repairOrphanedUpgrade(p,unit)
     and lineageContains(getr(p,candidate,'LINEAGE',''),'UNIT_COMMONWEALTH_OLD_FRIEND') then
     local oldUnitID=tonumber(getr(p,candidate,'CURRENT_UNIT',-1)) or -1
     local oldUnit=player:GetUnitByID(oldUnitID)
-    if not oldUnit then
+    local oldUnitBelongsToProfile=oldUnit and oldUnit:IsHasPromotion(SINCE) and friendID(p,oldUnitID) == candidate
+    if not oldUnitBelongsToProfile then
       local oldX=tonumber(getr(p,candidate,'PENDING_DEATH_X',getr(p,candidate,'DEATH_X',getr(p,candidate,'X',-1000)))) or -1000
       local oldY=tonumber(getr(p,candidate,'PENDING_DEATH_Y',getr(p,candidate,'DEATH_Y',getr(p,candidate,'Y',-1000)))) or -1000
       local oldTurn=tonumber(getr(p,candidate,'PENDING_DEATH_TURN',-1000)) or -1000
       if oldTurn <= -1000 then oldTurn=tonumber(getr(p,candidate,'DEATH_TURN',-1000)) or -1000 end
       local sameGeneration=unitBorn > -1000 and oldTurn == unitBorn
+      if oldX >= 0 and oldY >= 0 and unit:GetX() >= 0 and unit:GetY() >= 0
+        and oldX == unit:GetX() and oldY == unit:GetY() then target=candidate; break end
       if sameGeneration then
         turnMatch=turnMatch or candidate; turnMatchCount=turnMatchCount+1
-        if oldX == unit:GetX() and oldY == unit:GetY() then target=candidate; break end
       end
     end
   end end

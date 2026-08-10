@@ -140,8 +140,71 @@ function CommonwealthAddMemories(p, amount, reason) addMemories(p, amount, reaso
 local function friendFieldByID(p, unitID, field) return 'FRIEND_' .. p .. '_' .. unitID .. '_' .. field end
 local function friendField(unit, field) return friendFieldByID(unit:GetOwner(), unit:GetID(), field) end
 local function isFriend(unit) return unit and unit:IsHasPromotion(SINCE) end
+local function archivedFriendField(p,id,field) return 'COY2_REC_'..p..'_'..id..'_'..field end
+local function archiveMapField(p,unitID) return 'COY2_MAP_'..p..'_'..unitID end
+local function liveArchivedProfile(p,id,exceptUnitID)
+  local currentID=tonumber(save.GetValue(archivedFriendField(p,id,'CURRENT_UNIT'))) or -1
+  if currentID < 0 or currentID == exceptUnitID then return false end
+  local current=Players[p] and Players[p]:GetUnitByID(currentID)
+  return current and current:IsHasPromotion(SINCE) and tonumber(save.GetValue(archiveMapField(p,currentID))) == id
+end
+local function restoreArchivedFriend(unit)
+  local p,unitID=unit:GetOwner(),unit:GetID()
+  local id=tonumber(save.GetValue(archiveMapField(p,unitID))) or 0
+  while id > 0 do
+    local merged=tonumber(save.GetValue(archivedFriendField(p,id,'MERGED_INTO'))) or 0
+    if merged <= 0 or merged == id then break end
+    id=merged
+  end
+  if id > 0 and liveArchivedProfile(p,id,unitID) then id=0 end
+  if id <= 0 then
+    local custom=''
+    if unit:HasName() then
+      custom=tostring(unit:GetNameNoDesc() or '')
+      local localized=Locale.Lookup(custom)
+      if localized and localized ~= '' then custom=tostring(localized) end
+    end
+    local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
+    local candidate=nil
+    for profile=1,count do
+      local merged=tonumber(save.GetValue(archivedFriendField(p,profile,'MERGED_INTO'))) or 0
+      if merged == 0 then
+        local profileUnit=tonumber(save.GetValue(archivedFriendField(p,profile,'CURRENT_UNIT'))) or -1
+        local name=tostring(save.GetValue(archivedFriendField(p,profile,'NAME')) or '')
+        local tag=tostring(save.GetValue(archivedFriendField(p,profile,'TAG')) or '')
+        local matchesID=profileUnit == unitID
+        local matchesName=custom ~= '' and name ~= '' and string.find(custom,name,1,true)
+          and (tag == '' or string.find(custom,tag,1,true))
+        if (matchesID or matchesName) and not liveArchivedProfile(p,profile,unitID) then
+          if candidate and candidate ~= profile then candidate=-1; break end
+          candidate=profile
+        end
+      end
+    end
+    id=candidate or 0
+  end
+  if id <= 0 then return false end
+  local name=save.GetValue(archivedFriendField(p,id,'NAME'))
+  local tag=save.GetValue(archivedFriendField(p,id,'TAG'))
+  if not name or not tag then return false end
+  save.SetValue(archiveMapField(p,unitID),id)
+  local fields={NAME='NAME',TAG='TAG',ALIASES='ALIASES',BORN='BORN',ERA='BORN_ERA',YEARS='YEARS',UPGRADES='UPGRADES',LINEAGE='LINEAGE'}
+  for legacy,archived in pairs(fields) do
+    local value=save.GetValue(archivedFriendField(p,id,archived))
+    if value ~= nil then save.SetValue(friendFieldByID(p,unitID,legacy),value) end
+  end
+  save.SetValue(friendFieldByID(p,unitID,'ACTIVE'),1)
+  save.SetValue(archivedFriendField(p,id,'CURRENT_UNIT'),unitID)
+  save.SetValue(archivedFriendField(p,id,'CURRENT_TYPE'),unit:GetUnitType())
+  save.SetValue(archivedFriendField(p,id,'STATUS'),'Still With Us')
+  save.SetValue(archivedFriendField(p,id,'DEATH_TURN'),-1)
+  save.SetValue(archivedFriendField(p,id,'X'),unit:GetX()); save.SetValue(archivedFriendField(p,id,'Y'),unit:GetY())
+  unit:SetName(tostring(name)..' - '..tostring(tag))
+  print('CommonwealthCore: restored archived profile '..id..' for unit '..unitID)
+  return true
+end
 local function registerFriend(unit)
-  if not isFriend(unit) then return end
+  if not isFriend(unit) then return false end
   local p = unit:GetOwner()
   local field = friendField(unit, 'NAME')
   local storedName = save.GetValue(field)
@@ -155,8 +218,13 @@ local function registerFriend(unit)
     save.SetValue(friendField(unit, 'ACTIVE'), 1)
     local storedTag = tostring(save.GetValue(friendField(unit, 'TAG')) or '')
     unit:SetName(tostring(storedName) .. (storedTag ~= '' and ' - ' .. storedTag or ''))
-    return
+    return true
   end
+  if restoreArchivedFriend(unit) then return true end
+  -- A non-Old-Friend unit carrying Since the Beginning must be an upgraded
+  -- lineage. Let the archive reconciliation recover it instead of assigning a
+  -- fresh identity when callbacks arrive in a different order during reload.
+  if unit:GetUnitType() ~= OLD_FRIEND then return false end
   local name, tag, aliases = CommonwealthChooseFriendIdentity(p)
   save.SetValue(field, name); save.SetValue(friendField(unit, 'TAG'), tag)
   save.SetValue(friendField(unit, 'ALIASES'), aliases)
@@ -165,7 +233,8 @@ local function registerFriend(unit)
   save.SetValue(friendField(unit, 'ERA'), Players[p]:GetCurrentEra())
   save.SetValue(friendField(unit, 'YEARS'), 0); save.SetValue(friendField(unit, 'UPGRADES'), 0)
   save.SetValue(friendField(unit, 'LINEAGE'), GameInfo.Units[unit:GetUnitType()].Type)
-  unit:SetName(name .. ' — ' .. tag)
+  unit:SetName(name .. ' - ' .. tag)
+  return true
 end
 
 local legacyFriendFields = {'NAME','TAG','ALIASES','BORN','ERA','YEARS','UPGRADES','LINEAGE'}
@@ -214,8 +283,7 @@ local function refreshUnits(p)
   local active = tonumber(get(p, 'ACTIVE', 0)) or 0
   for unit in player:Units() do
     if isFriend(unit) then
-      registerFriend(unit)
-      applyYears(unit,friendYears(unit))
+      if registerFriend(unit) then applyYears(unit,friendYears(unit)) end
       unit:SetHasPromotion(FRIEND_ADJ, adjacentMilitary(unit, true))
     end
     unit:SetHasPromotion(REM_ADJ, active == 1 and unit:IsCombatUnit() and adjacentMilitary(unit, false))
@@ -278,11 +346,12 @@ local function eraChanged(p, newEra)
   addMemories(p, 6 + 2 * player:GetNumCities(), 'a new era began')
   for unit in player:Units() do
     if isFriend(unit) then
-      registerFriend(unit)
-      local level = math.min(6, friendYears(unit) + 1)
-      save.SetValue(friendField(unit, 'YEARS'), level)
-      save.SetValue(friendField(unit, 'ERAS'), (tonumber(save.GetValue(friendField(unit, 'ERAS'))) or 0) + 1)
-      unit:ChangeDamage(-25); addMemories(p, 1, nil); applyYears(unit, level)
+      if registerFriend(unit) then
+        local level = math.min(6, friendYears(unit) + 1)
+        save.SetValue(friendField(unit, 'YEARS'), level)
+        save.SetValue(friendField(unit, 'ERAS'), (tonumber(save.GetValue(friendField(unit, 'ERAS'))) or 0) + 1)
+        unit:ChangeDamage(-25); addMemories(p, 1, nil); applyYears(unit, level)
+      end
     end
   end
   for city in player:Cities() do

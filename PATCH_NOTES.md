@@ -1,5 +1,21 @@
 # Patch Notes
 
+## Repository version 1.0.52 - Reload-safe Friend identities
+
+### Fixed
+
+- Upgraded Old Friend descendants no longer receive a fresh identity when Civ V reloads them before the advanced Ledger has restored their archive mapping.
+- Core registration now restores a uniquely matching archived profile by mapping, unit ID, or persistent custom name before it can generate a new identity.
+- Archive reconciliation now verifies that a unit ID genuinely belongs to a profile instead of treating any living unit that reused the ID as proof that the original Friend is still represented.
+- Missed upgrades can recover from the recorded upgrade tile even when the temporary replacement profile was created on a later reload turn.
+
+### Existing-save recovery
+
+- A living replacement profile such as Trent in place of Ben is merged into Ben's original history when the Commonwealth next updates or the Ledger opens, provided the replacement occupies Ben's recorded upgrade tile.
+- Ben's name, gamertag, lineage, Years Together, timeline, and other archived statistics are restored to the living upgraded unit; the temporary Trent profile is hidden as merged.
+- Properly mapped living Friends are explicitly excluded from recovery candidates, preventing one Friend from taking another living Friend's archive.
+- The ModBuddy project and `.modinfo` version remain `1`; deployment remains manual.
+
 ## Repository version 1.0.51 - Commonwealth presentation pass
 
 ### Added
