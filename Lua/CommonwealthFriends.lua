@@ -660,7 +660,9 @@ LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
     local tributeAliases=CommonwealthTributeAliases and CommonwealthTributeAliases(name,tag)
     if tributeAliases then aliases=tributeAliases; setr(p,id,'ALIASES',aliases) end
     local closest,together=closestFriend(p,id,count); local timeline={}; local tc=tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
-    for i=1,tc do
+    -- Show the newest memories first so recent upgrades remain visible in the
+    -- Ledger's compact timeline viewport.
+    for i=tc,1,-1 do
       local eventText=getr(p,id,'TIME_'..i..'_TEXT','')
       timeline[#timeline+1]=timelineEventIcon(eventText)..'  [COLOR_GREY]Turn '..getr(p,id,'TIME_'..i..'_TURN',0)..'[ENDCOLOR][NEWLINE]'..eventText
     end
@@ -670,7 +672,7 @@ LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
       years=tonumber(getr(p,id,'YEARS',0)) or 0,eras=tonumber(getr(p,id,'ERAS',0)) or 0,level=tonumber(getr(p,id,'LEVEL',1)) or 1,xp=tonumber(getr(p,id,'XP',0)) or 0,
       battles=tonumber(getr(p,id,'BATTLES',0)) or 0,kills=tonumber(getr(p,id,'KILLS',0)) or 0,distance=tonumber(getr(p,id,'DISTANCE',0)) or 0,
       upgrades=tonumber(getr(p,id,'UPGRADES',0)) or 0,lowHP=tonumber(getr(p,id,'LOW_HP',100)) or 100,memories=tonumber(getr(p,id,'MEMORIES',0)) or 0,conversations=tonumber(getr(p,id,'CONVERSATIONS',0)) or 0,
-      closest=closest,together=together,location=getr(p,id,'LOCATION','Unknown'),lineage=displayLineage(getr(p,id,'LINEAGE','')),timeline=table.concat(timeline,'[NEWLINE][NEWLINE]'),
+      closest=closest,together=together,location=getr(p,id,'LOCATION','Unknown'),lineage=displayLineage(getr(p,id,'LINEAGE','')),timeline=table.concat(timeline,'[NEWLINE]'),
       deathTurn=tonumber(getr(p,id,'DEATH_TURN',-1)) or -1,currentUnit=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1}
   end end
   LuaEvents.CommonwealthAdvancedLedgerResponse(p,rows)

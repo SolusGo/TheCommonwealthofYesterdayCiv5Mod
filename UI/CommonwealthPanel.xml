@@ -78,7 +78,8 @@
       <Label ID="LineageText" Anchor="L,T" Offset="18,280" Size="540,42" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
       <Label ID="RelationshipText" Anchor="L,T" Offset="18,326" Size="540,42" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
       <Label Anchor="L,T" Offset="18,371" Size="120,20" Font="TwCenMT16" FontStyle="Shadow" String="TIMELINE" Color="236,142,76,255" />
-      <ScrollPanel Anchor="L,T" Offset="14,392" Size="552,74" Vertical="1"><Label ID="TimelineText" Anchor="L,T" Offset="6,4" Size="516,2048" WrapWidth="516" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" /></ScrollPanel>
+      <Label Anchor="R,T" Offset="18,373" Size="120,18" Font="TwCenMT14" FontStyle="Shadow" String="NEWEST FIRST" Color="184,164,135,255" />
+      <ScrollPanel ID="TimelineScroll" Anchor="L,T" Offset="14,392" Size="552,74" Vertical="1"><Label ID="TimelineText" Anchor="L,T" Offset="6,4" Size="516,2048" WrapWidth="516" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" /></ScrollPanel>
       <Label ID="RememberQuote" Anchor="L,B" Offset="18,10" Size="540,24" WrapWidth="540" Font="TwCenMT14" FontStyle="Shadow" Color="240,168,105,255" />
     </Grid>
     <GridButton ID="ConversationToggle" Anchor="L,B" Offset="25,22" Size="260,38" Style="BaseButton" String="Conversations: On" ToolTip="Enable or disable spontaneous adjacent Old Friend conversations." />

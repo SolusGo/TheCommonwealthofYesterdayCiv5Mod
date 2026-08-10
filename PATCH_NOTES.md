@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.53 - Newest-first Friend timelines
+
+### Fixed
+
+- Ledger timelines now open with the newest event first, so a recent upgrade such as Jack becoming a Musketman is immediately visible.
+- Timeline spacing is more compact, and opening or switching profiles resets the timeline viewport to the newest entry.
+- Added a subtle `NEWEST FIRST` label to make the ordering explicit.
+
+### Compatibility
+
+- This is a presentation-only change; unit forms, upgrades, promotions, identities, and saved timeline data are unchanged.
+- Existing saves are compatible after rebuilding. The ModBuddy project and `.modinfo` version remain `1`; deployment remains manual.
+
 ## Repository version 1.0.52 - Reload-safe Friend identities
 
 ### Fixed

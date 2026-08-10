@@ -105,6 +105,7 @@ local function selectFriend(row)
     Controls.ProfileName:SetText('Select an Old Friend'); Controls.ProfileTag:SetText(''); Controls.ProfileStatus:SetText('')
     Controls.ProfileSummary:SetText(''); Controls.CombatStats:SetText(''); Controls.SurvivalStats:SetText('')
     Controls.LineageText:SetText(''); Controls.RelationshipText:SetText(''); Controls.TimelineText:SetText(''); Controls.YearsBonus:SetText('')
+    Controls.TimelineScroll:CalculateInternalSize(); Controls.TimelineScroll:SetScrollValue(0)
     setPips('Year',0,6); hookFriendPortrait(Controls.ProfilePortrait,64)
     Controls.LocateButton:SetDisabled(true); Controls.RememberButton:SetDisabled(true); return
   end
@@ -120,6 +121,7 @@ local function selectFriend(row)
   Controls.LineageText:SetText(row.lineage ~= '' and row.lineage or row.form)
   Controls.RelationshipText:SetText('Closest: '..row.closest..'   |   Together: '..row.together..' turns   |   Conversations: '..row.conversations..'[NEWLINE]Eras Survived: '..row.eras..'   |   Memories Generated: '..row.memories)
   Controls.TimelineText:SetText(row.timeline ~= '' and row.timeline or 'No archived events yet.')
+  Controls.TimelineScroll:CalculateInternalSize(); Controls.TimelineScroll:SetScrollValue(0)
   Controls.LocateButton:SetDisabled(row.status=='Offline' or row.currentUnit<0)
   Controls.RememberButton:SetDisabled(false)
 end
