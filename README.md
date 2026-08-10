@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.48** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.49** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -109,7 +109,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.45 | `b77f73b` | Added the Commonwealth spy roster. |
 | 1.0.46 | `9af8698` | Made Old Friend upgrade identity transfers transition-safe. |
 | 1.0.47 | `a97f4df` | Prevented dialogue repetition across different Old Friend pairs. |
-| 1.0.48 | Current | Restored Years Together buffs after recovered upgrades. |
+| 1.0.48 | `1dfb113` | Restored Years Together buffs after recovered upgrades. |
+| 1.0.49 | Current | Prevented queued events from silencing normal conversations. |
 
 ## ModBuddy development
 

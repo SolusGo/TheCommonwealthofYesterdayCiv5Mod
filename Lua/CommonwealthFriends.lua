@@ -415,7 +415,9 @@ local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
     end end
     if oldestLine then eventLines[1]=oldestLine end
   end
-  if eventType then return eventLines,active,bedroom,eventType end
+  -- A queued event with every suitable line inside the global repeat cooldown
+  -- remains queued, but must not silence ordinary conversations in the meantime.
+  if #eventLines > 0 then return eventLines,active,bedroom,eventType end
   return #contextual > 0 and contextual or general,active,bedroom,nil
 end
 local function expandConversationLine(text,p,selfName,otherName,location,selfUnit,otherUnit)

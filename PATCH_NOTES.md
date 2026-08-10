@@ -1,5 +1,18 @@
 # Patch Notes
 
+## Repository version 1.0.49 - Conversation queue availability
+
+### Fixed
+
+- A queued event whose dialogue lines are temporarily protected by the Commonwealth-wide repeat cooldown no longer suppresses every ordinary conversation.
+- The unavailable event remains queued while eligible pairs can continue producing contextual or general exchanges at their normal chances.
+- Event conversations still take priority whenever at least one appropriate event exchange is actually available.
+
+### Compatibility
+
+- Existing saves require no migration; blocked queues resume normal conversation checks immediately after rebuilding.
+- The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.48 - Years Together synchronization
 
 ### Fixed
