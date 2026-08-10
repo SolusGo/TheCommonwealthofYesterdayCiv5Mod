@@ -2,23 +2,39 @@
 <Context ID="CommonwealthPanel">
   <Instance Name="FriendRow">
     <GridButton ID="FriendButton" Size="246,68" Style="BaseButton">
-      <Label ID="RowName" Anchor="L,T" Offset="10,7" Size="226,24" Font="TwCenMT18" FontStyle="Shadow" Color="240,168,105,255" />
-      <Label ID="RowDetail" Anchor="L,T" Offset="10,32" Size="226,28" WrapWidth="226" Font="TwCenMT14" FontStyle="Shadow" Color="232,219,194,255" />
+      <Grid Anchor="L,C" Offset="7,0" Size="54,54" Style="Grid9Frame"><Image ID="RowPortrait" Anchor="C,C" Size="45,45" /></Grid>
+      <Label ID="RowName" Anchor="L,T" Offset="66,7" Size="170,24" Font="TwCenMT18" FontStyle="Shadow" Color="240,168,105,255" />
+      <Label ID="RowDetail" Anchor="L,T" Offset="66,32" Size="170,28" WrapWidth="170" Font="TwCenMT14" FontStyle="Shadow" Color="232,219,194,255" />
     </GridButton>
   </Instance>
 
   <GridButton ID="MemoryButton" Anchor="R,T" Offset="24,146" Size="196,42" Style="BaseButton" String="MEMORIES: 0 / 100" ToolTip="Open the Commonwealth Memories panel" />
-  <Grid ID="Panel" Anchor="R,T" Offset="24,196" Size="500,408" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
+  <Grid ID="Panel" Anchor="R,T" Offset="24,196" Size="500,468" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
     <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
-    <Box Anchor="C,C" Offset="0,13" Size="438,332" Color="31,52,52,150" />
+    <Box Anchor="C,C" Offset="0,13" Size="438,392" Color="31,52,52,150" />
     <Box Anchor="C,T" Offset="0,12" Size="438,40" Color="51,66,73,230" />
     <Box Anchor="C,T" Offset="0,52" Size="438,2" Color="229,109,40,170" />
     <Label Anchor="C,T" Offset="0,18" Size="420,28" Font="TwCenMT24" FontStyle="Shadow" String="MEMORIES" Color="240,156,91,255" />
-    <Label ID="StatusLabel" Anchor="C,T" Offset="0,55" Size="420,48" WrapWidth="420" Font="TwCenMT18" FontStyle="Shadow" Color="245,226,195,255" />
-    <GridButton ID="BoysButton" Anchor="C,T" Offset="0,112" Size="452,52" Style="BaseButton" String="The Boys Are Online" ToolTip="+15% Production and adjacent formation strength, followed by -10% military Production during Everyone Logged Off." />
-    <GridButton ID="WorldButton" Anchor="C,T" Offset="0,172" Size="452,52" Style="BaseButton" String="One More World Before Bed" ToolTip="Workers gain +1 Movement and +25% work rate, followed by -10% Science during The Sun Is Coming Up." />
-    <GridButton ID="SummerButton" Anchor="C,T" Offset="0,232" Size="452,52" Style="BaseButton" String="The Summer That Never Ended" ToolTip="+15% Culture, Happiness, and Bedroom Food, followed by -10% Culture and -2 Happiness during September Morning." />
-    <Label Anchor="C,T" Offset="0,296" Size="420,38" WrapWidth="420" Font="TwCenMT16" FontStyle="Shadow" String="Every Reminiscence is followed by four turns of Melancholy." Color="236,164,109,255" />
+    <Label ID="MemoryAmount" Anchor="L,T" Offset="39,62" Size="220,22" Font="TwCenMT18" FontStyle="Shadow" String="0 / 100 Memories" Color="245,226,195,255" />
+    <Label ID="MemoryCost" Anchor="R,T" Offset="39,63" Size="190,20" Font="TwCenMT16" FontStyle="Shadow" String="Next: 25" Color="240,168,105,255" />
+    <Box Anchor="C,T" Offset="0,87" Size="420,16" Color="13,29,31,210" />
+    <Box ID="MemoryFill" Anchor="L,T" Offset="40,90" Size="1,10" Color="229,109,40,220" />
+    <Box ID="MemoryCostMarker" Anchor="L,T" Offset="40,85" Size="2,20" Color="245,226,195,230" />
+    <Label ID="StatusLabel" Anchor="C,T" Offset="0,110" Size="420,45" WrapWidth="420" Font="TwCenMT18" FontStyle="Shadow" Color="245,226,195,255" />
+    <Grid ID="KeepsakeStrip" Anchor="C,T" Offset="0,151" Size="420,39">
+      <Image Anchor="L,C" Offset="0,0" Size="32,32" Texture="Art/Bedroom/CommonwealthBedroomIcon32.dds" />
+      <Label ID="KeepsakeCity" Anchor="L,T" Offset="38,0" Size="250,19" Font="TwCenMT14" FontStyle="Shadow" String="Selected city" Color="232,219,194,255" />
+      <Label Anchor="L,T" Offset="38,18" Size="85,18" Font="TwCenMT14" FontStyle="Shadow" String="KEEPSAKES" Color="240,168,105,255" />
+      <Box ID="Keep1Off" Anchor="L,B" Offset="130,5" Size="42,8" Color="72,80,77,190" /><Box ID="Keep1On" Anchor="L,B" Offset="130,5" Size="42,8" Color="240,168,105,255" Hidden="1" />
+      <Box ID="Keep2Off" Anchor="L,B" Offset="178,5" Size="42,8" Color="72,80,77,190" /><Box ID="Keep2On" Anchor="L,B" Offset="178,5" Size="42,8" Color="240,168,105,255" Hidden="1" />
+      <Box ID="Keep3Off" Anchor="L,B" Offset="226,5" Size="42,8" Color="72,80,77,190" /><Box ID="Keep3On" Anchor="L,B" Offset="226,5" Size="42,8" Color="240,168,105,255" Hidden="1" />
+      <Box ID="Keep4Off" Anchor="L,B" Offset="274,5" Size="42,8" Color="72,80,77,190" /><Box ID="Keep4On" Anchor="L,B" Offset="274,5" Size="42,8" Color="240,168,105,255" Hidden="1" />
+      <Label ID="KeepsakeYield" Anchor="R,C" Offset="0,0" Size="96,32" WrapWidth="96" Font="TwCenMT14" FontStyle="Shadow" Color="245,226,195,255" />
+    </Grid>
+    <GridButton ID="BoysButton" Anchor="C,T" Offset="0,198" Size="452,50" Style="BaseButton" String="The Boys Are Online" ToolTip="+15% Production and adjacent formation strength, followed by -10% military Production during Everyone Logged Off." />
+    <GridButton ID="WorldButton" Anchor="C,T" Offset="0,254" Size="452,50" Style="BaseButton" String="One More World Before Bed" ToolTip="Workers gain +1 Movement and +25% work rate, followed by -10% Science during The Sun Is Coming Up." />
+    <GridButton ID="SummerButton" Anchor="C,T" Offset="0,310" Size="452,50" Style="BaseButton" String="The Summer That Never Ended" ToolTip="+15% Culture, Happiness, and Bedroom Food, followed by -10% Culture and -2 Happiness during September Morning." />
+    <Label Anchor="C,T" Offset="0,366" Size="420,38" WrapWidth="420" Font="TwCenMT16" FontStyle="Shadow" String="Every Reminiscence is followed by four turns of Melancholy." Color="236,164,109,255" />
     <GridButton ID="LedgerButton" Anchor="L,B" Offset="24,22" Size="190,38" Style="BaseButton" String="Old Friends Ledger" />
     <GridButton ID="CloseButton" Anchor="R,B" Offset="24,22" Size="100,38" Style="BaseButton" String="Close" />
   </Grid>
@@ -42,18 +58,27 @@
     <Grid Anchor="L,T" Offset="310,70" Size="584,512" Style="GridBlackIndent8">
       <Box Anchor="C,C" Size="568,496" Color="24,45,45,98" />
       <Box Anchor="L,C" Offset="8,0" Size="2,488" Color="229,109,40,135" />
-      <Label ID="ProfileName" Anchor="L,T" Offset="18,12" Size="540,28" Font="TwCenMT22" FontStyle="Shadow" String="Select an Old Friend" Color="240,168,105,255" />
-      <Label ID="ProfileTag" Anchor="L,T" Offset="18,40" Size="540,22" Font="TwCenMT16" FontStyle="Shadow" Color="232,219,194,255" />
-      <Grid Anchor="C,T" Offset="0,67" Size="548,1" Style="Grid9Bar" />
-      <Label ID="ProfileStatus" Anchor="L,T" Offset="18,76" Size="540,23" Font="TwCenMT18" FontStyle="Shadow" Color="236,142,76,255" />
-      <Label ID="ProfileSummary" Anchor="L,T" Offset="18,104" Size="540,70" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
-      <Grid Anchor="L,T" Offset="16,178" Size="266,64" Style="Grid9Frame"><Label ID="CombatStats" Anchor="L,C" Offset="12,0" Size="242,52" WrapWidth="242" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" /></Grid>
-      <Grid Anchor="R,T" Offset="16,178" Size="266,64" Style="Grid9Frame"><Label ID="SurvivalStats" Anchor="L,C" Offset="12,0" Size="242,52" WrapWidth="242" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" /></Grid>
-      <Label Anchor="L,T" Offset="18,252" Size="120,20" Font="TwCenMT16" FontStyle="Shadow" String="LINEAGE" Color="236,142,76,255" />
-      <Label ID="LineageText" Anchor="L,T" Offset="18,274" Size="540,48" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
+      <Grid Anchor="L,T" Offset="18,12" Size="68,68" Style="Grid9Frame"><Image ID="ProfilePortrait" Anchor="C,C" Size="64,64" /></Grid>
+      <Label ID="ProfileName" Anchor="L,T" Offset="96,12" Size="462,28" Font="TwCenMT22" FontStyle="Shadow" String="Select an Old Friend" Color="240,168,105,255" />
+      <Label ID="ProfileTag" Anchor="L,T" Offset="96,40" Size="462,38" WrapWidth="462" Font="TwCenMT16" FontStyle="Shadow" Color="232,219,194,255" />
+      <Grid Anchor="C,T" Offset="0,84" Size="548,1" Style="Grid9Bar" />
+      <Label ID="ProfileStatus" Anchor="L,T" Offset="18,91" Size="540,23" Font="TwCenMT18" FontStyle="Shadow" Color="236,142,76,255" />
+      <Label ID="ProfileSummary" Anchor="L,T" Offset="18,117" Size="540,42" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
+      <Label Anchor="L,T" Offset="18,163" Size="132,18" Font="TwCenMT14" FontStyle="Shadow" String="YEARS TOGETHER" Color="236,142,76,255" />
+      <Box ID="Year1Off" Anchor="L,T" Offset="154,169" Size="48,8" Color="72,80,77,190" /><Box ID="Year1On" Anchor="L,T" Offset="154,169" Size="48,8" Color="240,168,105,255" Hidden="1" />
+      <Box ID="Year2Off" Anchor="L,T" Offset="207,169" Size="48,8" Color="72,80,77,190" /><Box ID="Year2On" Anchor="L,T" Offset="207,169" Size="48,8" Color="240,168,105,255" Hidden="1" />
+      <Box ID="Year3Off" Anchor="L,T" Offset="260,169" Size="48,8" Color="72,80,77,190" /><Box ID="Year3On" Anchor="L,T" Offset="260,169" Size="48,8" Color="240,168,105,255" Hidden="1" />
+      <Box ID="Year4Off" Anchor="L,T" Offset="313,169" Size="48,8" Color="72,80,77,190" /><Box ID="Year4On" Anchor="L,T" Offset="313,169" Size="48,8" Color="240,168,105,255" Hidden="1" />
+      <Box ID="Year5Off" Anchor="L,T" Offset="366,169" Size="48,8" Color="72,80,77,190" /><Box ID="Year5On" Anchor="L,T" Offset="366,169" Size="48,8" Color="240,168,105,255" Hidden="1" />
+      <Box ID="Year6Off" Anchor="L,T" Offset="419,169" Size="48,8" Color="72,80,77,190" /><Box ID="Year6On" Anchor="L,T" Offset="419,169" Size="48,8" Color="240,168,105,255" Hidden="1" />
+      <Label ID="YearsBonus" Anchor="R,T" Offset="18,163" Size="88,18" Font="TwCenMT14" FontStyle="Shadow" Color="245,226,195,255" />
+      <Grid Anchor="L,T" Offset="16,188" Size="266,64" Style="Grid9Frame"><Label ID="CombatStats" Anchor="L,C" Offset="12,0" Size="242,52" WrapWidth="242" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" /></Grid>
+      <Grid Anchor="R,T" Offset="16,188" Size="266,64" Style="Grid9Frame"><Label ID="SurvivalStats" Anchor="L,C" Offset="12,0" Size="242,52" WrapWidth="242" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" /></Grid>
+      <Label Anchor="L,T" Offset="18,258" Size="120,20" Font="TwCenMT16" FontStyle="Shadow" String="LINEAGE" Color="236,142,76,255" />
+      <Label ID="LineageText" Anchor="L,T" Offset="18,280" Size="540,42" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
       <Label ID="RelationshipText" Anchor="L,T" Offset="18,326" Size="540,42" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
       <Label Anchor="L,T" Offset="18,371" Size="120,20" Font="TwCenMT16" FontStyle="Shadow" String="TIMELINE" Color="236,142,76,255" />
-      <ScrollPanel Anchor="L,T" Offset="14,394" Size="552,72" Vertical="1"><Label ID="TimelineText" Anchor="L,T" Offset="6,4" Size="516,2048" WrapWidth="516" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" /></ScrollPanel>
+      <ScrollPanel Anchor="L,T" Offset="14,392" Size="552,74" Vertical="1"><Label ID="TimelineText" Anchor="L,T" Offset="6,4" Size="516,2048" WrapWidth="516" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" /></ScrollPanel>
       <Label ID="RememberQuote" Anchor="L,B" Offset="18,10" Size="540,24" WrapWidth="540" Font="TwCenMT14" FontStyle="Shadow" Color="240,168,105,255" />
     </Grid>
     <GridButton ID="ConversationToggle" Anchor="L,B" Offset="25,22" Size="260,38" Style="BaseButton" String="Conversations: On" ToolTip="Enable or disable spontaneous adjacent Old Friend conversations." />
@@ -62,23 +87,27 @@
     <GridButton ID="LedgerClose" Anchor="R,B" Offset="30,22" Size="110,38" Style="BaseButton" String="Close" />
   </Grid>
 
-  <Grid ID="ConversationPanel" Anchor="C,C" Size="640,278" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
+  <Grid ID="ConversationPanel" Anchor="C,C" Size="660,322" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
     <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
-    <Box Anchor="C,C" Offset="0,8" Size="580,222" Color="31,52,52,150" />
-    <Box Anchor="C,T" Offset="0,12" Size="580,50" Color="51,66,73,230" />
-    <Box Anchor="C,T" Offset="0,62" Size="580,2" Color="229,109,40,170" />
-    <Label Anchor="C,T" Offset="0,14" Size="560,28" Font="TwCenMT22" FontStyle="Shadow" String="OLD FRIENDS" Color="240,156,91,255" />
-    <Label ID="ConversationContext" Anchor="C,T" Offset="0,42" Size="560,22" Font="TwCenMT16" FontStyle="Shadow" Color="232,219,194,255" />
-    <Grid Anchor="C,T" Offset="0,70" Size="590,70" Style="GridBlackIndent8">
-      <Box Anchor="C,C" Size="574,54" Color="24,45,45,100" />
-      <Label ID="ConversationSpeakerOne" Anchor="L,T" Offset="12,8" Size="566,22" Font="TwCenMT18" FontStyle="Shadow" Color="240,168,105,255" />
-      <Label ID="ConversationLineOne" Anchor="L,T" Offset="12,31" Size="566,32" WrapWidth="566" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
+    <Box Anchor="C,C" Offset="0,8" Size="600,266" Color="31,52,52,150" />
+    <Box Anchor="C,T" Offset="0,12" Size="600,58" Color="51,66,73,230" />
+    <Box Anchor="C,T" Offset="0,70" Size="600,2" Color="229,109,40,170" />
+    <Image ID="ConversationEventIcon" Anchor="L,T" Offset="44,19" Size="32,32" />
+    <Label Anchor="C,T" Offset="0,14" Size="520,28" Font="TwCenMT22" FontStyle="Shadow" String="OLD FRIENDS" Color="240,156,91,255" />
+    <Label ID="ConversationContext" Anchor="C,T" Offset="0,43" Size="520,22" Font="TwCenMT16" FontStyle="Shadow" Color="232,219,194,255" />
+    <Grid Anchor="C,T" Offset="0,78" Size="610,78" Style="GridBlackIndent8">
+      <Box Anchor="C,C" Size="594,62" Color="24,45,45,100" />
+      <Grid Anchor="L,C" Offset="9,0" Size="58,58" Style="Grid9Frame"><Image ID="ConversationPortraitOne" Anchor="C,C" Size="45,45" /></Grid>
+      <Label ID="ConversationSpeakerOne" Anchor="L,T" Offset="77,8" Size="518,22" Font="TwCenMT18" FontStyle="Shadow" Color="240,168,105,255" />
+      <Label ID="ConversationLineOne" Anchor="L,T" Offset="77,31" Size="518,38" WrapWidth="518" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
     </Grid>
-    <Grid Anchor="C,T" Offset="0,148" Size="590,70" Style="GridBlackIndent8">
-      <Box Anchor="C,C" Size="574,54" Color="24,45,45,100" />
-      <Label ID="ConversationSpeakerTwo" Anchor="L,T" Offset="12,8" Size="566,22" Font="TwCenMT18" FontStyle="Shadow" Color="240,168,105,255" />
-      <Label ID="ConversationLineTwo" Anchor="L,T" Offset="12,31" Size="566,32" WrapWidth="566" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
+    <Grid Anchor="C,T" Offset="0,164" Size="610,78" Style="GridBlackIndent8">
+      <Box Anchor="C,C" Size="594,62" Color="24,45,45,100" />
+      <Grid Anchor="L,C" Offset="9,0" Size="58,58" Style="Grid9Frame"><Image ID="ConversationPortraitTwo" Anchor="C,C" Size="45,45" /></Grid>
+      <Label ID="ConversationSpeakerTwo" Anchor="L,T" Offset="77,8" Size="518,22" Font="TwCenMT18" FontStyle="Shadow" Color="240,168,105,255" />
+      <Label ID="ConversationLineTwo" Anchor="L,T" Offset="77,31" Size="518,38" WrapWidth="518" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
     </Grid>
+    <Label ID="ConversationFooter" Anchor="C,T" Offset="0,248" Size="560,20" Font="TwCenMT14" FontStyle="Shadow" String="Another moment preserved in the Ledger." Color="236,164,109,255" />
     <GridButton ID="ConversationClose" Anchor="C,B" Offset="0,18" Size="120,36" Style="BaseButton" String="Continue" />
   </Grid>
 </Context>

@@ -1,5 +1,21 @@
 # Patch Notes
 
+## Repository version 1.0.51 - Commonwealth presentation pass
+
+### Added
+
+- Added a live Memories meter with a next-Reminiscence cost marker and clearer active-state text.
+- Added four city-aware Keepsake pips, current Culture and Tourism contributions, and a safe capital fallback outside city view.
+- Added Old Friend portraits to Ledger rows and profiles, plus a six-pip Years Together display with the exact combat bonus.
+- Added native event icons to Ledger timelines and portrait-led conversation cards with contextual event presentation.
+- Added a styled Civilopedia quick reference and visual section labels for the leader, Old Friend, and Childhood Bedroom articles.
+
+### Compatibility
+
+- All additions are read-only presentation logic; Memories, Keepsakes, promotions, conversations, yields, and save-data keys are unchanged.
+- Existing city, top-panel, production, and Civilopedia screens are not replaced. The interface remains contained in the Commonwealth add-in and uses existing 32/45/64px art.
+- Existing saves are compatible after rebuilding. The ModBuddy project and `.modinfo` version remain `1`.
+
 ## Repository version 1.0.50 - Safe Keepsake Tourism
 
 ### Fixed

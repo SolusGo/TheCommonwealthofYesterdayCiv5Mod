@@ -5,6 +5,8 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 ('TXT_KEY_CIV_COMMONWEALTH_ADJECTIVE','Nostalgic'),
 ('TXT_KEY_LEADER_CHILD_WE_WERE','The Child We Were'),
 ('TXT_KEY_LEADER_CHILD_WE_WERE_PEDIA',
+ '[ICON_CAPITAL] [COLOR_POSITIVE_TEXT]A LEADER MADE OF MEMORY[ENDCOLOR]'
+ || '[NEWLINE][NEWLINE]' ||
  'The Child We Were is not one historical ruler, but the remembered self at the centre of the Commonwealth: the child who believed the night could last forever, that the whole group would always be online tomorrow, and that a bedroom could contain an entire universe.'
  || '[NEWLINE][NEWLINE]' ||
  'The Child rules by preserving rather than conquering. Old friendships become living military lineages, familiar rooms gather Keepsakes as the ages pass, and the ordinary milestones of a civilization are transformed into Memories. Those Memories can briefly make the past feel present again, but every Reminiscence is followed by Melancholy—a quiet interval in which another cannot begin.'
@@ -85,6 +87,15 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
  'The Commonwealth''s colours join sunset orange to the deep blue of evening: the warm last light of childhood against the night in which so many shared worlds were made. Its house emblem represents safety, return, and the ordinary place that memory transforms into sacred ground. The linked figures carried by the Old Friend represent companionship surviving the change from one age to the next.'
  || '[NEWLINE][NEWLINE]' ||
  'Its central belief is not that the past was perfect. It is that people often recognize a treasured era only after it has ended. The Commonwealth answers that loss by remembering deliberately—and by making the present worthy of becoming someone else''s yesterday.'),
+('TXT_KEY_CIV5_COMMONWEALTH_HEADING_10','Quick Reference'),
+('TXT_KEY_CIV5_COMMONWEALTH_TEXT_10',
+ '[ICON_CULTURE] [COLOR_POSITIVE_TEXT]MEMORIES[ENDCOLOR][NEWLINE]Maximum reserve: 100. Era transitions, upgrades, Great People, World Wonders, Keepsakes, and surviving Old Friends generate Memories.'
+ || '[NEWLINE][NEWLINE]' ||
+ '[ICON_ARROW_RIGHT] [COLOR_POSITIVE_TEXT]REMINISCENCES[ENDCOLOR][NEWLINE]The first activation each era costs 25 Memories; later activations cost 35, 45, and so on. Eight active turns are followed by four turns of Melancholy on Standard speed.'
+ || '[NEWLINE][NEWLINE]' ||
+ '[ICON_STRENGTH] [COLOR_POSITIVE_TEXT]OLD FRIENDS[ENDCOLOR][NEWLINE]Preserve and upgrade their lineages. Each survived era adds one Years Together level, worth +2% Combat Strength up to +12%.'
+ || '[NEWLINE][NEWLINE]' ||
+ '[ICON_CAPITAL] [COLOR_POSITIVE_TEXT]CHILDHOOD BEDROOMS[ENDCOLOR][NEWLINE]Build them early. Each later era can add one of four Keepsakes, each worth +1 Culture and 2 Memories; every two add +1 Tourism after Archaeology.'),
 
 -- Leader Civilopedia sections.
 ('TXT_KEY_CIVILOPEDIA_LEADERS_CHILD_WE_WERE_HEADING_1','The Child We Were'),
@@ -170,6 +181,8 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 -- Unique unit and promotions.
 ('TXT_KEY_UNIT_OLD_FRIEND','Old Friend'),
 ('TXT_KEY_UNIT_OLD_FRIEND_PEDIA',
+ '[ICON_STRENGTH] [COLOR_POSITIVE_TEXT]PRESERVE THE LINEAGE[ENDCOLOR]'
+ || '[NEWLINE][NEWLINE]' ||
  'An Old Friend is more than the Commonwealth''s first soldier. This is one of the people who was present when the world still felt new: a companion remembered by name, carried from the ancient era into every age that follows.'
  || '[NEWLINE][NEWLINE]' ||
  'The unit replaces the Warrior without changing its base Combat Strength and costs 40 [ICON_PRODUCTION] Production. Since the Beginning is retained through upgrades, preserving the unit''s identity, history, and eligibility for all Old Friend mechanics. At every era transition, a surviving Old Friend heals 25 damage, generates 1 Memory, and gains +2% Combat Strength from Years Together, up to +12% after six transitions. It also gains +10% Combat Strength while adjacent to another Old Friend or descendant.'
@@ -192,6 +205,8 @@ INSERT OR REPLACE INTO Language_en_US (Tag,Text) VALUES
 -- Unique building.
 ('TXT_KEY_BUILDING_BEDROOM','Childhood Bedroom'),
 ('TXT_KEY_BUILDING_BEDROOM_PEDIA',
+ '[ICON_CULTURE] [COLOR_POSITIVE_TEXT]A ROOM THAT GROWS WITH TIME[ENDCOLOR]'
+ || '[NEWLINE][NEWLINE]' ||
  'A Childhood Bedroom is the first world a person truly rules. Its geography is intimate: the bed, the desk, the shelves, the window, the screen glowing after everyone else has gone to sleep. To an outsider it is an ordinary room. To the Commonwealth it is an archive whose objects acquire meaning as their owner grows older.'
  || '[NEWLINE][NEWLINE]' ||
  'The Childhood Bedroom replaces the Monument. It costs 40 [ICON_PRODUCTION] Production, has no maintenance cost, and provides +2 [ICON_CULTURE] Culture and +1 local [ICON_HAPPINESS_1] Happiness. At each era transition after the era in which it was built, the Bedroom gains one Keepsake, up to four. Every Keepsake generates 2 Memories when gained and permanently adds +1 Culture.'

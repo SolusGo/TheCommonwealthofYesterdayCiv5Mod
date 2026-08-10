@@ -1,4 +1,12 @@
+include('IconSupport')
+
 local CIV = GameInfoTypes.CIVILIZATION_COMMONWEALTH_YESTERDAY
+local BEDROOM = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM
+local KEEPSAKES = {
+  GameInfoTypes.BUILDING_COMMONWEALTH_KEEP_1, GameInfoTypes.BUILDING_COMMONWEALTH_KEEP_2,
+  GameInfoTypes.BUILDING_COMMONWEALTH_KEEP_3, GameInfoTypes.BUILDING_COMMONWEALTH_KEEP_4
+}
+local ARCHAEOLOGY = GameInfoTypes.TECH_ARCHAEOLOGY
 local state = {mem=0,used=0,active=0,activeTurns=0,mel=0,melTurns=0}
 local labels = {
   [1]='The Boys Are Online',
@@ -30,19 +38,65 @@ local quotes = {
   'There was once always someone online.'
 }
 
+local function hookFriendPortrait(control,size)
+  if control then IconHookup(0,size,'COMMONWEALTH_OLD_FRIEND_ATLAS',control) end
+end
+local function hookConversationEvent(eventType)
+  local atlas = eventType == 'bedroom' and 'COMMONWEALTH_BEDROOM_ATLAS' or 'COMMONWEALTH_CIV_ATLAS'
+  IconHookup(0,32,atlas,Controls.ConversationEventIcon)
+end
+local function setPips(prefix,count,total)
+  count=math.max(0,math.min(total,tonumber(count) or 0))
+  for i=1,total do
+    local on,off=Controls[prefix..i..'On'],Controls[prefix..i..'Off']
+    if on then on:SetHide(i>count) end
+    if off then off:SetHide(i<=count) end
+  end
+end
+
 local function playerID() return Game.GetActivePlayer() end
 local function eligible() local p=Players[playerID()]; return p and p:GetCivilizationType()==CIV end
 local function refresh()
   ContextPtr:SetHide(not eligible())
   if eligible() then LuaEvents.CommonwealthGetState(playerID()); LuaEvents.CommonwealthConversationStatusRequest(playerID()) end
 end
+local function selectedCommonwealthCity()
+  local p=Players[playerID()]
+  if not p then return nil end
+  local city=UI.GetHeadSelectedCity and UI.GetHeadSelectedCity() or nil
+  if city and city:GetOwner()==playerID() then return city end
+  return p:GetCapitalCity()
+end
+local function redrawKeepsakes()
+  if not eligible() then return end
+  local city=selectedCommonwealthCity()
+  if not city then
+    Controls.KeepsakeCity:SetText('No city selected'); Controls.KeepsakeYield:SetText(''); setPips('Keep',0,4); return
+  end
+  local hasBedroom=city:GetNumRealBuilding(BEDROOM)>0 or city:GetNumFreeBuilding(BEDROOM)>0
+  local count=0
+  for _,building in ipairs(KEEPSAKES) do if city:GetNumRealBuilding(building)>0 then count=count+1 end end
+  Controls.KeepsakeCity:SetText(city:GetName()..(hasBedroom and '' or ' - No Bedroom'))
+  setPips('Keep',count,4)
+  if not hasBedroom then Controls.KeepsakeYield:SetText('Not collecting') return end
+  local player=Players[playerID()]
+  local team=player and Teams[player:GetTeam()]
+  local hasArchaeology=team and team:GetTeamTechs():HasTech(ARCHAEOLOGY)
+  local tourism=hasArchaeology and math.floor(count/2) or 0
+  Controls.KeepsakeYield:SetText('+'..count..' [ICON_CULTURE]'..(hasArchaeology and ('  +'..tourism..' [ICON_TOURISM]') or '[NEWLINE]Tourism later'))
+end
 local function redraw()
   local cost=25+state.used*10; Controls.MemoryButton:SetText('MEMORIES: '..state.mem..' / 100')
+  Controls.MemoryAmount:SetText(state.mem..' / 100 Memories')
+  Controls.MemoryCost:SetText('Next: '..cost)
+  Controls.MemoryFill:SetSizeX(math.max(1,math.floor(420*math.max(0,math.min(100,state.mem))/100)))
+  Controls.MemoryCostMarker:SetOffsetX(40+math.floor(420*math.max(0,math.min(100,cost))/100))
   if state.activeTurns>0 then Controls.StatusLabel:SetText(labels[state.active]..' - '..state.activeTurns..' turns remain')
   elseif state.melTurns>0 then Controls.StatusLabel:SetText('Melancholy: '..melancholy[state.mel]..' ('..melancholyEffects[state.mel]..') - '..state.melTurns..' turns remain')
   else Controls.StatusLabel:SetText('Next Reminiscence: '..cost..' Memories') end
   local disabled=state.activeTurns>0 or state.melTurns>0 or state.mem<cost
   Controls.BoysButton:SetDisabled(disabled); Controls.WorldButton:SetDisabled(disabled); Controls.SummerButton:SetDisabled(disabled)
+  redrawKeepsakes()
 end
 
 local function selectFriend(row)
@@ -50,7 +104,8 @@ local function selectFriend(row)
   if not row then
     Controls.ProfileName:SetText('Select an Old Friend'); Controls.ProfileTag:SetText(''); Controls.ProfileStatus:SetText('')
     Controls.ProfileSummary:SetText(''); Controls.CombatStats:SetText(''); Controls.SurvivalStats:SetText('')
-    Controls.LineageText:SetText(''); Controls.RelationshipText:SetText(''); Controls.TimelineText:SetText('')
+    Controls.LineageText:SetText(''); Controls.RelationshipText:SetText(''); Controls.TimelineText:SetText(''); Controls.YearsBonus:SetText('')
+    setPips('Year',0,6); hookFriendPortrait(Controls.ProfilePortrait,64)
     Controls.LocateButton:SetDisabled(true); Controls.RememberButton:SetDisabled(true); return
   end
   Controls.ProfileName:SetText(row.name..' - '..row.epithet)
@@ -58,7 +113,8 @@ local function selectFriend(row)
   Controls.ProfileTag:SetText('Known Online As: '..row.tag..aliases)
   local lastOnline = row.status=='Offline' and row.deathTurn>=0 and ('   |   Last Online: Turn '..row.deathTurn) or ''
   Controls.ProfileStatus:SetText('Status: '..row.status..'   |   Current Location: '..row.location..lastOnline)
-  Controls.ProfileSummary:SetText('Current Form: '..row.form..'[NEWLINE]Created: '..row.bornEra..', Turn '..row.bornTurn..'   |   Years Together: '..row.years..'/6   |   Level '..row.level..' ('..row.xp..' XP)')
+  Controls.ProfileSummary:SetText('Current Form: '..row.form..'[NEWLINE]Created: '..row.bornEra..', Turn '..row.bornTurn..'   |   Level '..row.level..' ('..row.xp..' XP)')
+  setPips('Year',row.years,6); Controls.YearsBonus:SetText(row.years..'/6  (+'..(row.years*2)..'%)'); hookFriendPortrait(Controls.ProfilePortrait,64)
   Controls.CombatStats:SetText('[ICON_STRENGTH] COMBAT RECORD[NEWLINE]Battles: '..row.battles..'   Enemies Defeated: '..row.kills)
   Controls.SurvivalStats:SetText('[ICON_HEALTH] PERSONAL RECORD[NEWLINE]Lowest HP: '..row.lowHP..'   Distance: '..row.distance..'   Upgrades: '..row.upgrades)
   Controls.LineageText:SetText(row.lineage ~= '' and row.lineage or row.form)
@@ -78,6 +134,7 @@ local function renderLedgerList()
   for _,row in ipairs(ledgerRows) do if includeRow(row) then
     shown=shown+1; if not first then first=row end
     local control={}; ContextPtr:BuildInstanceForControl('FriendRow',control,Controls.LedgerStack)
+    hookFriendPortrait(control.RowPortrait,45)
     control.RowName:SetText(row.name..' - '..row.tag)
     control.RowDetail:SetText(row.form..'   |   '..row.status)
     control.FriendButton:RegisterCallback(Mouse.eLClick,function() selectFriend(row) end)
@@ -132,7 +189,13 @@ LuaEvents.CommonwealthConversationShown.Add(function(p,nameA,tagA,lineA,nameB,ta
   Controls.ConversationLineOne:SetText('"'..lineA..'"')
   Controls.ConversationSpeakerTwo:SetText(nameB..' - '..tagB)
   Controls.ConversationLineTwo:SetText('"'..lineB..'"')
+  hookFriendPortrait(Controls.ConversationPortraitOne,45); hookFriendPortrait(Controls.ConversationPortraitTwo,45); hookConversationEvent(eventType)
+  Controls.ConversationFooter:SetText(eventType=='general' and 'Another quiet moment preserved in the Ledger.' or 'A new chapter preserved in both timelines.')
   Controls.ConversationPanel:SetHide(false)
 end)
 Controls.ConversationClose:RegisterCallback(Mouse.eLClick,function() Controls.ConversationPanel:SetHide(true) end)
-Events.ActivePlayerTurnStart.Add(refresh); Events.LoadScreenClose.Add(refresh); refresh()
+Events.ActivePlayerTurnStart.Add(refresh); Events.LoadScreenClose.Add(refresh)
+Events.SerialEventEnterCityScreen.Add(redrawKeepsakes); Events.SerialEventExitCityScreen.Add(redrawKeepsakes)
+Events.SerialEventCityInfoDirty.Add(redrawKeepsakes)
+hookFriendPortrait(Controls.ProfilePortrait,64); hookFriendPortrait(Controls.ConversationPortraitOne,45); hookFriendPortrait(Controls.ConversationPortraitTwo,45)
+refresh()

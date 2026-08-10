@@ -636,6 +636,17 @@ local function displayLineage(raw)
   for value in string.gmatch(raw or '','[^|]+') do local row=GameInfo.Units[value]; names[#names+1]=row and Locale.ConvertTextKey(row.Description) or value end
   return table.concat(names,'  [ICON_ARROW_RIGHT]  ')
 end
+local function timelineEventIcon(text)
+  text=string.lower(text or '')
+  if string.find(text,'became ',1,true) then return '[ICON_ARROW_RIGHT]' end
+  if string.find(text,'survived into',1,true) then return '[ICON_CULTURE]' end
+  if string.find(text,'defeated ',1,true) then return '[ICON_STRENGTH]' end
+  if string.find(text,'survived with',1,true) or string.find(text,'survived a battle',1,true) then return '[ICON_HEALTH]' end
+  if string.find(text,'conversation with',1,true) then return '[ICON_GREAT_PEOPLE]' end
+  if string.find(text,'went offline',1,true) then return '[ICON_RAZING]' end
+  if string.find(text,'joined the commonwealth',1,true) then return '[ICON_CAPITAL]' end
+  return '[ICON_BULLET]'
+end
 
 LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
   local player=Players[p]; if not isCommonwealth(player) then LuaEvents.CommonwealthAdvancedLedgerResponse(p,{}); return end
@@ -647,7 +658,10 @@ LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
     local tributeAliases=CommonwealthTributeAliases and CommonwealthTributeAliases(name,tag)
     if tributeAliases then aliases=tributeAliases; setr(p,id,'ALIASES',aliases) end
     local closest,together=closestFriend(p,id,count); local timeline={}; local tc=tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
-    for i=1,tc do timeline[#timeline+1]='[COLOR_GREY]Turn '..getr(p,id,'TIME_'..i..'_TURN',0)..'[ENDCOLOR][NEWLINE]'..getr(p,id,'TIME_'..i..'_TEXT','') end
+    for i=1,tc do
+      local eventText=getr(p,id,'TIME_'..i..'_TEXT','')
+      timeline[#timeline+1]=timelineEventIcon(eventText)..'  [COLOR_GREY]Turn '..getr(p,id,'TIME_'..i..'_TURN',0)..'[ENDCOLOR][NEWLINE]'..eventText
+    end
     local currentType=tonumber(getr(p,id,'CURRENT_TYPE',-1)) or -1
     rows[#rows+1]={id=id,name=name,tag=tag,aliases=aliases,epithet=epithet(p,id),status=getr(p,id,'STATUS','Offline'),
       form=currentType>=0 and unitName(currentType) or 'Unknown',bornEra=eraName(tonumber(getr(p,id,'BORN_ERA',0)) or 0),bornTurn=tonumber(getr(p,id,'BORN',0)) or 0,

@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.50** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.51** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -45,6 +45,10 @@ The conversation library contains 96 exchanges. Dialogue is stored separately fr
 ### Childhood Bedroom
 
 The Childhood Bedroom replaces the Monument. It costs 40 Production, has no maintenance, and provides +2 Culture and +1 local Happiness. Constructed Bedrooms and policy-granted free Bedrooms both gain one Keepsake at each era transition after the era in which they were acquired, up to four. Each Keepsake adds +1 Culture and generates 2 Memories. After Archaeology, every two Keepsakes also add +1 Tourism.
+
+### Commonwealth interface
+
+The Memories panel includes a live reserve meter, next-cost marker, and four Keepsake pips for the city currently open (falling back to the capital outside city view). The Ledger uses Old Friend portraits, a six-pip Years Together display, and event-marked timelines. Conversation cards include portraits and contextual event presentation, while the Civilopedia provides a styled quick-reference section alongside the full lore and strategy articles.
 
 ## Installation
 
@@ -111,7 +115,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.47 | `a97f4df` | Prevented dialogue repetition across different Old Friend pairs. |
 | 1.0.48 | `1dfb113` | Restored Years Together buffs after recovered upgrades. |
 | 1.0.49 | `e1e20a3` | Prevented queued events from silencing normal conversations. |
-| 1.0.50 | Current | Safely implemented Keepsake Tourism as dedicated building yields. |
+| 1.0.50 | `7ecf7bc` | Safely implemented Keepsake Tourism as dedicated building yields. |
+| 1.0.51 | Current | Polished the Commonwealth interface and Civilopedia presentation. |
 
 ## ModBuddy development
 
