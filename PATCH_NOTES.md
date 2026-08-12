@@ -1,5 +1,25 @@
 # Patch Notes
 
+## Repository version 1.0.55 - Save-rollback conversation recovery
+
+### Fixed
+
+- Conversation timestamps stored by Civ V's persistent mod save data no longer block dialogue after loading an earlier game save whose turn is lower than the recorded global, pair, adjacency, event, or line-history turn.
+- Future cooldown timestamps now self-clear, and future queued events are discarded instead of remaining eligible indefinitely.
+- A queued special event whose 60% roll fails no longer suppresses a successful ordinary conversation roll for the same turn.
+- Successful special-event conversations still take priority over ordinary chatter.
+
+### Diagnostics
+
+- Successful exchanges now write the dialogue ID, both Friend names, and the turn to `Lua.log`.
+- Automatic recovery from a future global cooldown is also reported in `Lua.log`.
+
+### Compatibility
+
+- Existing dialogue history remains intact; only timestamps impossible in the currently loaded save are reset.
+- Conversation chances and cooldown lengths are unchanged: 8% ordinary, 60% event, eight-turn global cooldown, and fifteen-turn pair cooldown.
+- Existing saves are compatible after rebuilding. The ModBuddy project and `.modinfo` version remain `1`; deployment remains manual.
+
 ## Repository version 1.0.54 - Reliable upgrade timelines
 
 ### Fixed

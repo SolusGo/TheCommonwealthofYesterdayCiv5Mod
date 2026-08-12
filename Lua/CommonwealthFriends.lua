@@ -55,14 +55,14 @@ local function loadFriendEvents(p,id)
   for i=1,storedCount do
     local kind=getr(p,id,'EVENT_QUEUE_'..i..'_TYPE','')
     local eventTurn=tonumber(getr(p,id,'EVENT_QUEUE_'..i..'_TURN',-1000)) or -1000
-    if kind ~= '' and turn-eventTurn <= EVENT_LIFETIME and not seen[kind] then
+    if kind ~= '' and eventTurn <= turn and turn-eventTurn <= EVENT_LIFETIME and not seen[kind] then
       events[#events+1]={kind=kind,turn=eventTurn}; seen[kind]=true
     else changed=true end
   end
   local legacyKind=getr(p,id,'EVENT_TYPE','')
   local legacyTurn=tonumber(getr(p,id,'EVENT_TURN',-1000)) or -1000
   if legacyKind ~= '' then
-    if turn-legacyTurn <= EVENT_LIFETIME and not seen[legacyKind] then
+    if legacyTurn <= turn and turn-legacyTurn <= EVENT_LIFETIME and not seen[legacyKind] then
       events[#events+1]={kind=legacyKind,turn=legacyTurn}; seen[legacyKind]=true
     end
     changed=true
@@ -424,7 +424,8 @@ end
 local function pendingPairEvent(p,a,b)
   local eventType=save.GetValue(conversationPairKey(p,a,b,'EVENT_TYPE')) or ''
   local eventTurn=tonumber(save.GetValue(conversationPairKey(p,a,b,'EVENT_TURN'))) or -1000
-  if eventType ~= '' and Game.GetGameTurn()-eventTurn <= EVENT_LIFETIME then return eventType,eventTurn end
+  local turn=Game.GetGameTurn()
+  if eventType ~= '' and eventTurn <= turn and turn-eventTurn <= EVENT_LIFETIME then return eventType,eventTurn end
   if eventType ~= '' then
     save.SetValue(conversationPairKey(p,a,b,'EVENT_TYPE'),'')
     save.SetValue(conversationPairKey(p,a,b,'EVENT_TURN'),-1000)
@@ -442,6 +443,11 @@ local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
   for _,line in ipairs(conversationLines) do
     local pairUnused=tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) == 0
     local globalLast=tonumber(save.GetValue(globalConversationKey(p,line.id))) or -1000
+    if globalLast > turn then
+      -- Modding save data survives when an earlier Civ V save is loaded. A
+      -- future timestamp must not lock dialogue until the old turn catches up.
+      globalLast=-1000; save.SetValue(globalConversationKey(p,line.id),globalLast)
+    end
     if eventType and line.kind == eventType and pairUnused then eventPairHasUnused=true end
     if pairUnused and turn-globalLast >= GLOBAL_LINE_REPEAT_COOLDOWN then
       if eventType and line.kind == eventType then eventLines[#eventLines+1]=line
@@ -481,27 +487,39 @@ local function tryConversation(p,pairs)
   local player=Players[p]
   if not player:IsHuman() or not conversationsEnabled(p) or #pairs == 0 then return end
   local turn=Game.GetGameTurn(); local lastGlobal=tonumber(save.GetValue('COY2_CONV_LAST_'..p)) or -1000
+  if lastGlobal > turn then
+    print('CommonwealthFriends: cleared future global conversation cooldown from turn '..lastGlobal..' while loading turn '..turn)
+    lastGlobal=-1000; save.SetValue('COY2_CONV_LAST_'..p,lastGlobal)
+  end
   if turn-lastGlobal < GLOBAL_CONVERSATION_COOLDOWN then return end
-  local successes={}; local pendingEventExists=false
+  local successes,eventSuccesses={},{}
   for _,pair in ipairs(pairs) do
     local lastPair=tonumber(save.GetValue(conversationPairKey(p,pair.a,pair.b,'LAST'))) or -1000
+    if lastPair > turn then
+      lastPair=-1000; save.SetValue(conversationPairKey(p,pair.a,pair.b,'LAST'),lastPair)
+    end
     if turn-lastPair >= PAIR_CONVERSATION_COOLDOWN then
       local lines,active,bedroom,eventType=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB,pair.eventType)
-      if eventType then pendingEventExists=true end
       local chance=eventType and EVENT_CONVERSATION_CHANCE or
         (BASE_CONVERSATION_CHANCE+(active and REMINISCENCE_CHANCE_BONUS or 0)+(bedroom and BEDROOM_CHANCE_BONUS or 0))
       if #lines > 0 and Game.Rand(100,'Commonwealth adjacent Old Friends conversation') < chance then
-        successes[#successes+1]={pair=pair,lines=lines,eventType=eventType}
+        local success={pair=pair,lines=lines,eventType=eventType}
+        if eventType then eventSuccesses[#eventSuccesses+1]=success else successes[#successes+1]=success end
+      elseif eventType then
+        -- A failed special-event roll must not silence ordinary chatter for
+        -- the same otherwise-eligible adjacent pair.
+        local normalLines,normalActive,normalBedroom=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB,nil)
+        local normalChance=BASE_CONVERSATION_CHANCE+(normalActive and REMINISCENCE_CHANCE_BONUS or 0)
+          +(normalBedroom and BEDROOM_CHANCE_BONUS or 0)
+        if #normalLines > 0 and Game.Rand(100,'Commonwealth adjacent Old Friends fallback conversation') < normalChance then
+          successes[#successes+1]={pair=pair,lines=normalLines,eventType=nil}
+        end
       end
     end
   end
-  -- A normal exchange must not consume the global cooldown while a queued
-  -- event has an eligible adjacent pair waiting to speak.
-  if pendingEventExists then
-    local eventSuccesses={}
-    for _,success in ipairs(successes) do if success.eventType then eventSuccesses[#eventSuccesses+1]=success end end
-    successes=eventSuccesses
-  end
+  -- Successful special conversations retain priority, but a failed special
+  -- roll no longer discards successful ordinary conversations this turn.
+  if #eventSuccesses > 0 then successes=eventSuccesses end
   if #successes == 0 then return end
   local result=successes[Game.Rand(#successes,'Commonwealth conversation pair')+1]
   local pair=result.pair; local line=result.lines[Game.Rand(#result.lines,'Commonwealth conversation line')+1]
@@ -525,6 +543,7 @@ local function tryConversation(p,pairs)
   setr(p,pair.b,'CONVERSATIONS',(tonumber(getr(p,pair.b,'CONVERSATIONS',0)) or 0)+1)
   appendTimeline(p,pair.a,'Shared a quiet conversation with '..nameB..' at '..location..'.')
   appendTimeline(p,pair.b,'Shared a quiet conversation with '..nameA..' at '..location..'.')
+  print('CommonwealthFriends: showed conversation '..line.id..' for '..nameA..' and '..nameB..' on turn '..turn)
   LuaEvents.CommonwealthConversationShown(p,nameA,tagA,lineA,nameB,tagB,lineB,location,line.kind or result.eventType or 'general')
 end
 local function updateFriendships(p, units)
@@ -534,6 +553,9 @@ local function updateFriendships(p, units)
       local a,b = registerFriend(units[i]),registerFriend(units[j])
       local key = pairKey(p,a,b); save.SetValue(key,(tonumber(save.GetValue(key)) or 0)+1)
       local lastAdjacent=tonumber(save.GetValue(conversationPairKey(p,a,b,'ADJ_LAST'))) or -1000
+      if lastAdjacent > turn then
+        lastAdjacent=-1000; save.SetValue(conversationPairKey(p,a,b,'ADJ_LAST'),lastAdjacent)
+      end
       if lastAdjacent > -1000 and turn-lastAdjacent >= 15 then
         save.SetValue(conversationPairKey(p,a,b,'EVENT_TYPE'),'reunion')
         save.SetValue(conversationPairKey(p,a,b,'EVENT_TURN'),turn)
