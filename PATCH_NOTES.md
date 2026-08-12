@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.54 - Reliable upgrade timelines
+
+### Fixed
+
+- A living Old Friend whose identity transfers before the Ledger receives `UnitUpgraded` now records the missing form change during normal archive reconciliation.
+- Upgrade recording is idempotent across creation, movement, turn, recovery, and native upgrade callbacks, preventing duplicate Lineage forms, upgrade counts, Friend Memory telemetry, and timeline entries.
+- Existing saves with the correct current form and Lineage but a missing matching timeline entry repair automatically when the Ledger updates.
+- Timelines now retain the newest 30 events by dropping the oldest entry when full; previously, every event after the first 30 was silently discarded.
+
+### Compatibility
+
+- Old Friend identities, promotions, unit forms, Years Together, and combat mechanics are unchanged.
+- Existing saves are compatible after rebuilding. The ModBuddy project and `.modinfo` version remain `1`; deployment remains manual.
+
 ## Repository version 1.0.53 - Newest-first Friend timelines
 
 ### Fixed

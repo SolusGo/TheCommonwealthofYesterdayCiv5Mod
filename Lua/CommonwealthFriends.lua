@@ -100,7 +100,15 @@ local function unitName(unitType)
 end
 local function appendTimeline(p, id, text, eventTurn)
   local count = tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
-  if count >= 30 then return end
+  -- Keep a rolling archive. The old cap preserved the first 30 events forever,
+  -- which silently discarded later upgrades in long games.
+  if count >= 30 then
+    for i=2,count do
+      setr(p,id,'TIME_'..(i-1)..'_TURN',getr(p,id,'TIME_'..i..'_TURN',0))
+      setr(p,id,'TIME_'..(i-1)..'_TEXT',getr(p,id,'TIME_'..i..'_TEXT',''))
+    end
+    count = 29
+  end
   count = count + 1; setr(p,id,'TIMELINE_COUNT',count)
   setr(p,id,'TIME_'..count..'_TURN',eventTurn or Game.GetGameTurn()); setr(p,id,'TIME_'..count..'_TEXT',text)
 end
@@ -118,6 +126,43 @@ end
 local function lineageContains(lineage, value)
   for part in string.gmatch(lineage or '', '[^|]+') do if part == value then return true end end
   return false
+end
+local function timelineHasUpgrade(p,id,form)
+  local needle=' became '..form..'.'
+  local count=tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
+  for i=1,count do
+    if string.find(getr(p,id,'TIME_'..i..'_TEXT',''),needle,1,true) then return true end
+  end
+  return false
+end
+local function recordLedgerUpgrade(p,id,unitType,eventTurn)
+  local typeRow=GameInfo.Units[unitType]
+  if not typeRow then return false end
+  local typeName=typeRow.Type
+  local lineage=getr(p,id,'LINEAGE','')
+  if not lineageContains(lineage,typeName) then
+    lineage=lineage..(lineage ~= '' and '|' or '')..typeName
+    setr(p,id,'LINEAGE',lineage)
+  end
+  local forms=0
+  for _ in string.gmatch(lineage,'[^|]+') do forms=forms+1 end
+  local expectedUpgrades=math.max(0,forms-1)
+  local recordedUpgrades=tonumber(getr(p,id,'UPGRADES',0)) or 0
+  local missingUpgrades=math.max(0,expectedUpgrades-recordedUpgrades)
+  if missingUpgrades > 0 then
+    setr(p,id,'UPGRADES',expectedUpgrades)
+    setr(p,id,'MEMORIES',(tonumber(getr(p,id,'MEMORIES',0)) or 0)+(missingUpgrades*4))
+  end
+  local form=unitName(unitType)
+  local appended=false
+  local recordedKey='UPGRADE_RECORDED_'..typeName
+  if tonumber(getr(p,id,recordedKey,0)) ~= 1 and not timelineHasUpgrade(p,id,form) then
+    appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' became '..form..'.',eventTurn)
+    markFriendEvent(p,id,'upgrade')
+    appended=true
+  end
+  setr(p,id,recordedKey,1)
+  return missingUpgrades > 0 or appended
 end
 
 local function registerFriend(unit)
@@ -232,7 +277,12 @@ local function repairOrphanedUpgrade(p,unit)
   local unitType=GameInfo.Units[unit:GetUnitType()].Type
   local lineage=getr(p,id,'LINEAGE','')
   if lineageContains(lineage,'UNIT_COMMONWEALTH_OLD_FRIEND') then
-    if not lineageContains(lineage,unitType) then setr(p,id,'LINEAGE',lineage..'|'..unitType) end
+    local pendingTurn=tonumber(getr(p,id,'PENDING_DEATH_TURN',-1000)) or -1000
+    if pendingTurn <= -1000 then pendingTurn=Game.GetGameTurn() end
+    if recordLedgerUpgrade(p,id,unit:GetUnitType(),pendingTurn) then
+      syncLegacyFriendRecord(p,id,unit)
+      print('CommonwealthFriends: reconciled missing upgrade record for '..getr(p,id,'NAME','Old Friend')..' as '..unitType)
+    end
     return
   end
   local player=Players[p]; local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0; local target=nil
@@ -261,10 +311,7 @@ local function repairOrphanedUpgrade(p,unit)
   for _,field in ipairs({'BATTLES','KILLS','DISTANCE','MEMORIES','CONVERSATIONS'}) do
     setr(p,target,field,(tonumber(getr(p,target,field,0)) or 0)+(tonumber(getr(p,id,field,0)) or 0))
   end
-  setr(p,target,'UPGRADES',(tonumber(getr(p,target,'UPGRADES',0)) or 0)+1)
-  setr(p,target,'MEMORIES',(tonumber(getr(p,target,'MEMORIES',0)) or 0)+4)
-  lineage=getr(p,target,'LINEAGE','')
-  if not lineageContains(lineage,unitType) then setr(p,target,'LINEAGE',lineage..'|'..unitType) end
+  recordLedgerUpgrade(p,target,unit:GetUnitType())
   setr(p,target,'CURRENT_UNIT',unit:GetID()); setr(p,target,'CURRENT_TYPE',unit:GetUnitType())
   setr(p,target,'STATUS','Still With Us'); setr(p,target,'DEATH_TURN',-1); setr(p,target,'PENDING_DEATH_TURN',-1000)
   setr(p,target,'X',unit:GetX()); setr(p,target,'Y',unit:GetY()); setr(p,target,'LOCATION',plotLocation(unit:GetPlot()))
@@ -276,8 +323,6 @@ local function repairOrphanedUpgrade(p,unit)
   local pendingOldID=tonumber(getr(p,target,'PENDING_OLD_UNIT',-1)) or -1
   if pendingOldID >= 0 then save.SetValue('COY2_PENDING_UNIT_'..p..'_'..pendingOldID,-1) end
   setr(p,target,'PENDING_OLD_UNIT',-1)
-  markFriendEvent(p,target,'upgrade')
-  appendTimeline(p,target,name..' became '..unitName(unit:GetUnitType())..'.')
   if CommonwealthAddMemories then CommonwealthAddMemories(p,4,'an Old Friend upgrade was recovered') end
   print('CommonwealthFriends: recovered missed upgrade for '..name..' as '..unitType)
 end
@@ -560,15 +605,11 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,new
   end
   setFriendID(p,oldID,nil); setFriendID(p,newID,id)
   save.SetValue(pendingKey,-1); setr(p,id,'PENDING_DEATH_TURN',-1000); setr(p,id,'PENDING_OLD_UNIT',-1)
-  local unitType=GameInfo.Units[newUnit:GetUnitType()].Type; local lineage=getr(p,id,'LINEAGE','')
-  if not lineageContains(lineage,unitType) then setr(p,id,'LINEAGE',lineage..'|'..unitType) end
-  setr(p,id,'UPGRADES',(tonumber(getr(p,id,'UPGRADES',0)) or 0)+1)
-  setr(p,id,'MEMORIES',(tonumber(getr(p,id,'MEMORIES',0)) or 0)+4)
+  local unitType=GameInfo.Units[newUnit:GetUnitType()].Type
+  recordLedgerUpgrade(p,id,newUnit:GetUnitType())
   setr(p,id,'CURRENT_UNIT',newID); setr(p,id,'CURRENT_TYPE',newUnit:GetUnitType())
   newUnit:SetName(getr(p,id,'NAME','Old Friend')..' - '..getr(p,id,'TAG',''))
   syncLegacyFriendRecord(p,id,newUnit)
-  appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' became '..unitName(newUnit:GetUnitType())..'.')
-  markFriendEvent(p,id,'upgrade')
   print('CommonwealthFriends: transferred profile '..id..' from unit '..oldID..' to '..newID..' as '..unitType)
 end) end
 
