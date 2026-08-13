@@ -524,21 +524,20 @@ end)
 if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,newID,bGoodyHut)
   local player=Players[p]; if not isCommonwealth(player) then return end
   local oldUnit,newUnit=player:GetUnitByID(oldID),player:GetUnitByID(newID)
-  local pendingKey='COY2_PENDING_UNIT_'..p..'_'..oldID
-  local pendingID=tonumber(save.GetValue(pendingKey)); if pendingID and pendingID <= 0 then pendingID=nil end
-  -- Ruins upgrades may reuse the old unit ID, in which case friendID(oldID)
-  -- already points at a temporary UnitCreated profile. Prefer the profile
-  -- captured by UnitPrekill for that path.
-  local sameID=oldID == newID
-  local id=((bGoodyHut or sameID) and pendingID) or friendID(p,oldID) or pendingID or (oldUnit and registerFriend(oldUnit))
-  if not id or not newUnit or not newUnit:IsHasPromotion(SINCE) then return end
+  -- CP invokes UnitUpgraded before convert() transfers promotions and identity
+  -- to the replacement. Both paid and ruins upgrades must therefore be
+  -- authenticated from the still-live old unit and its exact archive mapping.
+  if not oldUnit or not oldUnit:IsHasPromotion(SINCE) then return end
+  local id=friendID(p,oldID) or registerFriend(oldUnit)
+  if not id or not newUnit then return end
   setFriendID(p,oldID,nil); setFriendID(p,newID,id)
-  save.SetValue(pendingKey,-1); setr(p,id,'PENDING_DEATH_TURN',-1000); setr(p,id,'PENDING_OLD_UNIT',-1)
   local unitType=GameInfo.Units[newUnit:GetUnitType()].Type
   recordLedgerUpgrade(p,id,newUnit:GetUnitType())
   setr(p,id,'CURRENT_UNIT',newID); setr(p,id,'CURRENT_TYPE',newUnit:GetUnitType())
+  setr(p,id,'STATUS','Still With Us'); setr(p,id,'DEATH_TURN',-1)
   newUnit:SetName(getr(p,id,'NAME','Old Friend')..' - '..getr(p,id,'TAG',''))
   syncUnitFriendRecord(p,id,newUnit)
+  if CommonwealthAddMemories then CommonwealthAddMemories(p,4,'an Old Friend was upgraded') end
   print('CommonwealthFriends: transferred profile '..id..' from unit '..oldID..' to '..newID..' as '..unitType)
 end) end
 

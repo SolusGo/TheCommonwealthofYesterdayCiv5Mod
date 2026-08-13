@@ -1,5 +1,21 @@
 # Patch Notes
 
+## Repository version 1.0.59 - Authoritative upgrade handoff
+
+### Fixed
+
+- Corrected the Old Friend upgrade handlers to follow the Community Patch DLL's actual callback order: `UnitUpgraded` fires before `CvUnit::convert()` copies promotions and identity to the replacement unit.
+- Authenticate paid and ancient-ruins upgrades from the still-live original unit and its exact archive mapping instead of checking the not-yet-converted replacement for `Since the Beginning`.
+- Transfer the Ledger profile, name, gamertag, lineage, Years Together, current form, and timeline to the replacement during the authoritative upgrade event.
+- Centralized the Old Friend's 4-Memory upgrade reward in the archive handoff so it is awarded exactly once; ordinary unit upgrades retain their existing 2-Memory reward.
+- Kept true deaths on the existing delayed confirmation path and retained the exact pending-ID safeguard used by unit replacement ordering. No name, tile, or broad save-repair matching was added.
+
+### Verification and compatibility
+
+- Audited paid upgrades, ruins upgrades, ordinary-unit upgrades, true deaths, callback ordering, duplicate Memory awards, timeline idempotency, and later unit-ID reuse.
+- This is a Lua-only lifecycle correction. Database rows, unit and promotion ordering, the conversation system, and the in-game ModBuddy version remain unchanged at `1`.
+- Rebuild and deploy manually, then load the save made before Rhys was promoted and repeat the promotion.
+
 ## Repository version 1.0.58 - Reliable Friend dialogue
 
 ### Fixed

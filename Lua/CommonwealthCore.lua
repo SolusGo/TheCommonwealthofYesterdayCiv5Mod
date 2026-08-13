@@ -367,10 +367,14 @@ GameEvents.UnitCreated.Add(function(p, unitID)
   if isCommonwealth(player) and unit and unit:GetUnitType() == OLD_FRIEND then registerFriend(unit) end
 end)
 if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p, oldID, newID)
-  local player, unit = Players[p], Players[p] and Players[p]:GetUnitByID(newID)
-  if not isCommonwealth(player) or not unit then return end
-  if unit:IsHasPromotion(SINCE) then
-    transferUnitFriend(p,oldID,newID); registerFriend(unit); addMemories(p, 4, 'an Old Friend was upgraded')
+  local player = Players[p]
+  local oldUnit, newUnit = player and player:GetUnitByID(oldID), player and player:GetUnitByID(newID)
+  if not isCommonwealth(player) or not newUnit then return end
+  -- CP fires UnitUpgraded before CvUnit::convert copies promotions and names to
+  -- the replacement. The old unit is therefore authoritative in this event;
+  -- checking the new unit here rejects every ordinary Old Friend upgrade.
+  if oldUnit and oldUnit:IsHasPromotion(SINCE) then
+    transferUnitFriend(p,oldID,newID)
   else addMemories(p, 2, 'a unit was upgraded') end
 end) end
 if GameEvents.GreatPersonExpended then GameEvents.GreatPersonExpended.Add(function(p) if isCommonwealth(Players[p]) then addMemories(p, 3, 'a Great Person was expended') end end) end

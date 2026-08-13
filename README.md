@@ -123,7 +123,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.55 | `95eee0f` | Restored conversations after loading earlier saves and prevented event-roll starvation. |
 | 1.0.56 | `5019eed` | Preserved Friend profiles through ruins upgrades and removed duplicate join events. |
 | 1.0.57 | `eb17c72` | Established a clean-campaign persistence baseline, removed old repair passes, hardened Friend upgrades, and polished the archive UI. |
-| 1.0.58 | Current | Added escalating conversation odds, a seven-miss guarantee, and runtime eligibility diagnostics. |
+| 1.0.58 | `f9c88b4` | Added escalating conversation odds, a seven-miss guarantee, and runtime eligibility diagnostics. |
+| 1.0.59 | Current | Aligned Old Friend identity transfers with the Community Patch's pre-conversion upgrade callback. |
 
 ## ModBuddy development
 
