@@ -27,7 +27,7 @@ local MEL_MILITARY = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_MILITARY
 local MEL_SCIENCE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_SCIENCE
 local MEL_CULTURE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_CULTURE
 local MEL_UNHAPPINESS = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_UNHAPPINESS
-local save = Modding.OpenSaveData()
+local save = CommonwealthSaveData or Modding.OpenSaveData()
 local friendIdentities = {
   tribute = {
     {name='Trent', tags={'Trentrouls'}},
@@ -142,47 +142,9 @@ local function friendField(unit, field) return friendFieldByID(unit:GetOwner(), 
 local function isFriend(unit) return unit and unit:IsHasPromotion(SINCE) end
 local function archivedFriendField(p,id,field) return 'COY2_REC_'..p..'_'..id..'_'..field end
 local function archiveMapField(p,unitID) return 'COY2_MAP_'..p..'_'..unitID end
-local function liveArchivedProfile(p,id,exceptUnitID)
-  local currentID=tonumber(save.GetValue(archivedFriendField(p,id,'CURRENT_UNIT'))) or -1
-  if currentID < 0 or currentID == exceptUnitID then return false end
-  local current=Players[p] and Players[p]:GetUnitByID(currentID)
-  return current and current:IsHasPromotion(SINCE) and tonumber(save.GetValue(archiveMapField(p,currentID))) == id
-end
-local function restoreArchivedFriend(unit)
+local function restoreMappedFriend(unit)
   local p,unitID=unit:GetOwner(),unit:GetID()
   local id=tonumber(save.GetValue(archiveMapField(p,unitID))) or 0
-  while id > 0 do
-    local merged=tonumber(save.GetValue(archivedFriendField(p,id,'MERGED_INTO'))) or 0
-    if merged <= 0 or merged == id then break end
-    id=merged
-  end
-  if id > 0 and liveArchivedProfile(p,id,unitID) then id=0 end
-  if id <= 0 then
-    local custom=''
-    if unit:HasName() then
-      custom=tostring(unit:GetNameNoDesc() or '')
-      local localized=Locale.Lookup(custom)
-      if localized and localized ~= '' then custom=tostring(localized) end
-    end
-    local count=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
-    local candidate=nil
-    for profile=1,count do
-      local merged=tonumber(save.GetValue(archivedFriendField(p,profile,'MERGED_INTO'))) or 0
-      if merged == 0 then
-        local profileUnit=tonumber(save.GetValue(archivedFriendField(p,profile,'CURRENT_UNIT'))) or -1
-        local name=tostring(save.GetValue(archivedFriendField(p,profile,'NAME')) or '')
-        local tag=tostring(save.GetValue(archivedFriendField(p,profile,'TAG')) or '')
-        local matchesID=profileUnit == unitID
-        local matchesName=custom ~= '' and name ~= '' and string.find(custom,name,1,true)
-          and (tag == '' or string.find(custom,tag,1,true))
-        if (matchesID or matchesName) and not liveArchivedProfile(p,profile,unitID) then
-          if candidate and candidate ~= profile then candidate=-1; break end
-          candidate=profile
-        end
-      end
-    end
-    id=candidate or 0
-  end
   if id <= 0 then return false end
   local name=save.GetValue(archivedFriendField(p,id,'NAME'))
   local tag=save.GetValue(archivedFriendField(p,id,'TAG'))
@@ -200,7 +162,7 @@ local function restoreArchivedFriend(unit)
   save.SetValue(archivedFriendField(p,id,'DEATH_TURN'),-1)
   save.SetValue(archivedFriendField(p,id,'X'),unit:GetX()); save.SetValue(archivedFriendField(p,id,'Y'),unit:GetY())
   unit:SetName(tostring(name)..' - '..tostring(tag))
-  print('CommonwealthCore: restored archived profile '..id..' for unit '..unitID)
+  print('CommonwealthCore: restored mapped profile '..id..' for unit '..unitID)
   return true
 end
 local function registerFriend(unit)
@@ -220,10 +182,9 @@ local function registerFriend(unit)
     unit:SetName(tostring(storedName) .. (storedTag ~= '' and ' - ' .. storedTag or ''))
     return true
   end
-  if restoreArchivedFriend(unit) then return true end
-  -- A non-Old-Friend unit carrying Since the Beginning must be an upgraded
-  -- lineage. Let the archive reconciliation recover it instead of assigning a
-  -- fresh identity when callbacks arrive in a different order during reload.
+  if restoreMappedFriend(unit) then return true end
+  -- Upgraded descendants receive identity only through their exact archive
+  -- mapping or the native upgrade handoff. Never guess from names or tiles.
   if unit:GetUnitType() ~= OLD_FRIEND then return false end
   local name, tag, aliases = CommonwealthChooseFriendIdentity(p)
   save.SetValue(field, name); save.SetValue(friendField(unit, 'TAG'), tag)
@@ -237,10 +198,10 @@ local function registerFriend(unit)
   return true
 end
 
-local legacyFriendFields = {'NAME','TAG','ALIASES','BORN','ERA','YEARS','UPGRADES','LINEAGE'}
-local function transferLegacyFriend(p, oldID, newID)
+local unitFriendFields = {'NAME','TAG','ALIASES','BORN','ERA','YEARS','UPGRADES','LINEAGE'}
+local function transferUnitFriend(p, oldID, newID)
   if oldID == newID then return end
-  for _, field in ipairs(legacyFriendFields) do
+  for _, field in ipairs(unitFriendFields) do
     local value = save.GetValue(friendFieldByID(p,oldID,field))
     if value ~= nil then save.SetValue(friendFieldByID(p,newID,field),value) end
   end
@@ -253,11 +214,11 @@ local function applyYears(unit, level)
 end
 local function friendYears(unit)
   local p,unitID=unit:GetOwner(),unit:GetID()
-  local legacy=tonumber(save.GetValue(friendField(unit,'YEARS'))) or 0
+  local cached=tonumber(save.GetValue(friendField(unit,'YEARS'))) or 0
   local archiveID=tonumber(save.GetValue('COY2_MAP_'..p..'_'..unitID)) or 0
   local archived=archiveID > 0 and tonumber(save.GetValue('COY2_REC_'..p..'_'..archiveID..'_YEARS')) or 0
-  local level=math.min(6,math.max(legacy,archived or 0))
-  if legacy ~= level then save.SetValue(friendField(unit,'YEARS'),level) end
+  local level=math.min(6,math.max(cached,archived or 0))
+  if cached ~= level then save.SetValue(friendField(unit,'YEARS'),level) end
   return level
 end
 local function adjacentMilitary(unit, requireFriend)
@@ -409,7 +370,7 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p, oldID, n
   local player, unit = Players[p], Players[p] and Players[p]:GetUnitByID(newID)
   if not isCommonwealth(player) or not unit then return end
   if unit:IsHasPromotion(SINCE) then
-    transferLegacyFriend(p,oldID,newID); registerFriend(unit); addMemories(p, 4, 'an Old Friend was upgraded')
+    transferUnitFriend(p,oldID,newID); registerFriend(unit); addMemories(p, 4, 'an Old Friend was upgraded')
   else addMemories(p, 2, 'a unit was upgraded') end
 end) end
 if GameEvents.GreatPersonExpended then GameEvents.GreatPersonExpended.Add(function(p) if isCommonwealth(Players[p]) then addMemories(p, 3, 'a Great Person was expended') end end) end

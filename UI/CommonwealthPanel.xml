@@ -8,7 +8,7 @@
     </GridButton>
   </Instance>
 
-  <GridButton ID="MemoryButton" Anchor="R,T" Offset="24,146" Size="196,42" Style="BaseButton" String="MEMORIES: 0 / 100" ToolTip="Open the Commonwealth Memories panel" />
+  <GridButton ID="MemoryButton" Anchor="R,T" Offset="24,146" Size="196,42" Style="BaseButton" String="[ICON_CULTURE] MEMORIES: 0 / 100" ToolTip="Open the Commonwealth Memories archive" />
   <Grid ID="Panel" Anchor="R,T" Offset="24,196" Size="500,468" Style="Grid9DetailFive140" Hidden="1" ConsumeMouse="1">
     <Box Style="MenuLeftSideTreatment" /><Box Style="MenuRightSideTreatment" />
     <Box Anchor="C,C" Offset="0,13" Size="438,392" Color="31,52,52,150" />
@@ -18,8 +18,11 @@
     <Label ID="MemoryAmount" Anchor="L,T" Offset="39,62" Size="220,22" Font="TwCenMT18" FontStyle="Shadow" String="0 / 100 Memories" Color="245,226,195,255" />
     <Label ID="MemoryCost" Anchor="R,T" Offset="39,63" Size="190,20" Font="TwCenMT16" FontStyle="Shadow" String="Next: 25" Color="240,168,105,255" />
     <Box Anchor="C,T" Offset="0,87" Size="420,16" Color="13,29,31,210" />
+    <Box ID="MemoryFillGlow" Anchor="L,T" Offset="40,88" Size="1,14" Color="240,168,105,70" />
     <Box ID="MemoryFill" Anchor="L,T" Offset="40,90" Size="1,10" Color="229,109,40,220" />
     <Box ID="MemoryCostMarker" Anchor="L,T" Offset="40,85" Size="2,20" Color="245,226,195,230" />
+    <Box Anchor="L,T" Offset="123,87" Size="1,16" Color="245,226,195,75" /><Box Anchor="L,T" Offset="207,87" Size="1,16" Color="245,226,195,75" />
+    <Box Anchor="L,T" Offset="291,87" Size="1,16" Color="245,226,195,75" /><Box Anchor="L,T" Offset="375,87" Size="1,16" Color="245,226,195,75" />
     <Label ID="StatusLabel" Anchor="C,T" Offset="0,110" Size="420,45" WrapWidth="420" Font="TwCenMT18" FontStyle="Shadow" Color="245,226,195,255" />
     <Grid ID="KeepsakeStrip" Anchor="C,T" Offset="0,151" Size="420,39">
       <Image Anchor="L,C" Offset="0,0" Size="32,32" Texture="Art/Bedroom/CommonwealthBedroomIcon32.dds" />
@@ -49,6 +52,7 @@
     <GridButton ID="LivingFilter" Anchor="L,T" Offset="25,70" Size="84,30" Style="BaseButton" String="Online" />
     <GridButton ID="OfflineFilter" Anchor="L,T" Offset="113,70" Size="84,30" Style="BaseButton" String="Offline" />
     <GridButton ID="AllFilter" Anchor="L,T" Offset="201,70" Size="84,30" Style="BaseButton" String="All" />
+    <Label ID="LedgerView" Anchor="R,T" Offset="28,76" Size="220,18" Font="TwCenMT14" FontStyle="Shadow" String="VIEWING: ONLINE" Color="240,168,105,255" />
     <Grid Anchor="L,T" Offset="25,106" Size="270,476" Style="GridBlackIndent8">
       <Box Anchor="C,C" Size="254,460" Color="24,45,45,105" />
       <Box Anchor="L,C" Offset="8,0" Size="2,452" Color="229,109,40,135" />

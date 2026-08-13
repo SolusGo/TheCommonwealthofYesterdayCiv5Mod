@@ -1,5 +1,32 @@
 # Patch Notes
 
+## Repository version 1.0.57 - Clean campaign baseline
+
+### Persistence
+
+- Namespaced Commonwealth save data by a stable fingerprint of the generated world, game speed, civilizations, leaders, and starting plots.
+- Prevented an abandoned campaign's Memories, Friend identities, Keepsakes, cooldowns, and Ledger records from bleeding into a fresh generated game.
+- Removed the broad existing-save repair passes for duplicate profiles, duplicate join events, orphaned upgrades, old one-slot event migration, and global dialogue-history migration.
+- Retained only deterministic runtime safeguards required in normal play: exact archive mappings, native old/new unit upgrade handoffs, goody-hut pending handoffs, delayed death confirmation, promotion synchronization, and future-turn cooldown clamps.
+
+### Friend lifecycle edge cases
+
+- Upgraded descendants no longer create provisional Friend profiles while waiting for the native upgrade callback.
+- Ledger refreshes are now read-only: opening or filtering the Ledger no longer advances adjacency time or relationship counters.
+- Ordinary and ruins upgrades continue to preserve identity, Years Together, lineage, timeline events, and Memory awards through exact mappings rather than tile, name, or generation guesses.
+
+### Interface polish
+
+- Added a soft glow and quarter markers to the Memories meter, plus a clear ready-state message when a Reminiscence is affordable.
+- Added a Memories icon to the compact HUD button and selected-state markers to the Ledger filters.
+- Added a warm `VIEWING` indicator to the Ledger without introducing new textures, atlases, animations, or base-game UI replacements.
+
+### Compatibility
+
+- This release is a deliberate fresh-campaign baseline. Earlier Commonwealth saves do not migrate their custom Lua state into the new namespace.
+- Database rows, unit and promotion order, gameplay values, and the in-game ModBuddy version remain unchanged at `1`.
+- Rebuild and deploy manually before starting the new campaign. Keep the enabled mod list and database files fixed for that campaign.
+
 ## Repository version 1.0.56 - Ruins upgrade identity repair
 
 ### Fixed

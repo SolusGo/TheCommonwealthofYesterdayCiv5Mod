@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.56** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.57** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -121,7 +121,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.53 | `dde1500` | Showed the newest Old Friend timeline events first. |
 | 1.0.54 | `3e5a216` | Recovered missed upgrade events and retained recent timeline history. |
 | 1.0.55 | `95eee0f` | Restored conversations after loading earlier saves and prevented event-roll starvation. |
-| 1.0.56 | Current | Preserved Friend profiles through ruins upgrades and removed duplicate join events. |
+| 1.0.56 | `5019eed` | Preserved Friend profiles through ruins upgrades and removed duplicate join events. |
+| 1.0.57 | Current | Established a clean-campaign persistence baseline, removed old repair passes, hardened Friend upgrades, and polished the archive UI. |
 
 ## ModBuddy development
 
@@ -139,6 +140,6 @@ The mod includes a front-end `SelectCivilization` override that places the full 
 
 ## Technical notes
 
-State is stored with `Modding.OpenSaveData`, so Memories, era counters, Bedroom construction eras, and living Old Friend records survive saves. Multiplayer and hotseat are intentionally disabled because the interface and persistence layer target single-player.
+State is stored with `Modding.OpenSaveData` under a campaign-specific world fingerprint, so Memories, era counters, Bedroom construction eras, conversation history, and Old Friend records survive ordinary save/load without leaking into a newly generated campaign. Repository version 1.0.57 begins a new persistence namespace and is intended for a fresh game; earlier Commonwealth saves do not carry their custom state into this baseline. Multiplayer and hotseat are intentionally disabled because the interface and persistence layer target single-player.
 
 Some requested bonuses do not have a safe category-specific modifier in the exposed database/API. The current implementation keeps their intended timing and theme while using close city-level equivalents. Exact implementation differences are recorded in [PATCH_NOTES.md](PATCH_NOTES.md).

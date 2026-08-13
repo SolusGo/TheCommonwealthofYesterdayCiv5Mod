@@ -86,13 +86,15 @@ local function redrawKeepsakes()
   Controls.KeepsakeYield:SetText('+'..count..' [ICON_CULTURE]'..(hasArchaeology and ('  +'..tourism..' [ICON_TOURISM]') or '[NEWLINE]Tourism later'))
 end
 local function redraw()
-  local cost=25+state.used*10; Controls.MemoryButton:SetText('MEMORIES: '..state.mem..' / 100')
+  local cost=25+state.used*10; Controls.MemoryButton:SetText('[ICON_CULTURE] MEMORIES: '..state.mem..' / 100')
   Controls.MemoryAmount:SetText(state.mem..' / 100 Memories')
   Controls.MemoryCost:SetText('Next: '..cost)
   Controls.MemoryFill:SetSizeX(math.max(1,math.floor(420*math.max(0,math.min(100,state.mem))/100)))
+  Controls.MemoryFillGlow:SetSizeX(math.max(1,math.floor(420*math.max(0,math.min(100,state.mem))/100)))
   Controls.MemoryCostMarker:SetOffsetX(40+math.floor(420*math.max(0,math.min(100,cost))/100))
   if state.activeTurns>0 then Controls.StatusLabel:SetText(labels[state.active]..' - '..state.activeTurns..' turns remain')
   elseif state.melTurns>0 then Controls.StatusLabel:SetText('Melancholy: '..melancholy[state.mel]..' ('..melancholyEffects[state.mel]..') - '..state.melTurns..' turns remain')
+  elseif state.mem>=cost then Controls.StatusLabel:SetText('[COLOR_POSITIVE_TEXT]Reminiscence ready.[ENDCOLOR] Choose a memory to relive.')
   else Controls.StatusLabel:SetText('Next Reminiscence: '..cost..' Memories') end
   local disabled=state.activeTurns>0 or state.melTurns>0 or state.mem<cost
   Controls.BoysButton:SetDisabled(disabled); Controls.WorldButton:SetDisabled(disabled); Controls.SummerButton:SetDisabled(disabled)
@@ -145,7 +147,14 @@ local function renderLedgerList()
   Controls.LedgerScroll:CalculateInternalSize(); Controls.LedgerScroll:SetScrollValue(0)
   if not selectedFriend or not includeRow(selectedFriend) then selectFriend(first) else selectFriend(selectedFriend) end
 end
-local function setFilter(value) ledgerFilter=value; selectedFriend=nil; renderLedgerList() end
+local function setFilter(value)
+  ledgerFilter=value; selectedFriend=nil
+  Controls.LedgerView:SetText('VIEWING: '..string.upper(value=='all' and 'ALL PROFILES' or value))
+  Controls.LivingFilter:SetText(value=='online' and '[ICON_BULLET] Online' or 'Online')
+  Controls.OfflineFilter:SetText(value=='offline' and '[ICON_BULLET] Offline' or 'Offline')
+  Controls.AllFilter:SetText(value=='all' and '[ICON_BULLET] All' or 'All')
+  renderLedgerList()
+end
 
 LuaEvents.CommonwealthStateResponse.Add(function(p,mem,used,active,activeTurns,mel,melTurns)
   if p~=playerID() then return end; state={mem=mem,used=used,active=active,activeTurns=activeTurns,mel=mel,melTurns=melTurns}; redraw()
@@ -177,7 +186,7 @@ LuaEvents.CommonwealthAdvancedLedgerResponse.Add(function(p,rows)
   if p~=playerID() then return end; ledgerRows=rows or {}; selectedFriend=nil
   local alive,offline=0,0; for _,row in ipairs(ledgerRows) do if row.status=='Offline' then offline=offline+1 else alive=alive+1 end end
   Controls.LedgerCount:SetText(alive..' online   |   '..offline..' no longer online   |   '..#ledgerRows..' archived profiles')
-  renderLedgerList()
+  setFilter(ledgerFilter)
 end)
 LuaEvents.CommonwealthConversationStatusResponse.Add(function(p,enabled)
   if p~=playerID() then return end
