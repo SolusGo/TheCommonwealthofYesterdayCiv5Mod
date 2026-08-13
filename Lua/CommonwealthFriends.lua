@@ -22,6 +22,8 @@ local BASE_CONVERSATION_CHANCE = 8
 local REMINISCENCE_CHANCE_BONUS = 6
 local BEDROOM_CHANCE_BONUS = 4
 local EVENT_CONVERSATION_CHANCE = 60
+local CONVERSATION_PITY_LIMIT = 7
+local lastConversationTrace = ''
 if GameInfo.Commonwealth_Conversations then
   for row in GameInfo.Commonwealth_Conversations() do
     conversationLines[#conversationLines+1]={id=row.ID,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo}
@@ -378,7 +380,7 @@ local function tryConversation(p,pairs)
     lastGlobal=-1000; save.SetValue('COY2_CONV_LAST_'..p,lastGlobal)
   end
   if turn-lastGlobal < GLOBAL_CONVERSATION_COOLDOWN then return end
-  local successes,eventSuccesses={},{}
+  local successes,eventSuccesses,evaluated={},{},{}
   for _,pair in ipairs(pairs) do
     local lastPair=tonumber(save.GetValue(conversationPairKey(p,pair.a,pair.b,'LAST'))) or -1000
     if lastPair > turn then
@@ -386,9 +388,14 @@ local function tryConversation(p,pairs)
     end
     if turn-lastPair >= PAIR_CONVERSATION_COOLDOWN then
       local lines,active,bedroom,eventType=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB,pair.eventType)
-      local chance=eventType and EVENT_CONVERSATION_CHANCE or
-        (BASE_CONVERSATION_CHANCE+(active and REMINISCENCE_CHANCE_BONUS or 0)+(bedroom and BEDROOM_CHANCE_BONUS or 0))
-      if #lines > 0 and Game.Rand(100,'Commonwealth adjacent Old Friends conversation') < chance then
+      local misses=math.max(0,tonumber(save.GetValue(conversationPairKey(p,pair.a,pair.b,'MISSES'))) or 0)
+      local chance=(eventType and EVENT_CONVERSATION_CHANCE or
+        (BASE_CONVERSATION_CHANCE+(active and REMINISCENCE_CHANCE_BONUS or 0)+(bedroom and BEDROOM_CHANCE_BONUS or 0)))
+        +math.min(eventType and 25 or 28,misses*(eventType and 5 or 4))
+      local succeeded=#lines > 0 and (misses >= CONVERSATION_PITY_LIMIT
+        or Game.Rand(100,'Commonwealth adjacent Old Friends conversation') < chance)
+      if #lines > 0 then evaluated[#evaluated+1]={pair=pair,misses=misses} end
+      if succeeded then
         local success={pair=pair,lines=lines,eventType=eventType}
         if eventType then eventSuccesses[#eventSuccesses+1]=success else successes[#successes+1]=success end
       elseif eventType then
@@ -396,8 +403,9 @@ local function tryConversation(p,pairs)
         -- the same otherwise-eligible adjacent pair.
         local normalLines,normalActive,normalBedroom=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB,nil)
         local normalChance=BASE_CONVERSATION_CHANCE+(normalActive and REMINISCENCE_CHANCE_BONUS or 0)
-          +(normalBedroom and BEDROOM_CHANCE_BONUS or 0)
-        if #normalLines > 0 and Game.Rand(100,'Commonwealth adjacent Old Friends fallback conversation') < normalChance then
+          +(normalBedroom and BEDROOM_CHANCE_BONUS or 0)+math.min(28,misses*4)
+        if #normalLines > 0 and (misses >= CONVERSATION_PITY_LIMIT
+          or Game.Rand(100,'Commonwealth adjacent Old Friends fallback conversation') < normalChance) then
           successes[#successes+1]={pair=pair,lines=normalLines,eventType=nil}
         end
       end
@@ -406,9 +414,18 @@ local function tryConversation(p,pairs)
   -- Successful special conversations retain priority, but a failed special
   -- roll no longer discards successful ordinary conversations this turn.
   if #eventSuccesses > 0 then successes=eventSuccesses end
-  if #successes == 0 then return end
+  if #successes == 0 then
+    for _,entry in ipairs(evaluated) do
+      save.SetValue(conversationPairKey(p,entry.pair.a,entry.pair.b,'MISSES'),math.min(CONVERSATION_PITY_LIMIT,entry.misses+1))
+    end
+    return
+  end
   local result=successes[Game.Rand(#successes,'Commonwealth conversation pair')+1]
   local pair=result.pair; local line=result.lines[Game.Rand(#result.lines,'Commonwealth conversation line')+1]
+  for _,entry in ipairs(evaluated) do
+    local selected=(entry.pair.a == pair.a and entry.pair.b == pair.b) or (entry.pair.a == pair.b and entry.pair.b == pair.a)
+    save.SetValue(conversationPairKey(p,entry.pair.a,entry.pair.b,'MISSES'),selected and 0 or math.min(CONVERSATION_PITY_LIMIT,entry.misses+1))
+  end
   local nameA,tagA=getr(p,pair.a,'NAME','Old Friend'),getr(p,pair.a,'TAG','')
   local nameB,tagB=getr(p,pair.b,'NAME','Old Friend'),getr(p,pair.b,'TAG','')
   local location=plotLocation(pair.unitA:GetPlot())
@@ -475,7 +492,13 @@ local function friendsTurn(p,advanceTurn)
     local previousActive=tonumber(save.GetValue('COY2_CONV_ACTIVE_'..p)) or 0
     if active > 0 and previousActive == 0 then for _,unit in ipairs(units) do markFriendEvent(p,registerFriend(unit),'reminiscence') end end
     save.SetValue('COY2_CONV_ACTIVE_'..p,active)
-    tryConversation(p,updateFriendships(p,units))
+    local pairs=updateFriendships(p,units)
+    local trace=tostring(#units)..':'..tostring(#pairs)..':'..(conversationsEnabled(p) and 'on' or 'off')
+    if trace ~= lastConversationTrace then
+      print('CommonwealthFriends: conversation eligibility changed - '..#units..' lineage(s), '..#pairs..' adjacent pair(s), dialogue '..(conversationsEnabled(p) and 'enabled' or 'disabled'))
+      lastConversationTrace=trace
+    end
+    tryConversation(p,pairs)
   end
 end
 GameEvents.PlayerDoTurn.Add(function(p) friendsTurn(p,true) end)

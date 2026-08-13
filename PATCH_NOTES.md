@@ -1,5 +1,21 @@
 # Patch Notes
 
+## Repository version 1.0.58 - Reliable Friend dialogue
+
+### Fixed
+
+- Confirmed from Civ V's live campaign data that Friend registration and adjacency tracking were working, but every eligible conversation roll had failed.
+- Added a persistent per-pair miss counter: ordinary dialogue starts at 8% and gains 4 percentage points after each eligible miss.
+- Guaranteed an exchange after seven consecutive eligible misses, preventing an unlimited random drought.
+- Event dialogue still begins at 60% and now gains 5 percentage points after each eligible miss.
+- Reset only the selected pair's miss counter after a conversation; other adjacent pairs retain their accumulated chance.
+
+### Diagnostics and compatibility
+
+- `Lua.log` now reports whenever the number of registered lineages, adjacent eligible pairs, or dialogue-enabled state changes, making registration and positioning failures visible without noisy per-turn logging.
+- The existing eight-turn global cooldown, 15-turn pair cooldown, 96-line library, contextual selection, non-repetition history, and Ledger timeline recording are unchanged.
+- This Lua/text-only update does not alter database row ordering or the in-game ModBuddy version, which remains `1`. Rebuild and deploy manually.
+
 ## Repository version 1.0.57 - Clean campaign baseline
 
 ### Persistence

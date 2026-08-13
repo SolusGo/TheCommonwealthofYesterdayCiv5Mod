@@ -38,7 +38,7 @@ The Old Friend replaces the Warrior at the same base strength and 40 Production.
 
 Old Friend identities are randomly selected from 54 generated names and 72 gamertags. Trent, Gabriel, Dion, Harrison, Lachlan, and Ben retain their tribute gamertags and are each eight times more likely to appear than a generated identity. Names are not repeated until the available pool is exhausted. The in-game **Friends** button opens a persistent archive with Online, Offline, and All views; profiles show form, age, level, combat and survival records, lineage, closest friend, location, timeline, and earned epithet. Records transfer across upgrades and remain after death.
 
-Adjacent Old Friends have an 8% chance per eligible pair each turn to share a brief conversation, increased to 14% during a Reminiscence, 12% near a Childhood Bedroom, or 18% with both bonuses. Queued event conversations use a 60% chance, persist for 40 turns, and take priority over normal chatter. New eras, upgrades, near-death survival, victories, and Reminiscence activations enter a persistent per-Friend queue rather than overwriting one another; reunions after at least 15 turns apart use a persistent per-pair event. An eight-turn global cooldown, a 15-turn pair cooldown, and per-pair dialogue history prevent interruptions or immediate repetition. Conversations are recorded in both Ledger timelines and can be disabled from the Ledger.
+Adjacent Old Friends have an 8% base chance per eligible pair each turn to share a brief conversation, increased to 14% during a Reminiscence, 12% near a Childhood Bedroom, or 18% with both bonuses. Each eligible miss raises that pair's next chance by 4 percentage points, with an exchange guaranteed after seven consecutive misses. Queued event conversations begin at 60%, gain 5 points after each miss, persist for 40 turns, and take priority over normal chatter. New eras, upgrades, near-death survival, victories, and Reminiscence activations enter a persistent per-Friend queue rather than overwriting one another; reunions after at least 15 turns apart use a persistent per-pair event. An eight-turn global cooldown, a 15-turn pair cooldown, and per-pair dialogue history prevent interruptions or immediate repetition. Conversations are recorded in both Ledger timelines and can be disabled from the Ledger.
 
 The conversation library contains 96 exchanges. Dialogue is stored separately from the Lua logic in `Data/CommonwealthConversations.xml`. The file defines a custom `GameInfo.Commonwealth_Conversations` database table, making it possible to add or revise exchanges without editing the conversation system itself. Lines can use `{SELF}`, `{OTHER}`, `{LOCATION}`, `{ERA}`, `{FORM}`, and `{OTHER_FORM}` tokens for contextual details.
 
@@ -122,7 +122,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.54 | `3e5a216` | Recovered missed upgrade events and retained recent timeline history. |
 | 1.0.55 | `95eee0f` | Restored conversations after loading earlier saves and prevented event-roll starvation. |
 | 1.0.56 | `5019eed` | Preserved Friend profiles through ruins upgrades and removed duplicate join events. |
-| 1.0.57 | Current | Established a clean-campaign persistence baseline, removed old repair passes, hardened Friend upgrades, and polished the archive UI. |
+| 1.0.57 | `eb17c72` | Established a clean-campaign persistence baseline, removed old repair passes, hardened Friend upgrades, and polished the archive UI. |
+| 1.0.58 | Current | Added escalating conversation odds, a seven-miss guarantee, and runtime eligibility diagnostics. |
 
 ## ModBuddy development
 
