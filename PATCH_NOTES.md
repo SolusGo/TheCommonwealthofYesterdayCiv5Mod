@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.56 - Ruins upgrade identity repair
+
+### Fixed
+
+- Made goody-hut upgrades prefer the Old Friend profile captured before the original unit was replaced, including the Community Patch path that reuses the same unit ID.
+- Prevented `UnitCreated` from registering a second Friend profile when a ruins upgrade already has a pending identity transfer.
+- Added save-safe Ledger cleanup that retains the earliest genuine “joined the Commonwealth” event and removes later duplicate join entries created by earlier ruins upgrades.
+- Kept normal paid upgrades, lineage updates, Years Together, Memories, names, gamertags, and promotion inheritance unchanged.
+
+### Deployment
+
+- Rebuild the ModBuddy project and deploy it manually. Loading an affected save will clean duplicate join entries on the next Commonwealth turn.
+- The ModBuddy/in-game version remains `1`.
+
 ## Repository version 1.0.55 - Save-rollback conversation recovery
 
 ### Fixed

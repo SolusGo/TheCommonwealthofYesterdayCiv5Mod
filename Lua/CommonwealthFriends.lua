@@ -112,6 +112,36 @@ local function appendTimeline(p, id, text, eventTurn)
   count = count + 1; setr(p,id,'TIMELINE_COUNT',count)
   setr(p,id,'TIME_'..count..'_TURN',eventTurn or Game.GetGameTurn()); setr(p,id,'TIME_'..count..'_TEXT',text)
 end
+local function normalizeJoinedTimeline(p,id)
+  local count=tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
+  local entries,earliestJoin,joinCount={},{turn=nil,text=nil,order=nil},0
+  for i=1,count do
+    local turn=tonumber(getr(p,id,'TIME_'..i..'_TURN',0)) or 0
+    local text=getr(p,id,'TIME_'..i..'_TEXT','')
+    if string.find(text,' joined the Commonwealth during the ',1,true) then
+      joinCount=joinCount+1
+      if earliestJoin.turn == nil or turn < earliestJoin.turn then
+        earliestJoin={turn=turn,text=text,order=i}
+      end
+    else
+      entries[#entries+1]={turn=turn,text=text,order=i}
+    end
+  end
+  if joinCount <= 1 then return false end
+  entries[#entries+1]=earliestJoin
+  table.sort(entries,function(a,b)
+    if a.turn == b.turn then return a.order < b.order end
+    return a.turn < b.turn
+  end)
+  setr(p,id,'TIMELINE_COUNT',#entries)
+  for i=1,count do
+    local entry=entries[i]
+    setr(p,id,'TIME_'..i..'_TURN',entry and entry.turn or 0)
+    setr(p,id,'TIME_'..i..'_TEXT',entry and entry.text or '')
+  end
+  print('CommonwealthFriends: removed duplicate joined events from profile '..id)
+  return true
+end
 local function plotLocation(plot)
   if not plot then return 'Unknown' end
   local city = plot:GetPlotCity()
@@ -170,6 +200,20 @@ local function registerFriend(unit)
   local p, unitID = unit:GetOwner(), unit:GetID()
   local id = friendID(p,unitID)
   if id then return id end
+  -- Goody-hut upgrades can destroy and recreate a unit with the same ID. The
+  -- pre-kill callback stores the original profile under that ID, so reclaim it
+  -- before UnitCreated has a chance to make a second Friend profile.
+  local pendingID=tonumber(save.GetValue('COY2_PENDING_UNIT_'..p..'_'..unitID)) or 0
+  local pendingTurn=pendingID > 0 and (tonumber(getr(p,pendingID,'PENDING_DEATH_TURN',-1000)) or -1000) or -1000
+  if unit:GetUnitType() ~= OLD_FRIEND and pendingID > 0 and pendingTurn == Game.GetGameTurn()
+    and tonumber(getr(p,pendingID,'MERGED_INTO',0)) == 0 then
+    setFriendID(p,unitID,pendingID)
+    setr(p,pendingID,'CURRENT_UNIT',unitID); setr(p,pendingID,'CURRENT_TYPE',unit:GetUnitType())
+    setr(p,pendingID,'STATUS','Still With Us'); setr(p,pendingID,'DEATH_TURN',-1)
+    unit:SetName(getr(p,pendingID,'NAME','Old Friend')..' - '..getr(p,pendingID,'TAG',''))
+    print('CommonwealthFriends: reclaimed pending profile '..pendingID..' for recreated unit '..unitID)
+    return pendingID
+  end
   local nextID = tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
   id = nextID + 1; save.SetValue('COY2_COUNT_'..p,id); setFriendID(p,unitID,id)
   local legacyPrefix = 'FRIEND_'..p..'_'..unitID..'_'
@@ -587,6 +631,10 @@ local function friendsTurn(p,allowConversation)
     registerFriend(unit); repairOrphanedUpgrade(p,unit); updateUnitRecord(p,unit); units[#units+1]=unit
   end end
   repairDuplicateIdentities(p)
+  local profileCount=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
+  for id=1,profileCount do
+    if tonumber(getr(p,id,'MERGED_INTO',0)) == 0 then normalizeJoinedTimeline(p,id) end
+  end
   if active > 0 and previousActive == 0 then for _,unit in ipairs(units) do markFriendEvent(p,registerFriend(unit),'reminiscence') end end
   save.SetValue('COY2_CONV_ACTIVE_'..p,active)
   local pairs=updateFriendships(p,units)
@@ -612,13 +660,17 @@ GameEvents.UnitCreated.Add(function(p,unitID)
   end
 end)
 
-if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,newID)
+if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,newID,bGoodyHut)
   local player=Players[p]; if not isCommonwealth(player) then return end
   local oldUnit,newUnit=player:GetUnitByID(oldID),player:GetUnitByID(newID)
   local pendingKey='COY2_PENDING_UNIT_'..p..'_'..oldID
   local pendingID=tonumber(save.GetValue(pendingKey)); if pendingID and pendingID <= 0 then pendingID=nil end
   local temporaryID=friendID(p,newID)
-  local id=friendID(p,oldID) or pendingID or (oldUnit and registerFriend(oldUnit))
+  -- Ruins upgrades may reuse the old unit ID, in which case friendID(oldID)
+  -- already points at a temporary UnitCreated profile. Prefer the profile
+  -- captured by UnitPrekill for that path.
+  local sameID=oldID == newID
+  local id=((bGoodyHut or sameID) and pendingID) or friendID(p,oldID) or pendingID or (oldUnit and registerFriend(oldUnit))
   if not id or not newUnit or not newUnit:IsHasPromotion(SINCE) then return end
   if temporaryID and temporaryID ~= id then
     setr(p,temporaryID,'MERGED_INTO',id); setr(p,temporaryID,'STATUS','Merged'); setr(p,temporaryID,'CURRENT_UNIT',-1)
