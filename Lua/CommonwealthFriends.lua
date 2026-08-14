@@ -15,14 +15,14 @@ local combatCredit = {}
 local conversationLines = {}
 local EVENT_LIFETIME = 40
 local MAX_PENDING_EVENTS = 6
-local GLOBAL_CONVERSATION_COOLDOWN = 8
-local PAIR_CONVERSATION_COOLDOWN = 15
+local GLOBAL_CONVERSATION_COOLDOWN = 5
+local PAIR_CONVERSATION_COOLDOWN = 9
 local GLOBAL_LINE_REPEAT_COOLDOWN = 120
-local BASE_CONVERSATION_CHANCE = 8
-local REMINISCENCE_CHANCE_BONUS = 6
-local BEDROOM_CHANCE_BONUS = 4
-local EVENT_CONVERSATION_CHANCE = 60
-local CONVERSATION_PITY_LIMIT = 7
+local BASE_CONVERSATION_CHANCE = 15
+local REMINISCENCE_CHANCE_BONUS = 10
+local BEDROOM_CHANCE_BONUS = 7
+local EVENT_CONVERSATION_CHANCE = 75
+local CONVERSATION_PITY_LIMIT = 4
 local lastConversationTrace = ''
 if GameInfo.Commonwealth_Conversations then
   for row in GameInfo.Commonwealth_Conversations() do
@@ -292,6 +292,28 @@ end
 local function globalConversationKey(p,lineID)
   return 'COY2_CONV_GLOBAL_'..p..'_LAST_'..tostring(lineID)
 end
+local function globalConversationUseKey(p,lineID)
+  return 'COY2_CONV_GLOBAL_'..p..'_USES_'..tostring(lineID)
+end
+local function globalConversationUses(p,lineID)
+  local uses=tonumber(save.GetValue(globalConversationUseKey(p,lineID)))
+  if uses ~= nil then return math.max(0,uses) end
+  -- Existing campaigns already have LAST keys. Count those as one use so the
+  -- new shuffle bag immediately remembers dialogue heard before this update.
+  return save.GetValue(globalConversationKey(p,lineID)) ~= nil and 1 or 0
+end
+local function leastUsedConversationLines(p,lines)
+  local result={}; local least=nil
+  for _,line in ipairs(lines) do
+    local uses=globalConversationUses(p,line.id)
+    if least == nil or uses < least then
+      least=uses; result={line}
+    elseif uses == least then
+      result[#result+1]=line
+    end
+  end
+  return result
+end
 local function conversationsEnabled(p)
   return tonumber(save.GetValue('COY2_CONV_ENABLED_'..p) or 1) ~= 0
 end
@@ -335,7 +357,9 @@ local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
     local pairUnused=tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) == 0
     local globalLast=tonumber(save.GetValue(globalConversationKey(p,line.id))) or -1000
     if globalLast > turn then
-      globalLast=-1000; save.SetValue(globalConversationKey(p,line.id),globalLast)
+      -- OpenSaveData persists across loading an earlier save. Preserve the
+      -- fact that the line was heard, but clamp its timestamp to this timeline.
+      globalLast=turn; save.SetValue(globalConversationKey(p,line.id),globalLast)
     end
     if eventType and line.kind == eventType and pairUnused then eventPairHasUnused=true end
     if pairUnused and turn-globalLast >= GLOBAL_LINE_REPEAT_COOLDOWN then
@@ -359,8 +383,9 @@ local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
   end
   -- A queued event with every suitable line inside the global repeat cooldown
   -- remains queued, but must not silence ordinary conversations in the meantime.
-  if #eventLines > 0 then return eventLines,active,bedroom,eventType end
-  return #contextual > 0 and contextual or general,active,bedroom,nil
+  if #eventLines > 0 then return leastUsedConversationLines(p,eventLines),active,bedroom,eventType end
+  local available=#contextual > 0 and contextual or general
+  return leastUsedConversationLines(p,available),active,bedroom,nil
 end
 local function expandConversationLine(text,p,selfName,otherName,location,selfUnit,otherUnit)
   local result=tostring(text or '')
@@ -391,7 +416,7 @@ local function tryConversation(p,pairs)
       local misses=math.max(0,tonumber(save.GetValue(conversationPairKey(p,pair.a,pair.b,'MISSES'))) or 0)
       local chance=(eventType and EVENT_CONVERSATION_CHANCE or
         (BASE_CONVERSATION_CHANCE+(active and REMINISCENCE_CHANCE_BONUS or 0)+(bedroom and BEDROOM_CHANCE_BONUS or 0)))
-        +math.min(eventType and 25 or 28,misses*(eventType and 5 or 4))
+        +math.min(eventType and 24 or 30,misses*(eventType and 8 or 10))
       local succeeded=#lines > 0 and (misses >= CONVERSATION_PITY_LIMIT
         or Game.Rand(100,'Commonwealth adjacent Old Friends conversation') < chance)
       if #lines > 0 then evaluated[#evaluated+1]={pair=pair,misses=misses} end
@@ -403,7 +428,7 @@ local function tryConversation(p,pairs)
         -- the same otherwise-eligible adjacent pair.
         local normalLines,normalActive,normalBedroom=unusedConversationLines(p,pair.a,pair.b,pair.unitA,pair.unitB,nil)
         local normalChance=BASE_CONVERSATION_CHANCE+(normalActive and REMINISCENCE_CHANCE_BONUS or 0)
-          +(normalBedroom and BEDROOM_CHANCE_BONUS or 0)+math.min(28,misses*4)
+          +(normalBedroom and BEDROOM_CHANCE_BONUS or 0)+math.min(30,misses*10)
         if #normalLines > 0 and (misses >= CONVERSATION_PITY_LIMIT
           or Game.Rand(100,'Commonwealth adjacent Old Friends fallback conversation') < normalChance) then
           successes[#successes+1]={pair=pair,lines=normalLines,eventType=nil}
@@ -431,10 +456,12 @@ local function tryConversation(p,pairs)
   local location=plotLocation(pair.unitA:GetPlot())
   local lineA=expandConversationLine(line.a,p,nameA,nameB,location,pair.unitA,pair.unitB)
   local lineB=expandConversationLine(line.b,p,nameB,nameA,location,pair.unitB,pair.unitA)
+  local previousGlobalUses=globalConversationUses(p,line.id)
   save.SetValue('COY2_CONV_LAST_'..p,turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'LAST'),turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'USED_'..line.id),1)
   save.SetValue(globalConversationKey(p,line.id),turn)
+  save.SetValue(globalConversationUseKey(p,line.id),previousGlobalUses+1)
   if result.eventType then
     if pair.eventFriend then clearFriendEvent(p,pair.eventFriend,pair.eventIndex)
     else

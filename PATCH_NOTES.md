@@ -1,5 +1,27 @@
 # Patch Notes
 
+## Repository version 1.0.60 - Livelier varied conversations
+
+### Fixed
+
+- Confirmed from the live campaign database that `river` played for one pair on turn 90 and became eligible for a different pair on turn 212 because its 120-turn Commonwealth-wide reuse timer had expired.
+- Added a campaign-wide least-used shuffle bag within the currently eligible dialogue pool. Every suitable exchange now receives a turn before a previously heard line can be selected again.
+- Preserved existing dialogue history when loading an earlier save: future line timestamps are clamped to the loaded turn instead of erasing the fact that the exchange was heard.
+- Retained permanent per-pair used-line history, so the same pair still cannot repeat an exchange.
+
+### Frequency
+
+- Raised ordinary dialogue from 8% to 15% base, with +10% during a Reminiscence and +7% near a Childhood Bedroom.
+- Raised the per-pair miss bonus from 4 to 10 percentage points and guaranteed a conversation after four consecutive eligible misses instead of seven.
+- Raised queued event dialogue from 60% to 75%, with 8 points added per miss.
+- Reduced the global cooldown from eight to five turns and the same-pair cooldown from fifteen to nine turns.
+
+### Compatibility
+
+- Existing campaign dialogue timestamps seed the shuffle bag automatically; no repair scan or save-data deletion is used.
+- This changes Lua and interface text only. The 96-line XML library and in-game ModBuddy version remain unchanged at `1`.
+- Rebuild and deploy manually; no files are copied into the live Mods directory by this update.
+
 ## Repository version 1.0.59 - Authoritative upgrade handoff
 
 ### Fixed

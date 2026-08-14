@@ -191,7 +191,7 @@ end)
 LuaEvents.CommonwealthConversationStatusResponse.Add(function(p,enabled)
   if p~=playerID() then return end
   conversationsEnabled=tonumber(enabled)==1
-  Controls.ConversationToggle:SetText(conversationsEnabled and 'Conversations: On (8% base)' or 'Conversations: Off')
+  Controls.ConversationToggle:SetText(conversationsEnabled and 'Conversations: On (15% base)' or 'Conversations: Off')
 end)
 LuaEvents.CommonwealthConversationShown.Add(function(p,nameA,tagA,lineA,nameB,tagB,lineB,location,eventType)
   if p~=playerID() or not conversationsEnabled then return end

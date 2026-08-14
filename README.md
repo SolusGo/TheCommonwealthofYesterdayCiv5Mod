@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.57** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.60** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -38,7 +38,7 @@ The Old Friend replaces the Warrior at the same base strength and 40 Production.
 
 Old Friend identities are randomly selected from 54 generated names and 72 gamertags. Trent, Gabriel, Dion, Harrison, Lachlan, and Ben retain their tribute gamertags and are each eight times more likely to appear than a generated identity. Names are not repeated until the available pool is exhausted. The in-game **Friends** button opens a persistent archive with Online, Offline, and All views; profiles show form, age, level, combat and survival records, lineage, closest friend, location, timeline, and earned epithet. Records transfer across upgrades and remain after death.
 
-Adjacent Old Friends have an 8% base chance per eligible pair each turn to share a brief conversation, increased to 14% during a Reminiscence, 12% near a Childhood Bedroom, or 18% with both bonuses. Each eligible miss raises that pair's next chance by 4 percentage points, with an exchange guaranteed after seven consecutive misses. Queued event conversations begin at 60%, gain 5 points after each miss, persist for 40 turns, and take priority over normal chatter. New eras, upgrades, near-death survival, victories, and Reminiscence activations enter a persistent per-Friend queue rather than overwriting one another; reunions after at least 15 turns apart use a persistent per-pair event. An eight-turn global cooldown, a 15-turn pair cooldown, and per-pair dialogue history prevent interruptions or immediate repetition. Conversations are recorded in both Ledger timelines and can be disabled from the Ledger.
+Adjacent Old Friends have a 15% base chance per eligible pair each turn to share a brief conversation, increased to 25% during a Reminiscence, 22% near a Childhood Bedroom, or 32% with both bonuses. Each eligible miss raises that pair's next chance by 10 percentage points, with an exchange guaranteed after four consecutive misses. Queued event conversations begin at 75%, gain 8 points after each miss, persist for 40 turns, and take priority over normal chatter. New eras, upgrades, near-death survival, victories, and Reminiscence activations enter a persistent per-Friend queue rather than overwriting one another; reunions after at least 15 turns apart use a persistent per-pair event. A five-turn global cooldown and nine-turn pair cooldown prevent interruptions. Per-pair history prevents a pair from repeating itself, while a campaign-wide least-used shuffle bag cycles through every currently eligible exchange before allowing a familiar line to return. Conversations are recorded in both Ledger timelines and can be disabled from the Ledger.
 
 The conversation library contains 96 exchanges. Dialogue is stored separately from the Lua logic in `Data/CommonwealthConversations.xml`. The file defines a custom `GameInfo.Commonwealth_Conversations` database table, making it possible to add or revise exchanges without editing the conversation system itself. Lines can use `{SELF}`, `{OTHER}`, `{LOCATION}`, `{ERA}`, `{FORM}`, and `{OTHER_FORM}` tokens for contextual details.
 
@@ -124,7 +124,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.56 | `5019eed` | Preserved Friend profiles through ruins upgrades and removed duplicate join events. |
 | 1.0.57 | `eb17c72` | Established a clean-campaign persistence baseline, removed old repair passes, hardened Friend upgrades, and polished the archive UI. |
 | 1.0.58 | `f9c88b4` | Added escalating conversation odds, a seven-miss guarantee, and runtime eligibility diagnostics. |
-| 1.0.59 | Current | Aligned Old Friend identity transfers with the Community Patch's pre-conversion upgrade callback. |
+| 1.0.59 | `f87b86f` | Aligned Old Friend identity transfers with the Community Patch's pre-conversion upgrade callback. |
+| 1.0.60 | Current | Cycled dialogue through a global shuffle bag and increased conversation frequency. |
 
 ## ModBuddy development
 
