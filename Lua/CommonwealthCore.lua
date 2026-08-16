@@ -90,7 +90,8 @@ function CommonwealthChooseFriendIdentity(p)
       totalWeight = totalWeight + 1
     end
   end
-  if totalWeight == 0 then
+  local hasUnusedIdentity=totalWeight > 0
+  if not hasUnusedIdentity then
     for i, identity in ipairs(friendIdentities.tribute) do candidates[#candidates+1] = {kind='tribute', index=i, weight=8}; totalWeight = totalWeight + 8 end
     for i, name in ipairs(friendIdentities.names) do candidates[#candidates+1] = {kind='generated', index=i, weight=1}; totalWeight = totalWeight + 1 end
   end
@@ -106,7 +107,7 @@ function CommonwealthChooseFriendIdentity(p)
     local tagIndex = Game.Rand(#identity.tags, 'Commonwealth tribute gamertag') + 1
     local alternates = {}
     for i, tag in ipairs(identity.tags) do if i ~= tagIndex then alternates[#alternates+1] = tag end end
-    return identity.name, identity.tags[tagIndex], table.concat(alternates, ', ')
+    return identity.name, identity.tags[tagIndex], table.concat(alternates, ', '),hasUnusedIdentity
   end
   set(p, 'USED_NAME_'..chosen.index, 1)
   local availableTags = {}
@@ -114,7 +115,7 @@ function CommonwealthChooseFriendIdentity(p)
   if #availableTags == 0 then for i, tag in ipairs(friendIdentities.tags) do availableTags[#availableTags+1] = i end end
   local tagIndex = availableTags[Game.Rand(#availableTags, 'Commonwealth generated gamertag') + 1]
   set(p, 'USED_TAG_'..tagIndex, 1)
-  return friendIdentities.names[chosen.index], friendIdentities.tags[tagIndex], ''
+  return friendIdentities.names[chosen.index], friendIdentities.tags[tagIndex], '',hasUnusedIdentity
 end
 function CommonwealthTributeAliases(name, primaryTag)
   for _, identity in ipairs(friendIdentities.tribute) do if identity.name == name then
@@ -328,10 +329,12 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p, oldID, n
   -- CP fires UnitUpgraded before CvUnit::convert copies promotions and names to
   -- the replacement. The old unit is therefore authoritative in this event;
   -- checking the new unit here rejects every ordinary Old Friend upgrade.
-  if oldUnit and oldUnit:IsHasPromotion(SINCE) then
-    local state=friendState()
-    if state and state.HandleUpgrade then state.HandleUpgrade(p,oldID,newID,bGoodyHut,oldUnit,newUnit) end
-  else addMemories(p, 2, 'a unit was upgraded') end
+  local state=friendState()
+  -- Let the archive authenticate the event. It can still recover a ruins
+  -- upgrade from its pending pre-kill record when CP has already removed the
+  -- old unit object by the time UnitUpgraded reaches Lua.
+  local handled=state and state.HandleUpgrade and state.HandleUpgrade(p,oldID,newID,bGoodyHut,oldUnit,newUnit)
+  if not handled then addMemories(p, 2, 'a unit was upgraded') end
 end) end
 if GameEvents.GreatPersonExpended then GameEvents.GreatPersonExpended.Add(function(p) if isCommonwealth(Players[p]) then addMemories(p, 3, 'a Great Person was expended') end end) end
 if GameEvents.CityConstructed then GameEvents.CityConstructed.Add(function(p, cityID, buildingType)

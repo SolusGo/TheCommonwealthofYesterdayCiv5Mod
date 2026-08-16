@@ -1,5 +1,32 @@
 # Patch Notes
 
+## Repository version 1.0.62 - Stable campaigns and recycled IDs
+
+### Campaign and conversation persistence
+
+- Replaced the mutable `COY3` world fingerprint with a `COY4` identifier based on map dimensions, game speed, the serialized map/synchronization seeds exposed by Civ V, and the fixed major-civilization setup.
+- Removed generated terrain and assigned starting plots from the active identifier. True Start and other map scripts can now finish their setup without making one campaign appear to be a new one after reload.
+- Excluded the synchronization seed when Civ V's **New Random Seed** option can reroll it on load; a diagnostic warning is written if no stable seed is exposed.
+- Added read-through compatibility for the matching `COY3` namespace when an existing save first adopts `COY4`. New campaigns do not import legacy state from a previous game.
+- Preserved global dialogue-use counts, per-pair used lines, cooldowns, event queues, and the rolling conversation archive through that migration. A previously heard `river` exchange therefore remains outside the least-used pool after an ordinary reload.
+
+### Friend lifecycle
+
+- Stopped newly created Old Friends from restoring names, gamertags, age, or Years Together from `FRIEND_*` cache entries left behind when Civ V recycles a numeric unit ID.
+- Tagged each compatibility cache with its owning archive profile. Cached Years Together can only be read when that tag matches the live profile; otherwise the authoritative archive value is used.
+- Added a narrow existing-save correction for exact duplicate live identities. The older profile is preserved, the later real unit receives an unused identity, and neither unit nor archive profile is deleted or merged.
+- Let the authoritative upgrade handoff recover a same-turn pending profile when the Community Patch has already removed the original unit object, covering paid and ruins callback orderings.
+- Made repeated delivery of the same upgrade callback idempotent and cleared pending-death state as part of a successful handoff, preventing duplicate Memories, timelines, or later false Offline transitions.
+
+### Verification and compatibility
+
+- Parsed all five Lua files independently, validated all 96 unique conversation rows and event categories, and modeled namespace stability, legacy read-through, paid/ruins handoffs, unit-ID reuse, stale Years Together caches, and duplicate-profile recovery.
+- Ran ModBuddy's `Build` target with an isolated temporary output and verified the generated 46-file manifest, both UI entry points, database actions, and in-game version `1`. Nothing was deployed to the live Mods directory.
+- Confirmed there is one `UnitUpgraded` listener and that the second `UnitCreated` listener remains idempotent through the shared archive mapping.
+- No database rows, gameplay values, art, Dawn of Man assets, project version, or checked-in `.modinfo` version changed. An already split `COY3` campaign adopts the namespace matching the loaded save; unrelated abandoned namespaces are not merged automatically.
+- Ordinary save/load is covered. Because Civ V's `Modding.OpenSaveData` is external to individual save snapshots, intentionally loading a much earlier turn can still retain later custom-state writes.
+- Rebuild and deploy manually; this update does not copy files into the live Mods directory.
+
 ## Repository version 1.0.61 - Archive and interface refactor
 
 ### Friend lifecycle
