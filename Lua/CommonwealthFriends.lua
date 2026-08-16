@@ -13,16 +13,18 @@ local YEARS = {
 local save = CommonwealthSaveData or Modding.OpenSaveData()
 local combatCredit = {}
 local conversationLines = {}
-local EVENT_LIFETIME = 40
-local MAX_PENDING_EVENTS = 6
-local GLOBAL_CONVERSATION_COOLDOWN = 5
-local PAIR_CONVERSATION_COOLDOWN = 9
-local GLOBAL_LINE_REPEAT_COOLDOWN = 120
-local BASE_CONVERSATION_CHANCE = 15
-local REMINISCENCE_CHANCE_BONUS = 10
-local BEDROOM_CHANCE_BONUS = 7
-local EVENT_CONVERSATION_CHANCE = 75
-local CONVERSATION_PITY_LIMIT = 4
+local EVENT_LIFETIME = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_EVENT_LIFETIME) or 40
+local MAX_PENDING_EVENTS = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_EVENT_QUEUE_LIMIT) or 6
+local GLOBAL_CONVERSATION_COOLDOWN = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_GLOBAL_COOLDOWN) or 5
+local PAIR_CONVERSATION_COOLDOWN = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_PAIR_COOLDOWN) or 9
+local GLOBAL_LINE_REPEAT_COOLDOWN = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_LINE_COOLDOWN) or 120
+local BASE_CONVERSATION_CHANCE = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_BASE_CHANCE) or 15
+local REMINISCENCE_CHANCE_BONUS = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_REMINISCENCE_BONUS) or 10
+local BEDROOM_CHANCE_BONUS = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_BEDROOM_BONUS) or 7
+local EVENT_CONVERSATION_CHANCE = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_EVENT_CHANCE) or 75
+local CONVERSATION_PITY_LIMIT = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_PITY_LIMIT) or 4
+local REUNION_TURNS = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_REUNION_TURNS) or 15
+local CONVERSATION_HISTORY_LIMIT = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_HISTORY_LIMIT) or 20
 local lastConversationTrace = ''
 if GameInfo.Commonwealth_Conversations then
   for row in GameInfo.Commonwealth_Conversations() do
@@ -90,7 +92,7 @@ end
 local function unitName(unitType)
   local row = GameInfo.Units[unitType]; return row and Locale.ConvertTextKey(row.Description) or 'Unknown Unit'
 end
-local function appendTimeline(p, id, text, eventTurn)
+local function appendTimeline(p, id, text, eventTurn, eventKind)
   local count = tonumber(getr(p,id,'TIMELINE_COUNT',0)) or 0
   -- Keep a rolling archive. The old cap preserved the first 30 events forever,
   -- which silently discarded later upgrades in long games.
@@ -98,11 +100,13 @@ local function appendTimeline(p, id, text, eventTurn)
     for i=2,count do
       setr(p,id,'TIME_'..(i-1)..'_TURN',getr(p,id,'TIME_'..i..'_TURN',0))
       setr(p,id,'TIME_'..(i-1)..'_TEXT',getr(p,id,'TIME_'..i..'_TEXT',''))
+      setr(p,id,'TIME_'..(i-1)..'_KIND',getr(p,id,'TIME_'..i..'_KIND',''))
     end
     count = 29
   end
   count = count + 1; setr(p,id,'TIMELINE_COUNT',count)
   setr(p,id,'TIME_'..count..'_TURN',eventTurn or Game.GetGameTurn()); setr(p,id,'TIME_'..count..'_TEXT',text)
+  setr(p,id,'TIME_'..count..'_KIND',eventKind or '')
 end
 local function plotLocation(plot)
   if not plot then return 'Unknown' end
@@ -149,7 +153,7 @@ local function recordLedgerUpgrade(p,id,unitType,eventTurn)
   local appended=false
   local recordedKey='UPGRADE_RECORDED_'..typeName
   if tonumber(getr(p,id,recordedKey,0)) ~= 1 and not timelineHasUpgrade(p,id,form) then
-    appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' became '..form..'.',eventTurn)
+    appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' became '..form..'.',eventTurn,'upgrade')
     markFriendEvent(p,id,'upgrade')
     appended=true
   end
@@ -198,26 +202,79 @@ local function registerFriend(unit)
   setr(p,id,'STATUS','Still With Us'); setr(p,id,'X',unit:GetX()); setr(p,id,'Y',unit:GetY())
   setr(p,id,'LOCATION',plotLocation(unit:GetPlot())); setr(p,id,'LEVEL',unit:GetLevel()); setr(p,id,'XP',unit:GetExperience())
   unit:SetName(name..' - '..tag)
-  appendTimeline(p,id,name..' joined the Commonwealth during the '..eraName(Players[p]:GetCurrentEra())..'.')
+  appendTimeline(p,id,name..' joined the Commonwealth during the '..eraName(Players[p]:GetCurrentEra())..'.',nil,'joined')
   return id
 end
 
 local function syncUnitFriendRecord(p,id,unit)
   if not unit or not id then return end
   local unitID=unit:GetID()
-  save.SetValue(unitFriendField(p,unitID,'NAME'),getr(p,id,'NAME','Old Friend'))
-  save.SetValue(unitFriendField(p,unitID,'TAG'),getr(p,id,'TAG',''))
-  save.SetValue(unitFriendField(p,unitID,'ALIASES'),getr(p,id,'ALIASES',''))
-  save.SetValue(unitFriendField(p,unitID,'BORN'),getr(p,id,'BORN',Game.GetGameTurn()))
-  save.SetValue(unitFriendField(p,unitID,'ERA'),getr(p,id,'BORN_ERA',Players[p]:GetCurrentEra()))
+  local function cache(field,value)
+    local storageKey=unitFriendField(p,unitID,field)
+    if save.GetValue(storageKey) ~= value then save.SetValue(storageKey,value) end
+  end
+  cache('NAME',getr(p,id,'NAME','Old Friend'))
+  cache('TAG',getr(p,id,'TAG',''))
+  cache('ALIASES',getr(p,id,'ALIASES',''))
+  cache('BORN',getr(p,id,'BORN',Game.GetGameTurn()))
+  cache('ERA',getr(p,id,'BORN_ERA',Players[p]:GetCurrentEra()))
   local profileYears=tonumber(getr(p,id,'YEARS',0)) or 0
   local cachedYears=tonumber(save.GetValue(unitFriendField(p,unitID,'YEARS'))) or 0
   local years=math.min(6,math.max(profileYears,cachedYears))
-  setr(p,id,'YEARS',years); save.SetValue(unitFriendField(p,unitID,'YEARS'),years)
-  for index,promotion in ipairs(YEARS) do unit:SetHasPromotion(promotion,index == years) end
-  save.SetValue(unitFriendField(p,unitID,'UPGRADES'),tonumber(getr(p,id,'UPGRADES',0)) or 0)
-  save.SetValue(unitFriendField(p,unitID,'LINEAGE'),getr(p,id,'LINEAGE',''))
-  save.SetValue(unitFriendField(p,unitID,'ACTIVE'),1)
+  if profileYears ~= years then setr(p,id,'YEARS',years) end
+  cache('YEARS',years)
+  for index,promotion in ipairs(YEARS) do
+    local desired=index == years
+    if unit:IsHasPromotion(promotion) ~= desired then unit:SetHasPromotion(promotion,desired) end
+  end
+  cache('UPGRADES',tonumber(getr(p,id,'UPGRADES',0)) or 0)
+  cache('LINEAGE',getr(p,id,'LINEAGE',''))
+  cache('ACTIVE',1)
+end
+
+-- The archive is the single authoritative Friend state. CommonwealthCore
+-- calls this API for era changes, refreshes, creation, and upgrades; the
+-- unit-keyed FRIEND_* fields remain only a synchronized runtime cache.
+CommonwealthFriendState = CommonwealthFriendState or {}
+CommonwealthFriendState.Register = registerFriend
+CommonwealthFriendState.GetID = friendID
+CommonwealthFriendState.Sync = syncUnitFriendRecord
+CommonwealthFriendState.Years = function(unit)
+  if not unit then return 0 end
+  local p,id=unit:GetOwner(),registerFriend(unit)
+  if not id then return 0 end
+  local archived=tonumber(getr(p,id,'YEARS',0)) or 0
+  local cached=tonumber(save.GetValue(unitFriendField(p,unit:GetID(),'YEARS'))) or 0
+  local years=math.min(6,math.max(archived,cached))
+  if archived ~= years then setr(p,id,'YEARS',years) end
+  if cached ~= years then save.SetValue(unitFriendField(p,unit:GetID(),'YEARS'),years) end
+  return years
+end
+CommonwealthFriendState.AdvanceEra = function(p,unit,newEra)
+  local id=registerFriend(unit); if not id then return false end
+  local lastEra=tonumber(getr(p,id,'LAST_ERA',newEra)) or newEra
+  if newEra <= lastEra then syncUnitFriendRecord(p,id,unit); return false end
+  local years=math.min(6,(tonumber(getr(p,id,'YEARS',0)) or 0)+1)
+  setr(p,id,'YEARS',years); setr(p,id,'ERAS',(tonumber(getr(p,id,'ERAS',0)) or 0)+1)
+  setr(p,id,'MEMORIES',(tonumber(getr(p,id,'MEMORIES',0)) or 0)+1); setr(p,id,'LAST_ERA',newEra)
+  appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived into the '..eraName(newEra)..' and gained Years Together '..years..'.',nil,'new_era')
+  markFriendEvent(p,id,'new_era'); syncUnitFriendRecord(p,id,unit)
+  return true
+end
+CommonwealthFriendState.HandleUpgrade = function(p,oldID,newID,bGoodyHut,oldUnit,newUnit)
+  if not oldUnit or not oldUnit:IsHasPromotion(SINCE) or not newUnit then return false end
+  local id=friendID(p,oldID) or registerFriend(oldUnit); if not id then return false end
+  setFriendID(p,oldID,nil); setFriendID(p,newID,id)
+  save.SetValue(unitFriendField(p,oldID,'ACTIVE'),0)
+  recordLedgerUpgrade(p,id,newUnit:GetUnitType())
+  setr(p,id,'CURRENT_UNIT',newID); setr(p,id,'CURRENT_TYPE',newUnit:GetUnitType())
+  setr(p,id,'STATUS','Still With Us'); setr(p,id,'DEATH_TURN',-1)
+  newUnit:SetName(getr(p,id,'NAME','Old Friend')..' - '..getr(p,id,'TAG',''))
+  syncUnitFriendRecord(p,id,newUnit)
+  if CommonwealthAddMemories then CommonwealthAddMemories(p,4,'an Old Friend was upgraded') end
+  local row=GameInfo.Units[newUnit:GetUnitType()]
+  print('CommonwealthFriends: transferred profile '..id..' from unit '..oldID..' to '..newID..' as '..(row and row.Type or 'unknown unit'))
+  return true
 end
 
 local function reconcileMappedUpgrade(p,unit)
@@ -247,7 +304,7 @@ local function finalizePendingDeaths(p)
         local x=tonumber(getr(p,id,'PENDING_DEATH_X',-1)) or -1; local y=tonumber(getr(p,id,'PENDING_DEATH_Y',-1)) or -1
         setr(p,id,'STATUS','Offline'); setr(p,id,'DEATH_TURN',pendingTurn); setr(p,id,'DEATH_X',x); setr(p,id,'DEATH_Y',y)
         setr(p,id,'LOCATION','Tile '..x..', '..y); setr(p,id,'CURRENT_UNIT',-1)
-        appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' went offline at tile '..x..', '..y..'.',pendingTurn)
+        appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' went offline at tile '..x..', '..y..'.',pendingTurn,'offline')
       end
       setr(p,id,'PENDING_DEATH_TURN',-1000)
     end
@@ -260,7 +317,7 @@ local function updateUnitRecord(p, unit)
   if hp < oldLow then
     setr(p,id,'LOW_HP',hp)
     if hp <= 10 and oldLow > 10 then
-      appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived with only '..hp..' HP.')
+      appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived with only '..hp..' HP.',nil,'near_death')
       markFriendEvent(p,id,'near_death')
     end
   end
@@ -269,11 +326,7 @@ local function updateUnitRecord(p, unit)
   setr(p,id,'LOCATION',plotLocation(unit:GetPlot()))
   local era = Players[p]:GetCurrentEra(); local lastEra = tonumber(getr(p,id,'LAST_ERA',era)) or era
   if era > lastEra then
-    local years = math.min(6,(tonumber(getr(p,id,'YEARS',0)) or 0)+1)
-    setr(p,id,'YEARS',years); setr(p,id,'ERAS',(tonumber(getr(p,id,'ERAS',0)) or 0)+1)
-    setr(p,id,'MEMORIES',(tonumber(getr(p,id,'MEMORIES',0)) or 0)+1); setr(p,id,'LAST_ERA',era)
-    appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived into the '..eraName(era)..' and gained Years Together '..years..'.')
-    markFriendEvent(p,id,'new_era')
+    CommonwealthFriendState.AdvanceEra(p,unit,era)
   end
   local capital = Players[p]:GetCapitalCity()
   local distance = capital and Map.PlotDistance(unit:GetX(),unit:GetY(),capital:GetX(),capital:GetY()) or 0
@@ -316,6 +369,31 @@ local function leastUsedConversationLines(p,lines)
 end
 local function conversationsEnabled(p)
   return tonumber(save.GetValue('COY2_CONV_ENABLED_'..p) or 1) ~= 0
+end
+local function conversationHistoryKey(p,index,field)
+  return 'COY2_CHAT_HISTORY_'..p..'_'..index..'_'..field
+end
+local conversationHistoryFields={'TURN','KIND','LINE_ID','NAME_A','TAG_A','LINE_A','NAME_B','TAG_B','LINE_B','LOCATION'}
+local function appendConversationHistory(p,entry)
+  local count=tonumber(save.GetValue('COY2_CHAT_HISTORY_COUNT_'..p)) or 0
+  if count >= CONVERSATION_HISTORY_LIMIT then
+    for i=2,count do for _,field in ipairs(conversationHistoryFields) do
+      save.SetValue(conversationHistoryKey(p,i-1,field),save.GetValue(conversationHistoryKey(p,i,field)))
+    end end
+    count=CONVERSATION_HISTORY_LIMIT
+  else count=count+1 end
+  save.SetValue('COY2_CHAT_HISTORY_COUNT_'..p,count)
+  local index=count
+  save.SetValue(conversationHistoryKey(p,index,'TURN'),entry.turn)
+  save.SetValue(conversationHistoryKey(p,index,'KIND'),entry.kind)
+  save.SetValue(conversationHistoryKey(p,index,'LINE_ID'),entry.lineID)
+  save.SetValue(conversationHistoryKey(p,index,'NAME_A'),entry.nameA)
+  save.SetValue(conversationHistoryKey(p,index,'TAG_A'),entry.tagA)
+  save.SetValue(conversationHistoryKey(p,index,'LINE_A'),entry.lineA)
+  save.SetValue(conversationHistoryKey(p,index,'NAME_B'),entry.nameB)
+  save.SetValue(conversationHistoryKey(p,index,'TAG_B'),entry.tagB)
+  save.SetValue(conversationHistoryKey(p,index,'LINE_B'),entry.lineB)
+  save.SetValue(conversationHistoryKey(p,index,'LOCATION'),entry.location)
 end
 local function nearBedroom(unit)
   local plot=unit and unit:GetPlot(); if not plot then return false end
@@ -456,6 +534,7 @@ local function tryConversation(p,pairs)
   local location=plotLocation(pair.unitA:GetPlot())
   local lineA=expandConversationLine(line.a,p,nameA,nameB,location,pair.unitA,pair.unitB)
   local lineB=expandConversationLine(line.b,p,nameB,nameA,location,pair.unitB,pair.unitA)
+  local conversationKind=line.kind or result.eventType or 'general'
   local previousGlobalUses=globalConversationUses(p,line.id)
   save.SetValue('COY2_CONV_LAST_'..p,turn)
   save.SetValue(conversationPairKey(p,pair.a,pair.b,'LAST'),turn)
@@ -471,10 +550,12 @@ local function tryConversation(p,pairs)
   end
   setr(p,pair.a,'CONVERSATIONS',(tonumber(getr(p,pair.a,'CONVERSATIONS',0)) or 0)+1)
   setr(p,pair.b,'CONVERSATIONS',(tonumber(getr(p,pair.b,'CONVERSATIONS',0)) or 0)+1)
-  appendTimeline(p,pair.a,'Shared a quiet conversation with '..nameB..' at '..location..'.')
-  appendTimeline(p,pair.b,'Shared a quiet conversation with '..nameA..' at '..location..'.')
+  appendTimeline(p,pair.a,'Shared a quiet conversation with '..nameB..' at '..location..'.',nil,'conversation')
+  appendTimeline(p,pair.b,'Shared a quiet conversation with '..nameA..' at '..location..'.',nil,'conversation')
+  appendConversationHistory(p,{turn=turn,kind=conversationKind,lineID=line.id,nameA=nameA,tagA=tagA,lineA=lineA,
+    nameB=nameB,tagB=tagB,lineB=lineB,location=location})
   print('CommonwealthFriends: showed conversation '..line.id..' for '..nameA..' and '..nameB..' on turn '..turn)
-  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,lineA,nameB,tagB,lineB,location,line.kind or result.eventType or 'general')
+  LuaEvents.CommonwealthConversationShown(p,nameA,tagA,lineA,nameB,tagB,lineB,location,conversationKind)
 end
 local function updateFriendships(p, units)
   local pairs={}; local turn=Game.GetGameTurn()
@@ -486,7 +567,7 @@ local function updateFriendships(p, units)
       if lastAdjacent > turn then
         lastAdjacent=-1000; save.SetValue(conversationPairKey(p,a,b,'ADJ_LAST'),lastAdjacent)
       end
-      if lastAdjacent > -1000 and turn-lastAdjacent >= 15 then
+      if lastAdjacent > -1000 and turn-lastAdjacent >= REUNION_TURNS then
         save.SetValue(conversationPairKey(p,a,b,'EVENT_TYPE'),'reunion')
         save.SetValue(conversationPairKey(p,a,b,'EVENT_TURN'),turn)
       end
@@ -548,26 +629,6 @@ GameEvents.UnitCreated.Add(function(p,unitID)
   end
 end)
 
-if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p,oldID,newID,bGoodyHut)
-  local player=Players[p]; if not isCommonwealth(player) then return end
-  local oldUnit,newUnit=player:GetUnitByID(oldID),player:GetUnitByID(newID)
-  -- CP invokes UnitUpgraded before convert() transfers promotions and identity
-  -- to the replacement. Both paid and ruins upgrades must therefore be
-  -- authenticated from the still-live old unit and its exact archive mapping.
-  if not oldUnit or not oldUnit:IsHasPromotion(SINCE) then return end
-  local id=friendID(p,oldID) or registerFriend(oldUnit)
-  if not id or not newUnit then return end
-  setFriendID(p,oldID,nil); setFriendID(p,newID,id)
-  local unitType=GameInfo.Units[newUnit:GetUnitType()].Type
-  recordLedgerUpgrade(p,id,newUnit:GetUnitType())
-  setr(p,id,'CURRENT_UNIT',newID); setr(p,id,'CURRENT_TYPE',newUnit:GetUnitType())
-  setr(p,id,'STATUS','Still With Us'); setr(p,id,'DEATH_TURN',-1)
-  newUnit:SetName(getr(p,id,'NAME','Old Friend')..' - '..getr(p,id,'TAG',''))
-  syncUnitFriendRecord(p,id,newUnit)
-  if CommonwealthAddMemories then CommonwealthAddMemories(p,4,'an Old Friend was upgraded') end
-  print('CommonwealthFriends: transferred profile '..id..' from unit '..oldID..' to '..newID..' as '..unitType)
-end) end
-
 if Events.RunCombatSim then Events.RunCombatSim.Add(function(ap,au,_,_,_,dp,du)
   local attacker=Players[ap] and Players[ap]:GetUnitByID(au); local defender=Players[dp] and Players[dp]:GetUnitByID(du)
   if attacker and attacker:IsHasPromotion(SINCE) then combatCredit[dp..'_'..du]={p=ap,id=registerFriend(attacker)} end
@@ -584,7 +645,7 @@ if Events.EndCombatSim then Events.EndCombatSim.Add(function(ap,au,_,af,amax,dp,
         if hp < oldLow then
           setr(p,id,'LOW_HP',hp)
           if hp <= 10 and oldLow > 10 then
-            appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived a battle with only '..hp..' HP.')
+            appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived a battle with only '..hp..' HP.',nil,'near_death')
             markFriendEvent(p,id,'near_death')
           end
         end
@@ -597,7 +658,7 @@ if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(function(killedP,kille
   local credit=combatCredit[killedP..'_'..killedID]
   if credit and killerP == credit.p then
     setr(credit.p,credit.id,'KILLS',(tonumber(getr(credit.p,credit.id,'KILLS',0)) or 0)+1)
-    appendTimeline(credit.p,credit.id,getr(credit.p,credit.id,'NAME','An Old Friend')..' defeated an enemy near tile '..x..', '..y..'.')
+    appendTimeline(credit.p,credit.id,getr(credit.p,credit.id,'NAME','An Old Friend')..' defeated an enemy near tile '..x..', '..y..'.',nil,'victory')
     markFriendEvent(credit.p,credit.id,'victory')
   end
   combatCredit[killedP..'_'..killedID]=nil
@@ -634,7 +695,12 @@ local function displayLineage(raw)
   for value in string.gmatch(raw or '','[^|]+') do local row=GameInfo.Units[value]; names[#names+1]=row and Locale.ConvertTextKey(row.Description) or value end
   return table.concat(names,'  [ICON_ARROW_RIGHT]  ')
 end
-local function timelineEventIcon(text)
+local function timelineEventIcon(kind,text)
+  local icons={upgrade='[ICON_ARROW_RIGHT]',new_era='[ICON_CULTURE]',victory='[ICON_STRENGTH]',near_death='[ICON_HEALTH]',
+    conversation='[ICON_GREAT_PEOPLE]',offline='[ICON_RAZING]',joined='[ICON_CAPITAL]'}
+  if icons[kind] then return icons[kind] end
+  -- Older timeline entries predate structured event kinds. Retain a narrow
+  -- text fallback so existing campaigns keep their familiar icons.
   text=string.lower(text or '')
   if string.find(text,'became ',1,true) then return '[ICON_ARROW_RIGHT]' end
   if string.find(text,'survived into',1,true) then return '[ICON_CULTURE]' end
@@ -660,16 +726,20 @@ LuaEvents.CommonwealthAdvancedLedgerRequest.Add(function(p)
     -- Ledger's compact timeline viewport.
     for i=tc,1,-1 do
       local eventText=getr(p,id,'TIME_'..i..'_TEXT','')
-      timeline[#timeline+1]=timelineEventIcon(eventText)..'  [COLOR_GREY]Turn '..getr(p,id,'TIME_'..i..'_TURN',0)..'[ENDCOLOR][NEWLINE]'..eventText
+      local eventKind=getr(p,id,'TIME_'..i..'_KIND','')
+      timeline[#timeline+1]=timelineEventIcon(eventKind,eventText)..'  [COLOR_GREY]Turn '..getr(p,id,'TIME_'..i..'_TURN',0)..'[ENDCOLOR][NEWLINE]'..eventText
     end
     local currentType=tonumber(getr(p,id,'CURRENT_TYPE',-1)) or -1
+    local currentRow=currentType>=0 and GameInfo.Units[currentType] or nil
     rows[#rows+1]={id=id,name=name,tag=tag,aliases=aliases,epithet=epithet(p,id),status=getr(p,id,'STATUS','Offline'),
       form=currentType>=0 and unitName(currentType) or 'Unknown',bornEra=eraName(tonumber(getr(p,id,'BORN_ERA',0)) or 0),bornTurn=tonumber(getr(p,id,'BORN',0)) or 0,
       years=tonumber(getr(p,id,'YEARS',0)) or 0,eras=tonumber(getr(p,id,'ERAS',0)) or 0,level=tonumber(getr(p,id,'LEVEL',1)) or 1,xp=tonumber(getr(p,id,'XP',0)) or 0,
       battles=tonumber(getr(p,id,'BATTLES',0)) or 0,kills=tonumber(getr(p,id,'KILLS',0)) or 0,distance=tonumber(getr(p,id,'DISTANCE',0)) or 0,
       upgrades=tonumber(getr(p,id,'UPGRADES',0)) or 0,lowHP=tonumber(getr(p,id,'LOW_HP',100)) or 100,memories=tonumber(getr(p,id,'MEMORIES',0)) or 0,conversations=tonumber(getr(p,id,'CONVERSATIONS',0)) or 0,
       closest=closest,together=together,location=getr(p,id,'LOCATION','Unknown'),lineage=displayLineage(getr(p,id,'LINEAGE','')),timeline=table.concat(timeline,'[NEWLINE]'),
-      deathTurn=tonumber(getr(p,id,'DEATH_TURN',-1)) or -1,currentUnit=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1}
+      deathTurn=tonumber(getr(p,id,'DEATH_TURN',-1)) or -1,currentUnit=tonumber(getr(p,id,'CURRENT_UNIT',-1)) or -1,currentType=currentType,
+      iconIndex=currentRow and currentRow.PortraitIndex or 0,iconAtlas=currentRow and currentRow.IconAtlas or 'COMMONWEALTH_OLD_FRIEND_ATLAS',
+      latestTurn=tc>0 and (tonumber(getr(p,id,'TIME_'..tc..'_TURN',0)) or 0) or (tonumber(getr(p,id,'BORN',0)) or 0)}
   end
   LuaEvents.CommonwealthAdvancedLedgerResponse(p,rows)
 end)
@@ -681,6 +751,19 @@ end)
 
 LuaEvents.CommonwealthConversationStatusRequest.Add(function(p)
   LuaEvents.CommonwealthConversationStatusResponse(p,conversationsEnabled(p) and 1 or 0)
+end)
+LuaEvents.CommonwealthConversationHistoryRequest.Add(function(p)
+  if not isCommonwealth(Players[p]) then LuaEvents.CommonwealthConversationHistoryResponse(p,{}); return end
+  local rows={}; local count=tonumber(save.GetValue('COY2_CHAT_HISTORY_COUNT_'..p)) or 0
+  for i=count,1,-1 do
+    rows[#rows+1]={turn=tonumber(save.GetValue(conversationHistoryKey(p,i,'TURN'))) or 0,
+      kind=save.GetValue(conversationHistoryKey(p,i,'KIND')) or 'general',lineID=save.GetValue(conversationHistoryKey(p,i,'LINE_ID')) or '',
+      nameA=save.GetValue(conversationHistoryKey(p,i,'NAME_A')) or 'Old Friend',tagA=save.GetValue(conversationHistoryKey(p,i,'TAG_A')) or '',
+      lineA=save.GetValue(conversationHistoryKey(p,i,'LINE_A')) or '',nameB=save.GetValue(conversationHistoryKey(p,i,'NAME_B')) or 'Old Friend',
+      tagB=save.GetValue(conversationHistoryKey(p,i,'TAG_B')) or '',lineB=save.GetValue(conversationHistoryKey(p,i,'LINE_B')) or '',
+      location=save.GetValue(conversationHistoryKey(p,i,'LOCATION')) or 'Unknown'}
+  end
+  LuaEvents.CommonwealthConversationHistoryResponse(p,rows)
 end)
 LuaEvents.CommonwealthConversationToggle.Add(function(p,enabled)
   if isCommonwealth(Players[p]) then

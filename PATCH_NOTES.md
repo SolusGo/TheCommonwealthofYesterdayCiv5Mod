@@ -1,5 +1,42 @@
 # Patch Notes
 
+## Repository version 1.0.61 - Archive and interface refactor
+
+### Friend lifecycle
+
+- Centralized Friend registration, Years Together, era advancement, and exact old/new unit upgrade transfer in one authoritative archive API.
+- Removed the duplicate Core-side profile restoration and transfer implementation and the second `UnitUpgraded` listener.
+- Kept unit-keyed Friend fields as a synchronized compatibility cache without using name, tile, or broad save-repair matching.
+- Made archive years, promotions, lineage, current form, status, custom name, and the 4-Memory Friend-upgrade reward update in the same atomic handoff.
+- Preserved the delayed true-death confirmation and exact same-ID ruins-upgrade safeguard.
+
+### Performance and maintainability
+
+- Moved Memories, Reminiscence, Melancholy, conversation, queue, cooldown, reunion, and archive limits into shared database Defines.
+- Added a data-driven Reminiscence table used by the interface, preventing active and Melancholy names or descriptions from drifting out of order.
+- Avoided rewriting unchanged dummy-building counts, aura promotions, Years Together promotions, and unit compatibility-cache fields.
+- Restricted movement-triggered empire aura scans to combat-unit movement and unit removal; civilian movement no longer rescans the roster.
+- Batched era-transition Memory income into one state update while preserving the exact total, cap, healing, Keepsake, and Years Together mechanics.
+- Added explicit timeline event kinds while retaining a narrow icon fallback for timeline entries saved by earlier builds.
+
+### Interface
+
+- Expanded the Memories panel with a glowing reserve meter, cost marker, era activation count, next-era reset notice, and illustrated Reminiscence cards with active and Melancholy details.
+- Added city-to-city Childhood Bedroom navigation, Keepsake progress text, four pips, and live Culture/Tourism output.
+- Added native current-unit icons and compact Years Together values to the Friend list and profile.
+- Added Name, Years Together, Recent, and Current Form sorting without changing the selected Ledger filter.
+- Added responsive Ledger sizing and separate Profile and Conversations tabs.
+- Added a rolling archive of the latest 20 complete conversations, including event context, speakers, lines, turn, and location.
+- Kept an open Ledger live-updated when Commonwealth state changes or a new active-player turn begins.
+- Preserved the warm Commonwealth city-banner palette and reused existing/native atlases rather than adding memory-heavy textures.
+
+### Verification and compatibility
+
+- Validated all Lua files with a Lua 5.1 parser, parsed every XML file, checked every Lua `Controls` reference against the interface XML, and executed the new configuration schema in SQLite.
+- Confirmed there is exactly one Old Friend upgrade listener and that the checked-in `.modinfo` still uses in-game version `1`.
+- No `Units` or `UnitPromotions` rows were added, deleted, or reordered. Existing 1.0.57+ campaign state remains readable; the new conversation archive fills prospectively.
+- Rebuild and deploy manually; this update does not copy files into the live Mods directory.
+
 ## Repository version 1.0.60 - Livelier varied conversations
 
 ### Fixed

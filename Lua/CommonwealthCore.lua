@@ -27,6 +27,11 @@ local MEL_MILITARY = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_MILITARY
 local MEL_SCIENCE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_SCIENCE
 local MEL_CULTURE = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_CULTURE
 local MEL_UNHAPPINESS = GameInfoTypes.BUILDING_COMMONWEALTH_MEL_UNHAPPINESS
+local MEMORY_MAX = tonumber(GameDefines.COMMONWEALTH_MEMORY_MAX) or 100
+local REMINISCENCE_BASE_COST = tonumber(GameDefines.COMMONWEALTH_REMINISCENCE_BASE_COST) or 25
+local REMINISCENCE_COST_STEP = tonumber(GameDefines.COMMONWEALTH_REMINISCENCE_COST_STEP) or 10
+local REMINISCENCE_TURNS = tonumber(GameDefines.COMMONWEALTH_REMINISCENCE_TURNS) or 8
+local MELANCHOLY_TURNS = tonumber(GameDefines.COMMONWEALTH_MELANCHOLY_TURNS) or 4
 local save = CommonwealthSaveData or Modding.OpenSaveData()
 local friendIdentities = {
   tribute = {
@@ -129,7 +134,7 @@ end
 local function memories(p) return tonumber(get(p, 'MEM', 0)) or 0 end
 local function addMemories(p, amount, reason)
   if amount <= 0 then return end
-  set(p, 'MEM', math.min(100, memories(p) + amount))
+  set(p, 'MEM', math.min(MEMORY_MAX, memories(p) + amount))
   if reason and Players[p]:IsHuman() then
     Events.GameplayAlertMessage(Locale.ConvertTextKey('[COLOR_POSITIVE_TEXT]+' .. amount .. ' Memories[ENDCOLOR] — ' .. reason))
   end
@@ -140,86 +145,22 @@ function CommonwealthAddMemories(p, amount, reason) addMemories(p, amount, reaso
 local function friendFieldByID(p, unitID, field) return 'FRIEND_' .. p .. '_' .. unitID .. '_' .. field end
 local function friendField(unit, field) return friendFieldByID(unit:GetOwner(), unit:GetID(), field) end
 local function isFriend(unit) return unit and unit:IsHasPromotion(SINCE) end
-local function archivedFriendField(p,id,field) return 'COY2_REC_'..p..'_'..id..'_'..field end
-local function archiveMapField(p,unitID) return 'COY2_MAP_'..p..'_'..unitID end
-local function restoreMappedFriend(unit)
-  local p,unitID=unit:GetOwner(),unit:GetID()
-  local id=tonumber(save.GetValue(archiveMapField(p,unitID))) or 0
-  if id <= 0 then return false end
-  local name=save.GetValue(archivedFriendField(p,id,'NAME'))
-  local tag=save.GetValue(archivedFriendField(p,id,'TAG'))
-  if not name or not tag then return false end
-  save.SetValue(archiveMapField(p,unitID),id)
-  local fields={NAME='NAME',TAG='TAG',ALIASES='ALIASES',BORN='BORN',ERA='BORN_ERA',YEARS='YEARS',UPGRADES='UPGRADES',LINEAGE='LINEAGE'}
-  for legacy,archived in pairs(fields) do
-    local value=save.GetValue(archivedFriendField(p,id,archived))
-    if value ~= nil then save.SetValue(friendFieldByID(p,unitID,legacy),value) end
-  end
-  save.SetValue(friendFieldByID(p,unitID,'ACTIVE'),1)
-  save.SetValue(archivedFriendField(p,id,'CURRENT_UNIT'),unitID)
-  save.SetValue(archivedFriendField(p,id,'CURRENT_TYPE'),unit:GetUnitType())
-  save.SetValue(archivedFriendField(p,id,'STATUS'),'Still With Us')
-  save.SetValue(archivedFriendField(p,id,'DEATH_TURN'),-1)
-  save.SetValue(archivedFriendField(p,id,'X'),unit:GetX()); save.SetValue(archivedFriendField(p,id,'Y'),unit:GetY())
-  unit:SetName(tostring(name)..' - '..tostring(tag))
-  print('CommonwealthCore: restored mapped profile '..id..' for unit '..unitID)
-  return true
-end
+local function friendState() return CommonwealthFriendState end
 local function registerFriend(unit)
-  if not isFriend(unit) then return false end
-  local p = unit:GetOwner()
-  local field = friendField(unit, 'NAME')
-  local storedName = save.GetValue(field)
-  local active = tonumber(save.GetValue(friendField(unit, 'ACTIVE')))
-  local archiveID = tonumber(save.GetValue('COY2_MAP_'..p..'_'..unit:GetID())) or 0
-  local currentName = tostring(unit:GetName() or '')
-  -- Civ V eventually reuses dead unit IDs. Only an active marker, current
-  -- archive mapping, or matching custom name proves this cache belongs to the
-  -- present unit; otherwise replace the stale identity for the new generation.
-  if storedName ~= nil and (active == 1 or archiveID > 0 or string.find(currentName,tostring(storedName),1,true)) then
-    save.SetValue(friendField(unit, 'ACTIVE'), 1)
-    local storedTag = tostring(save.GetValue(friendField(unit, 'TAG')) or '')
-    unit:SetName(tostring(storedName) .. (storedTag ~= '' and ' - ' .. storedTag or ''))
-    return true
-  end
-  if restoreMappedFriend(unit) then return true end
-  -- Upgraded descendants receive identity only through their exact archive
-  -- mapping or the native upgrade handoff. Never guess from names or tiles.
-  if unit:GetUnitType() ~= OLD_FRIEND then return false end
-  local name, tag, aliases = CommonwealthChooseFriendIdentity(p)
-  save.SetValue(field, name); save.SetValue(friendField(unit, 'TAG'), tag)
-  save.SetValue(friendField(unit, 'ALIASES'), aliases)
-  save.SetValue(friendField(unit, 'ACTIVE'), 1)
-  save.SetValue(friendField(unit, 'BORN'), Game.GetGameTurn())
-  save.SetValue(friendField(unit, 'ERA'), Players[p]:GetCurrentEra())
-  save.SetValue(friendField(unit, 'YEARS'), 0); save.SetValue(friendField(unit, 'UPGRADES'), 0)
-  save.SetValue(friendField(unit, 'LINEAGE'), GameInfo.Units[unit:GetUnitType()].Type)
-  unit:SetName(name .. ' - ' .. tag)
-  return true
-end
-
-local unitFriendFields = {'NAME','TAG','ALIASES','BORN','ERA','YEARS','UPGRADES','LINEAGE'}
-local function transferUnitFriend(p, oldID, newID)
-  if oldID == newID then return end
-  for _, field in ipairs(unitFriendFields) do
-    local value = save.GetValue(friendFieldByID(p,oldID,field))
-    if value ~= nil then save.SetValue(friendFieldByID(p,newID,field),value) end
-  end
-  save.SetValue(friendFieldByID(p,oldID,'ACTIVE'),0)
-  save.SetValue(friendFieldByID(p,newID,'ACTIVE'),1)
+  local state=friendState()
+  return isFriend(unit) and state and state.Register and state.Register(unit) ~= nil
 end
 
 local function applyYears(unit, level)
-  for i, promo in ipairs(YEARS) do unit:SetHasPromotion(promo, i == level) end
+  for i, promo in ipairs(YEARS) do
+    local desired=i == level
+    if unit:IsHasPromotion(promo) ~= desired then unit:SetHasPromotion(promo,desired) end
+  end
 end
 local function friendYears(unit)
-  local p,unitID=unit:GetOwner(),unit:GetID()
-  local cached=tonumber(save.GetValue(friendField(unit,'YEARS'))) or 0
-  local archiveID=tonumber(save.GetValue('COY2_MAP_'..p..'_'..unitID)) or 0
-  local archived=archiveID > 0 and tonumber(save.GetValue('COY2_REC_'..p..'_'..archiveID..'_YEARS')) or 0
-  local level=math.min(6,math.max(cached,archived or 0))
-  if cached ~= level then save.SetValue(friendField(unit,'YEARS'),level) end
-  return level
+  local state=friendState()
+  if state and state.Years then return state.Years(unit) end
+  return math.min(6,tonumber(save.GetValue(friendField(unit,'YEARS'))) or 0)
 end
 local function adjacentMilitary(unit, requireFriend)
   local plot = unit and unit:GetPlot()
@@ -238,6 +179,9 @@ local function adjacentMilitary(unit, requireFriend)
   end
   return false
 end
+local function setPromotionIfChanged(unit,promotion,desired)
+  if unit:IsHasPromotion(promotion) ~= desired then unit:SetHasPromotion(promotion,desired) end
+end
 local function refreshUnits(p)
   local player = Players[p]
   if not isCommonwealth(player) then return end
@@ -245,10 +189,10 @@ local function refreshUnits(p)
   for unit in player:Units() do
     if isFriend(unit) then
       if registerFriend(unit) then applyYears(unit,friendYears(unit)) end
-      unit:SetHasPromotion(FRIEND_ADJ, adjacentMilitary(unit, true))
+      setPromotionIfChanged(unit,FRIEND_ADJ,adjacentMilitary(unit,true))
     end
-    unit:SetHasPromotion(REM_ADJ, active == 1 and unit:IsCombatUnit() and adjacentMilitary(unit, false))
-    unit:SetHasPromotion(WORKER_BUFF, active == 2 and unit:GetUnitClassType() == GameInfoTypes.UNITCLASS_WORKER)
+    setPromotionIfChanged(unit,REM_ADJ,active == 1 and unit:IsCombatUnit() and adjacentMilitary(unit,false))
+    setPromotionIfChanged(unit,WORKER_BUFF,active == 2 and unit:GetUnitClassType() == GameInfoTypes.UNITCLASS_WORKER)
   end
 end
 
@@ -267,24 +211,27 @@ local function keepsakes(city)
   for _, building in ipairs(KEEP) do if city:GetNumRealBuilding(building) > 0 then count = count + 1 end end
   return count
 end
+local function setRealBuildingIfChanged(city,building,count)
+  if city:GetNumRealBuilding(building) ~= count then city:SetNumRealBuilding(building,count) end
+end
 
 local function applyEmpireEffects(p)
   local player = Players[p]
   if not isCommonwealth(player) then return end
   local active, melancholy = tonumber(get(p, 'ACTIVE', 0)) or 0, tonumber(get(p, 'MEL', 0)) or 0
   for city in player:Cities() do
-    city:SetNumRealBuilding(B_PROD, active == 1 and 15 or 0)
-    city:SetNumRealBuilding(B_CULT, active == 3 and 15 or 0)
-    city:SetNumRealBuilding(B_SCI, 0)
-    city:SetNumRealBuilding(B_HAPPY, active == 3 and 2 or 0)
-    city:SetNumRealBuilding(B_FOOD, active == 3 and hasBedroom(city) and 1 or 0)
+    setRealBuildingIfChanged(city,B_PROD,active == 1 and 15 or 0)
+    setRealBuildingIfChanged(city,B_CULT,active == 3 and 15 or 0)
+    setRealBuildingIfChanged(city,B_SCI,0)
+    setRealBuildingIfChanged(city,B_HAPPY,active == 3 and 2 or 0)
+    setRealBuildingIfChanged(city,B_FOOD,active == 3 and hasBedroom(city) and 1 or 0)
     -- Dedicated signed-effect buildings are toggled only between zero and one.
     -- This avoids unsupported negative building counts and cleans every stale
     -- Melancholy state whenever empire effects are refreshed.
-    city:SetNumRealBuilding(MEL_MILITARY, melancholy == 1 and 1 or 0)
-    city:SetNumRealBuilding(MEL_SCIENCE, melancholy == 2 and 1 or 0)
-    city:SetNumRealBuilding(MEL_CULTURE, melancholy == 3 and 1 or 0)
-    city:SetNumRealBuilding(MEL_UNHAPPINESS, melancholy == 3 and city:IsCapital() and 1 or 0)
+    setRealBuildingIfChanged(city,MEL_MILITARY,melancholy == 1 and 1 or 0)
+    setRealBuildingIfChanged(city,MEL_SCIENCE,melancholy == 2 and 1 or 0)
+    setRealBuildingIfChanged(city,MEL_CULTURE,melancholy == 3 and 1 or 0)
+    setRealBuildingIfChanged(city,MEL_UNHAPPINESS,melancholy == 3 and city:IsCapital() and 1 or 0)
   end
 end
 
@@ -293,10 +240,10 @@ function CommonwealthActivate(p, choice)
   if not isCommonwealth(player) or choice < 1 or choice > 3 then return false end
   if (tonumber(get(p, 'ACTIVE_TURNS', 0)) or 0) > 0 or (tonumber(get(p, 'MEL_TURNS', 0)) or 0) > 0 then return false end
   local used = tonumber(get(p, 'USED', 0)) or 0
-  local cost = 25 + used * 10
+  local cost = REMINISCENCE_BASE_COST + used * REMINISCENCE_COST_STEP
   if memories(p) < cost then return false end
   set(p, 'MEM', memories(p) - cost); set(p, 'USED', used + 1)
-  set(p, 'ACTIVE', choice); set(p, 'ACTIVE_TURNS', gameSpeedTurns(8)); set(p, 'MEL', 0)
+  set(p, 'ACTIVE', choice); set(p, 'ACTIVE_TURNS', gameSpeedTurns(REMINISCENCE_TURNS)); set(p, 'MEL', 0)
   applyEmpireEffects(p); refreshUnits(p); LuaEvents.CommonwealthStateChanged(p)
   return true
 end
@@ -304,14 +251,12 @@ end
 local function eraChanged(p, newEra)
   local player = Players[p]
   set(p, 'ERA', newEra); set(p, 'USED', 0)
-  addMemories(p, 6 + 2 * player:GetNumCities(), 'a new era began')
+  local memoryAward=6 + 2 * player:GetNumCities()
   for unit in player:Units() do
     if isFriend(unit) then
-      if registerFriend(unit) then
-        local level = math.min(6, friendYears(unit) + 1)
-        save.SetValue(friendField(unit, 'YEARS'), level)
-        save.SetValue(friendField(unit, 'ERAS'), (tonumber(save.GetValue(friendField(unit, 'ERAS'))) or 0) + 1)
-        unit:ChangeDamage(-25); addMemories(p, 1, nil); applyYears(unit, level)
+      local state=friendState()
+      if state and state.AdvanceEra and state.AdvanceEra(p,unit,newEra) then
+        unit:ChangeDamage(-25); memoryAward=memoryAward+1
       end
     end
   end
@@ -321,10 +266,11 @@ local function eraChanged(p, newEra)
       if builtEra == nil then setBedroomAge(city, newEra)
       elseif builtEra < newEra then
         local level = keepsakes(city)
-        if level < 4 then city:SetNumRealBuilding(KEEP[level + 1], 1); addMemories(p, 2, nil) end
+        if level < 4 then city:SetNumRealBuilding(KEEP[level + 1], 1); memoryAward=memoryAward+2 end
       end
     end
   end
+  addMemories(p,memoryAward,'a new era began')
   applyEmpireEffects(p); refreshUnits(p)
 end
 
@@ -348,25 +294,34 @@ local function turnStart(p)
     activeTurns = activeTurns - 1; set(p, 'ACTIVE_TURNS', activeTurns)
     if activeTurns == 0 then
       local ended = tonumber(get(p, 'ACTIVE', 0)) or 0
-      set(p, 'ACTIVE', 0); set(p, 'MEL', ended); set(p, 'MEL_TURNS', gameSpeedTurns(4))
+      set(p, 'ACTIVE', 0); set(p, 'MEL', ended); set(p, 'MEL_TURNS', gameSpeedTurns(MELANCHOLY_TURNS))
     end
   elseif melTurns > 0 then
     melTurns = melTurns - 1; set(p, 'MEL_TURNS', melTurns)
     if melTurns == 0 then set(p, 'MEL', 0) end
   end
   applyEmpireEffects(p); refreshUnits(p)
-  if not player:IsHuman() and memories(p) >= 25 and activeTurns == 0 and melTurns == 0 then
+  if not player:IsHuman() and memories(p) >= REMINISCENCE_BASE_COST and activeTurns == 0 and melTurns == 0 then
     CommonwealthActivate(p, player:GetNumMilitaryUnits() > player:GetNumCities() * 2 and 1 or (player:GetExcessHappiness() > 5 and 3 or 2))
   end
 end
 
 GameEvents.PlayerDoTurn.Add(turnStart)
-GameEvents.UnitSetXY.Add(function(p) refreshUnits(p) end)
+GameEvents.UnitSetXY.Add(function(p,unitID)
+  local player=Players[p]; if not isCommonwealth(player) then return end
+  local unit=player:GetUnitByID(unitID)
+  -- Only combat movement can alter either adjacency aura. Worker and civilian
+  -- movement no longer rescans the Commonwealth's entire unit roster.
+  -- A removed unit is no longer returned by ID, but its departure can still
+  -- invalidate a neighbour's aura. Civilian movement is the only safe case
+  -- that cannot change either military adjacency state.
+  if not unit or unit:IsCombatUnit() then refreshUnits(p) end
+end)
 GameEvents.UnitCreated.Add(function(p, unitID)
   local player, unit = Players[p], Players[p] and Players[p]:GetUnitByID(unitID)
   if isCommonwealth(player) and unit and unit:GetUnitType() == OLD_FRIEND then registerFriend(unit) end
 end)
-if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p, oldID, newID)
+if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p, oldID, newID, bGoodyHut)
   local player = Players[p]
   local oldUnit, newUnit = player and player:GetUnitByID(oldID), player and player:GetUnitByID(newID)
   if not isCommonwealth(player) or not newUnit then return end
@@ -374,7 +329,8 @@ if GameEvents.UnitUpgraded then GameEvents.UnitUpgraded.Add(function(p, oldID, n
   -- the replacement. The old unit is therefore authoritative in this event;
   -- checking the new unit here rejects every ordinary Old Friend upgrade.
   if oldUnit and oldUnit:IsHasPromotion(SINCE) then
-    transferUnitFriend(p,oldID,newID)
+    local state=friendState()
+    if state and state.HandleUpgrade then state.HandleUpgrade(p,oldID,newID,bGoodyHut,oldUnit,newUnit) end
   else addMemories(p, 2, 'a unit was upgraded') end
 end) end
 if GameEvents.GreatPersonExpended then GameEvents.GreatPersonExpended.Add(function(p) if isCommonwealth(Players[p]) then addMemories(p, 3, 'a Great Person was expended') end end) end

@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.60** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.61** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -38,7 +38,7 @@ The Old Friend replaces the Warrior at the same base strength and 40 Production.
 
 Old Friend identities are randomly selected from 54 generated names and 72 gamertags. Trent, Gabriel, Dion, Harrison, Lachlan, and Ben retain their tribute gamertags and are each eight times more likely to appear than a generated identity. Names are not repeated until the available pool is exhausted. The in-game **Friends** button opens a persistent archive with Online, Offline, and All views; profiles show form, age, level, combat and survival records, lineage, closest friend, location, timeline, and earned epithet. Records transfer across upgrades and remain after death.
 
-Adjacent Old Friends have a 15% base chance per eligible pair each turn to share a brief conversation, increased to 25% during a Reminiscence, 22% near a Childhood Bedroom, or 32% with both bonuses. Each eligible miss raises that pair's next chance by 10 percentage points, with an exchange guaranteed after four consecutive misses. Queued event conversations begin at 75%, gain 8 points after each miss, persist for 40 turns, and take priority over normal chatter. New eras, upgrades, near-death survival, victories, and Reminiscence activations enter a persistent per-Friend queue rather than overwriting one another; reunions after at least 15 turns apart use a persistent per-pair event. A five-turn global cooldown and nine-turn pair cooldown prevent interruptions. Per-pair history prevents a pair from repeating itself, while a campaign-wide least-used shuffle bag cycles through every currently eligible exchange before allowing a familiar line to return. Conversations are recorded in both Ledger timelines and can be disabled from the Ledger.
+Adjacent Old Friends have a 15% base chance per eligible pair each turn to share a brief conversation, increased to 25% during a Reminiscence, 22% near a Childhood Bedroom, or 32% with both bonuses. Each eligible miss raises that pair's next chance by 10 percentage points, with an exchange guaranteed after four consecutive misses. Queued event conversations begin at 75%, gain 8 points after each miss, persist for 40 turns, and take priority over normal chatter. New eras, upgrades, near-death survival, victories, and Reminiscence activations enter a persistent per-Friend queue rather than overwriting one another; reunions after at least 15 turns apart use a persistent per-pair event. A five-turn global cooldown and nine-turn pair cooldown prevent interruptions. Per-pair history prevents a pair from repeating itself, while a campaign-wide least-used shuffle bag cycles through every currently eligible exchange before allowing a familiar line to return. Conversations are recorded in both Friend timelines and in a rolling 20-exchange Ledger archive, and can be disabled from the Ledger.
 
 The conversation library contains 96 exchanges. Dialogue is stored separately from the Lua logic in `Data/CommonwealthConversations.xml`. The file defines a custom `GameInfo.Commonwealth_Conversations` database table, making it possible to add or revise exchanges without editing the conversation system itself. Lines can use `{SELF}`, `{OTHER}`, `{LOCATION}`, `{ERA}`, `{FORM}`, and `{OTHER_FORM}` tokens for contextual details.
 
@@ -48,7 +48,11 @@ The Childhood Bedroom replaces the Monument. It costs 40 Production, has no main
 
 ### Commonwealth interface
 
-The Memories panel includes a live reserve meter, next-cost marker, and four Keepsake pips for the city currently open (falling back to the capital outside city view). The Ledger uses Old Friend portraits, a six-pip Years Together display, and event-marked timelines. Conversation cards include portraits and contextual event presentation, while the Civilopedia provides a styled quick-reference section alongside the full lore and strategy articles.
+The Memories panel includes a live reserve meter, next-cost marker, current-era activation count, and the next-era cost reset. Each Reminiscence is presented as an illustrated card that shows its exact active bonus and previews the following Melancholy in its tooltip.
+
+The Keepsake strip has four progress pips and can browse every city with a Childhood Bedroom, showing the selected city's current Culture and Tourism contribution and when its next Keepsake will arrive.
+
+The responsive Old Friends Ledger includes native current-form icons, six Years Together pips, sortable profiles, structured timeline event icons, and separate **Profile** and **Conversations** tabs. The conversation archive preserves the latest 20 complete exchanges with speakers, event context, turn, and location. Live conversation cards use the same warm city-banner presentation, while the Civilopedia retains its styled quick-reference section alongside the full lore and strategy articles.
 
 ## Installation
 
@@ -125,7 +129,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.57 | `eb17c72` | Established a clean-campaign persistence baseline, removed old repair passes, hardened Friend upgrades, and polished the archive UI. |
 | 1.0.58 | `f9c88b4` | Added escalating conversation odds, a seven-miss guarantee, and runtime eligibility diagnostics. |
 | 1.0.59 | `f87b86f` | Aligned Old Friend identity transfers with the Community Patch's pre-conversion upgrade callback. |
-| 1.0.60 | Current | Cycled dialogue through a global shuffle bag and increased conversation frequency. |
+| 1.0.60 | `de25d94` | Cycled dialogue through a global shuffle bag and increased conversation frequency. |
+| 1.0.61 | Current | Refactored Friend state and expanded the Commonwealth interface. |
 
 ## ModBuddy development
 
@@ -144,5 +149,7 @@ The mod includes a front-end `SelectCivilization` override that places the full 
 ## Technical notes
 
 State is stored with `Modding.OpenSaveData` under a campaign-specific world fingerprint, so Memories, era counters, Bedroom construction eras, conversation history, and Old Friend records survive ordinary save/load without leaking into a newly generated campaign. Repository version 1.0.57 begins a new persistence namespace and is intended for a fresh game; earlier Commonwealth saves do not carry their custom state into this baseline. Multiplayer and hotseat are intentionally disabled because the interface and persistence layer target single-player.
+
+Old Friend registration, Years Together, era advancement, and old/new unit upgrade handoffs now use one authoritative archive API. The older unit-keyed fields remain as a synchronized runtime cache for compatibility, but no second upgrade listener can independently create, rename, archive, or retire a profile. Shared Memories, Reminiscence, Melancholy, conversation, and presentation settings live in the Commonwealth database so gameplay and UI labels use the same source.
 
 Some requested bonuses do not have a safe category-specific modifier in the exposed database/API. The current implementation keeps their intended timing and theme while using close city-level equivalents. Exact implementation differences are recorded in [PATCH_NOTES.md](PATCH_NOTES.md).
