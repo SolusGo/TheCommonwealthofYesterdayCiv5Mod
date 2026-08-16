@@ -2,7 +2,7 @@
 
 A ModBuddy project and single-player Civilization V mod for Brave New World with the Community Patch / Vox Populi, led by **The Child We Were**.
 
-**Repository version: 1.0.62** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
+**Repository version: 1.0.63** — this documentation version is independent of the in-game ModBuddy version, which intentionally remains `1`.
 
 The Commonwealth turns nostalgia into a long-game resource. Its strongest pieces are not disposable: old units, old cities, and the buildings that witnessed earlier eras become more valuable when preserved.
 
@@ -131,7 +131,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.59 | `f87b86f` | Aligned Old Friend identity transfers with the Community Patch's pre-conversion upgrade callback. |
 | 1.0.60 | `de25d94` | Cycled dialogue through a global shuffle bag and increased conversation frequency. |
 | 1.0.61 | `74a8e4e` | Refactored Friend state and expanded the Commonwealth interface. |
-| 1.0.62 | Current | Stabilized campaign persistence and isolated Friend identities from recycled unit IDs. |
+| 1.0.62 | `9840caf` | Stabilized campaign persistence and isolated Friend identities from recycled unit IDs. |
+| 1.0.63 | Current | Prevented upgrade-transition units from creating extra Friend profiles. |
 
 ## ModBuddy development
 
@@ -151,6 +152,6 @@ The mod includes a front-end `SelectCivilization` override that places the full 
 
 State is stored with `Modding.OpenSaveData` under a campaign-specific identifier derived from immutable setup data and Civ V's serialized random seeds. Terrain and starting locations are deliberately excluded because map scripts can finalize them after the Commonwealth add-in loads. Repository version 1.0.62 uses the `COY4` namespace and provides read-through access to the matching `COY3` state when an existing save is first loaded; fresh games never import a legacy campaign. This keeps Memories, era counters, Bedroom construction eras, conversation history, and Old Friend records stable across ordinary save/load while separating newly generated campaigns. Multiplayer and hotseat are intentionally disabled because the interface and persistence layer target single-player.
 
-Old Friend registration, Years Together, era advancement, and old/new unit upgrade handoffs now use one authoritative archive API. The older unit-keyed fields remain as a synchronized runtime cache for compatibility, but no second upgrade listener can independently create, rename, archive, or retire a profile. Shared Memories, Reminiscence, Melancholy, conversation, and presentation settings live in the Commonwealth database so gameplay and UI labels use the same source.
+Old Friend registration, Years Together, era advancement, and old/new unit upgrade handoffs now use one authoritative archive API. The older unit-keyed fields remain as a synchronized runtime cache for compatibility, but no second upgrade listener can independently create, rename, archive, or retire a profile. Event-time unit callbacks may reconnect an existing archive, while only a stable roster scan may create a genuinely new Friend profile; this prevents Civ V's briefly unconverted upgrade replacement from appearing as an extra Friend. Shared Memories, Reminiscence, Melancholy, conversation, and presentation settings live in the Commonwealth database so gameplay and UI labels use the same source.
 
 Some requested bonuses do not have a safe category-specific modifier in the exposed database/API. The current implementation keeps their intended timing and theme while using close city-level equivalents. Exact implementation differences are recorded in [PATCH_NOTES.md](PATCH_NOTES.md).

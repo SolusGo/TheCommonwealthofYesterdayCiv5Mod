@@ -1,5 +1,23 @@
 # Patch Notes
 
+## Repository version 1.0.63 - Upgrade-transition profile fix
+
+### Friend lifecycle
+
+- Restricted new Friend-profile creation to stable player-roster scans. `UnitCreated`, movement, combat, and conversion-time callbacks can reconnect a known archive but cannot mint a profile from Civ V's briefly unconverted upgrade replacement.
+- Reserved both numeric unit IDs for the duration of an upgrade tick, preventing an old or replacement object that remains observable during conversion from being treated as a newly trained Old Friend.
+- Captured and retired a provisional same-turn profile during the authoritative `UnitUpgraded` handoff if an earlier build already created one.
+- Added an exact existing-save cleanup for the reported extra entries. It only suppresses a zero-upgrade Old Friend archive born on the same turn and numeric unit ID as a recorded upgrade, and it preserves any real Old Friend that is still alive and mapped to that profile.
+- Reconciled live replacements before finalizing pending deaths, preferred the pre-kill archive for same-ID ruins upgrades, and cleared recovered pending state immediately.
+- Made combat telemetry tolerate a deliberately deferred new profile without indexing a missing archive ID.
+
+### Verification and compatibility
+
+- Checked paid upgrades, same-ID ruins upgrades, true deaths, same-turn ID reuse, event callbacks before and after `UnitUpgraded`, repeated callbacks, deferred genuine Friend creation, Ledger filtering, and combat telemetry against the new registration boundary.
+- Parsed both modified Lua files, revalidated all 96 conversation rows and the single authoritative `UnitUpgraded` listener, and parsed every XML/project/manifest file.
+- Ran ModBuddy's `Build` target into an isolated temporary folder and verified the 46-file manifest, both modified Lua payloads, and in-game version `1`. Nothing was deployed to the live Mods directory.
+- No gameplay values, conversation odds or dialogue, database rows, art, Dawn of Man assets, project version, or checked-in `.modinfo` version changed. Rebuild and deploy manually.
+
 ## Repository version 1.0.62 - Stable campaigns and recycled IDs
 
 ### Campaign and conversation persistence

@@ -147,9 +147,9 @@ local function friendFieldByID(p, unitID, field) return 'FRIEND_' .. p .. '_' ..
 local function friendField(unit, field) return friendFieldByID(unit:GetOwner(), unit:GetID(), field) end
 local function isFriend(unit) return unit and unit:IsHasPromotion(SINCE) end
 local function friendState() return CommonwealthFriendState end
-local function registerFriend(unit)
+local function registerFriend(unit,allowNew)
   local state=friendState()
-  return isFriend(unit) and state and state.Register and state.Register(unit) ~= nil
+  return isFriend(unit) and state and state.Register and state.Register(unit,allowNew) ~= nil
 end
 
 local function applyYears(unit, level)
@@ -183,13 +183,13 @@ end
 local function setPromotionIfChanged(unit,promotion,desired)
   if unit:IsHasPromotion(promotion) ~= desired then unit:SetHasPromotion(promotion,desired) end
 end
-local function refreshUnits(p)
+local function refreshUnits(p,allowNew)
   local player = Players[p]
   if not isCommonwealth(player) then return end
   local active = tonumber(get(p, 'ACTIVE', 0)) or 0
   for unit in player:Units() do
     if isFriend(unit) then
-      if registerFriend(unit) then applyYears(unit,friendYears(unit)) end
+      if registerFriend(unit,allowNew) then applyYears(unit,friendYears(unit)) end
       setPromotionIfChanged(unit,FRIEND_ADJ,adjacentMilitary(unit,true))
     end
     setPromotionIfChanged(unit,REM_ADJ,active == 1 and unit:IsCombatUnit() and adjacentMilitary(unit,false))
@@ -272,7 +272,7 @@ local function eraChanged(p, newEra)
     end
   end
   addMemories(p,memoryAward,'a new era began')
-  applyEmpireEffects(p); refreshUnits(p)
+  applyEmpireEffects(p); refreshUnits(p,true)
 end
 
 local function turnStart(p)
@@ -301,7 +301,7 @@ local function turnStart(p)
     melTurns = melTurns - 1; set(p, 'MEL_TURNS', melTurns)
     if melTurns == 0 then set(p, 'MEL', 0) end
   end
-  applyEmpireEffects(p); refreshUnits(p)
+  applyEmpireEffects(p); refreshUnits(p,true)
   if not player:IsHuman() and memories(p) >= REMINISCENCE_BASE_COST and activeTurns == 0 and melTurns == 0 then
     CommonwealthActivate(p, player:GetNumMilitaryUnits() > player:GetNumCities() * 2 and 1 or (player:GetExcessHappiness() > 5 and 3 or 2))
   end
@@ -356,7 +356,7 @@ LuaEvents.CommonwealthLedgerRequest.Add(function(p)
   local rows = {}
   if isCommonwealth(Players[p]) then
     for unit in Players[p]:Units() do if isFriend(unit) then
-      registerFriend(unit)
+      registerFriend(unit,true)
       rows[#rows+1] = {name=save.GetValue(friendField(unit,'NAME')) or 'Old Friend', tag=save.GetValue(friendField(unit,'TAG')) or '',
         form=Locale.ConvertTextKey(GameInfo.Units[unit:GetUnitType()].Description), years=friendYears(unit),
         level=unit:GetLevel(), experience=unit:GetExperience(), status='Still With Us'}
