@@ -44,8 +44,14 @@ local function hookFriendPortrait(control,size)
 end
 local function hookUnitIcon(control,row)
   if not control then return end
-  if not row or not row.iconAtlas or not IconHookup(row.iconIndex or 0,32,row.iconAtlas,control) then
-    IconHookup(0,32,'COMMONWEALTH_OLD_FRIEND_ATLAS',control)
+  local index=row and (tonumber(row.iconIndex) or 0) or 0
+  local atlas=row and row.iconAtlas or nil
+  local offset,texture=nil,nil
+  if atlas then offset,texture=IconLookup(index,45,atlas) end
+  if not offset or not texture then offset,texture=IconLookup(0,45,'COMMONWEALTH_OLD_FRIEND_ATLAS') end
+  if offset and texture then
+    control:SetTexture(texture)
+    control:SetTextureOffset(offset)
   end
   control:SetToolTipString(row and ('Current form: '..row.form) or 'Old Friend')
 end

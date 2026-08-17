@@ -1,5 +1,21 @@
 # Patch Notes
 
+## Repository version 1.0.66 - Current-form profile badge
+
+### Interface fix
+
+- Restored the small current-form portrait in the upper-left Ledger profile. An upgraded Old Friend now shows the portrait of its actual form—such as Musketman—over the persistent Old Friend portrait.
+- Switched the badge from an unavailable 32px standard-unit atlas size to Civ V's native 45px unit portraits.
+- Replaced the unreliable `IconHookup` success check with an explicit `IconLookup`; if a modded unit does not provide a compatible 45px portrait, the badge now visibly falls back to the Old Friend icon instead of remaining blank.
+- Enlarged and repositioned the framed badge and moved the profile headings clear of it, preserving the existing warm Ledger layout without changing the Friend cards.
+
+### Verification and compatibility
+
+- Confirmed Musketman uses portrait index 38 in `UNIT_ATLAS_1`, and that the atlas supplies a valid 45px sheet but no 32px sheet.
+- Parsed the modified interface XML, checked its Lua control references, and verified both the native Musketman lookup and Commonwealth fallback atlas have valid 45px entries.
+- This is an interface-only update. Friend identity, upgrades, lineage, conversations, gameplay, save data, art assets, Dawn of Man assets, and the in-game ModBuddy version remain unchanged at `1`.
+- Rebuild and deploy manually; no files are copied into the live Mods directory by this update.
+
 ## Repository version 1.0.65 - Distinct Friend conversations
 
 ### Fixed

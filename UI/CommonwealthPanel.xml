@@ -87,9 +87,9 @@
       <Box ID="ProfileShade" Anchor="C,C" Size="568,460" Color="24,45,45,98" />
       <Box ID="ProfileAccent" Anchor="L,C" Offset="8,0" Size="2,452" Color="229,109,40,135" />
       <Grid Anchor="L,T" Offset="18,12" Size="68,68" Style="Grid9Frame"><Image ID="ProfilePortrait" Anchor="C,C" Size="64,64" /></Grid>
-      <Grid Anchor="L,T" Offset="62,48" Size="38,38" Style="Grid9Frame"><Image ID="ProfileFormIcon" Anchor="C,C" Size="32,32" /></Grid>
-      <Label ID="ProfileName" Anchor="L,T" Offset="96,12" Size="462,28" Font="TwCenMT22" FontStyle="Shadow" String="Select an Old Friend" Color="240,168,105,255" />
-      <Label ID="ProfileTag" Anchor="L,T" Offset="96,40" Size="462,38" WrapWidth="462" Font="TwCenMT16" FontStyle="Shadow" Color="232,219,194,255" />
+      <Grid Anchor="L,T" Offset="58,38" Size="48,48" Style="Grid9Frame"><Image ID="ProfileFormIcon" Anchor="C,C" Size="45,45" /></Grid>
+      <Label ID="ProfileName" Anchor="L,T" Offset="114,12" Size="444,28" Font="TwCenMT22" FontStyle="Shadow" String="Select an Old Friend" Color="240,168,105,255" />
+      <Label ID="ProfileTag" Anchor="L,T" Offset="114,40" Size="444,38" WrapWidth="444" Font="TwCenMT16" FontStyle="Shadow" Color="232,219,194,255" />
       <Grid Anchor="C,T" Offset="0,84" Size="548,1" Style="Grid9Bar" />
       <Label ID="ProfileStatus" Anchor="L,T" Offset="18,91" Size="540,23" Font="TwCenMT18" FontStyle="Shadow" Color="236,142,76,255" />
       <Label ID="ProfileSummary" Anchor="L,T" Offset="18,117" Size="540,42" WrapWidth="540" Font="TwCenMT16" FontStyle="Shadow" Color="245,226,195,255" />
