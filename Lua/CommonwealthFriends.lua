@@ -26,12 +26,34 @@ local CONVERSATION_PITY_LIMIT = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_P
 local REUNION_TURNS = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_REUNION_TURNS) or 15
 local CONVERSATION_HISTORY_LIMIT = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_HISTORY_LIMIT) or 20
 local lastConversationTrace = ''
-if GameInfo.Commonwealth_Conversations then
-  for row in GameInfo.Commonwealth_Conversations() do
-    conversationLines[#conversationLines+1]={id=row.ID,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo}
+local conversationIDs = {}
+local duplicateConversationIDs = {}
+local function addConversationLine(row)
+  local id=tostring(row and row.ID or '')
+  if id == '' then
+    print('CommonwealthFriends: ignored a conversation with no text ID')
+  elseif conversationIDs[id] then
+    duplicateConversationIDs[id]=true
+  else
+    conversationIDs[id]=true
+    conversationLines[#conversationLines+1]={id=id,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo}
   end
 end
-print('CommonwealthFriends: loaded '..tostring(#conversationLines)..' conversation exchanges')
+-- Commonwealth_Conversations uses descriptive text IDs. Civ V's GameInfo
+-- cache assumes ID is numeric and can resolve every iterated row to the first
+-- cached entry. Query SQLite directly so all 96 distinct exchanges reach Lua.
+if DB and DB.Query then
+  for row in DB.Query('SELECT ID, EventType, SpeakerOne, SpeakerTwo FROM Commonwealth_Conversations ORDER BY rowid') do
+    addConversationLine(row)
+  end
+elseif GameInfo.Commonwealth_Conversations then
+  -- Retained only as a compatibility fallback for environments without DB.Query.
+  for row in GameInfo.Commonwealth_Conversations() do addConversationLine(row) end
+end
+local duplicateCount=0
+for _ in pairs(duplicateConversationIDs) do duplicateCount=duplicateCount+1 end
+print('CommonwealthFriends: loaded '..tostring(#conversationLines)..' unique conversation exchanges'
+  ..(duplicateCount > 0 and ' ('..tostring(duplicateCount)..' duplicate text IDs ignored)' or ''))
 if #conversationLines == 0 then print('CommonwealthFriends: no conversation data was loaded') end
 local function isCommonwealth(player)
   return player and player:IsAlive() and player:GetCivilizationType() == CIV

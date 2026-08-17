@@ -1,5 +1,20 @@
 # Patch Notes
 
+## Repository version 1.0.65 - Distinct Friend conversations
+
+### Fixed
+
+- Bypassed Civ V's numeric-`ID`-oriented `GameInfo` cache for the text-keyed `Commonwealth_Conversations` table. Lua now reads the dialogue rows directly from SQLite in their authored order, preventing every cached entry from resolving to the first `river` exchange.
+- Added a uniqueness gate while loading dialogue. Duplicate or empty text IDs cannot enter the random-selection pool, and `Lua.log` now reports the number of unique exchanges actually available rather than only the number of iterator steps.
+- Kept the existing text IDs unchanged, preserving campaign-wide use counts, 120-turn line cooldowns, per-pair history, event queues, and the rolling conversation archive in existing saves.
+
+### Verification and compatibility
+
+- Confirmed the live database contains 96 distinct text IDs, including 28 general exchanges, and that only `river` had been recorded because the old cached loader repeatedly exposed the first row.
+- Revalidated the least-used shuffle path against the distinct dialogue pool: an existing `river` use now excludes it while any eligible zero-use exchange remains.
+- This is a Lua loader correction only. Conversation wording, odds, cooldowns, gameplay, art, Dawn of Man assets, database rows, and the in-game ModBuddy version remain unchanged at `1`.
+- Rebuild and deploy manually; no files are copied into the live Mods directory by this update.
+
 ## Repository version 1.0.64 - Refined Ledger cards
 
 ### Interface
