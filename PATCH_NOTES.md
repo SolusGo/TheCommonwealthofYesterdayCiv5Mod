@@ -1,5 +1,20 @@
 # Patch Notes
 
+## Repository version 1.0.64 - Refined Ledger cards
+
+### Interface
+
+- Rebuilt each Friend card into separate real-name, gamertag, and current-form/status lines so long identities no longer compete with the unit details for one narrow label.
+- Removed the inconsistent secondary unit icon, which duplicated the Old Friend portrait for some forms and appeared empty for others.
+- Replaced that icon with six compact Years Together pips plus the exact numeric level and strength bonus in the card tooltip.
+- Kept the selected Friend and scroll position stable when the open Ledger receives live profile updates.
+
+### Verification and compatibility
+
+- Parsed the modified interface XML, checked every Lua `Controls` reference against the XML, and confirmed the scroll getter is part of Civilization V's shipped UI API.
+- This is an interface-only update. It does not alter gameplay, Friend identities or persistence, database rows, art, Dawn of Man assets, conversation behavior, or the in-game ModBuddy version.
+- Rebuild and deploy manually; no files are copied into the live Mods directory by this update.
+
 ## Repository version 1.0.63 - Upgrade-transition profile fix
 
 ### Friend lifecycle

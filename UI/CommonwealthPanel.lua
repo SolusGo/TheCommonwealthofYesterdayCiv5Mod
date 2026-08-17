@@ -61,6 +61,14 @@ local function setPips(prefix,count,total)
     if off then off:SetHide(i<=count) end
   end
 end
+local function setRowYears(control,count)
+  count=math.max(0,math.min(6,tonumber(count) or 0))
+  for i=1,6 do
+    local on,off=control['RowYear'..i..'On'],control['RowYear'..i..'Off']
+    if on then on:SetHide(i>count) end
+    if off then off:SetHide(i<=count) end
+  end
+end
 local function setupReminiscenceCards()
   reminiscenceControls={
     [1]={button=Controls.BoysButton,icon=Controls.BoysIcon,name=Controls.BoysName,effect=Controls.BoysEffect},
@@ -204,20 +212,24 @@ local function sortLedgerRows()
     return Locale.Compare(a.name,b.name)==-1
   end)
 end
-local function renderLedgerList()
+local function renderLedgerList(preserveScroll)
   local previousMode=ledgerMode
+  local scrollValue=preserveScroll and Controls.LedgerScroll:GetScrollValue() or 0
   Controls.LedgerStack:DestroyAllChildren(); sortLedgerRows(); local shown=0; local first=nil
   for _,row in ipairs(ledgerRows) do if includeRow(row) then
     shown=shown+1; if not first then first=row end
     local control={}; ContextPtr:BuildInstanceForControl('FriendRow',control,Controls.LedgerStack)
     hookFriendPortrait(control.RowPortrait,45)
-    hookUnitIcon(control.RowFormIcon,row); control.RowYears:SetText(row.years..'/6')
-    control.RowName:SetText(row.name..' - '..row.tag)
-    control.RowDetail:SetText(row.form..'   |   '..row.status)
+    setRowYears(control,row.years); control.RowYears:SetText(row.years..'/6')
+    local compactStatus=row.status=='Offline' and 'Last Online' or 'Online'
+    control.RowName:SetText(row.name)
+    control.RowTag:SetText('@'..row.tag)
+    control.RowDetail:SetText(row.form..'  |  '..compactStatus)
+    control.FriendButton:SetToolTipString(row.name..' - '..row.tag..'[NEWLINE]'..row.form..'  |  '..row.status..'[NEWLINE]Years Together: '..row.years..'/6 (+'..(row.years*2)..'% Strength)[NEWLINE][NEWLINE]Open profile')
     control.FriendButton:RegisterCallback(Mouse.eLClick,function() selectFriend(row) end)
   end end
   Controls.NoFriendsLabel:SetHide(shown>0); Controls.LedgerStack:CalculateSize(); Controls.LedgerStack:ReprocessAnchoring()
-  Controls.LedgerScroll:CalculateInternalSize(); Controls.LedgerScroll:SetScrollValue(0)
+  Controls.LedgerScroll:CalculateInternalSize(); Controls.LedgerScroll:SetScrollValue(scrollValue)
   if not selectedFriend or not includeRow(selectedFriend) then selectFriend(first) else selectFriend(selectedFriend) end
   if previousMode=='conversations' then setLedgerMode(previousMode) end
 end
@@ -292,10 +304,14 @@ Controls.RememberButton:RegisterCallback(Mouse.eLClick,function()
   if selectedFriend then Controls.RememberQuote:SetText('"'..quotes[((selectedFriend.id+Game.GetGameTurn()) % #quotes)+1]..'"') end
 end)
 LuaEvents.CommonwealthAdvancedLedgerResponse.Add(function(p,rows)
-  if p~=playerID() then return end; ledgerRows=rows or {}; selectedFriend=nil
+  if p~=playerID() then return end
+  local selectedID=selectedFriend and selectedFriend.id or nil
+  ledgerRows=rows or {}; selectedFriend=nil
+  if selectedID then for _,row in ipairs(ledgerRows) do if row.id==selectedID then selectedFriend=row; break end end end
   local alive,offline=0,0; for _,row in ipairs(ledgerRows) do if row.status=='Offline' then offline=offline+1 else alive=alive+1 end end
   Controls.LedgerCount:SetText(alive..' online   |   '..offline..' no longer online   |   '..#ledgerRows..' archived profiles')
-  setFilter(ledgerFilter)
+  Controls.LedgerView:SetText(string.upper(ledgerFilter=='all' and 'ALL' or ledgerFilter))
+  renderLedgerList(true)
 end)
 LuaEvents.CommonwealthConversationHistoryResponse.Add(function(p,rows)
   if p~=playerID() then return end; conversationHistory=rows or {}; renderConversationHistory()

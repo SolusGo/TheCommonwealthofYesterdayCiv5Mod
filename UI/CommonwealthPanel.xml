@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Context ID="CommonwealthPanel">
   <Instance Name="FriendRow">
-    <GridButton ID="FriendButton" Size="246,68" Style="BaseButton">
+    <GridButton ID="FriendButton" Size="246,82" Style="BaseButton">
       <Grid Anchor="L,C" Offset="7,0" Size="54,54" Style="Grid9Frame"><Image ID="RowPortrait" Anchor="C,C" Size="45,45" /></Grid>
-      <Label ID="RowName" Anchor="L,T" Offset="66,7" Size="136,24" Font="TwCenMT18" FontStyle="Shadow" Color="240,168,105,255" />
-      <Label ID="RowDetail" Anchor="L,T" Offset="66,32" Size="136,28" WrapWidth="136" Font="TwCenMT14" FontStyle="Shadow" Color="232,219,194,255" />
-      <Grid Anchor="R,T" Offset="4,4" Size="36,36" Style="Grid9Frame"><Image ID="RowFormIcon" Anchor="C,C" Size="32,32" /></Grid>
-      <Label ID="RowYears" Anchor="R,B" Offset="8,6" Size="38,18" Font="TwCenMT14" FontStyle="Shadow" Color="245,226,195,255" />
+      <Label ID="RowName" Anchor="L,T" Offset="66,5" Size="170,21" Font="TwCenMT18" FontStyle="Shadow" Color="240,168,105,255" />
+      <Label ID="RowTag" Anchor="L,T" Offset="66,25" Size="170,18" Font="TwCenMT14" FontStyle="Shadow" Color="207,187,157,255" />
+      <Label ID="RowDetail" Anchor="L,T" Offset="66,43" Size="170,18" Font="TwCenMT14" FontStyle="Shadow" Color="232,219,194,255" />
+      <Box ID="RowYear1Off" Anchor="L,B" Offset="66,8" Size="18,5" Color="72,80,77,190" /><Box ID="RowYear1On" Anchor="L,B" Offset="66,8" Size="18,5" Color="240,168,105,255" Hidden="1" />
+      <Box ID="RowYear2Off" Anchor="L,B" Offset="88,8" Size="18,5" Color="72,80,77,190" /><Box ID="RowYear2On" Anchor="L,B" Offset="88,8" Size="18,5" Color="240,168,105,255" Hidden="1" />
+      <Box ID="RowYear3Off" Anchor="L,B" Offset="110,8" Size="18,5" Color="72,80,77,190" /><Box ID="RowYear3On" Anchor="L,B" Offset="110,8" Size="18,5" Color="240,168,105,255" Hidden="1" />
+      <Box ID="RowYear4Off" Anchor="L,B" Offset="132,8" Size="18,5" Color="72,80,77,190" /><Box ID="RowYear4On" Anchor="L,B" Offset="132,8" Size="18,5" Color="240,168,105,255" Hidden="1" />
+      <Box ID="RowYear5Off" Anchor="L,B" Offset="154,8" Size="18,5" Color="72,80,77,190" /><Box ID="RowYear5On" Anchor="L,B" Offset="154,8" Size="18,5" Color="240,168,105,255" Hidden="1" />
+      <Box ID="RowYear6Off" Anchor="L,B" Offset="176,8" Size="18,5" Color="72,80,77,190" /><Box ID="RowYear6On" Anchor="L,B" Offset="176,8" Size="18,5" Color="240,168,105,255" Hidden="1" />
+      <Label ID="RowYears" Anchor="L,B" Offset="201,1" Size="35,18" Font="TwCenMT14" FontStyle="Shadow" Color="245,226,195,255" />
     </GridButton>
   </Instance>
   <Instance Name="ConversationArchiveRow">
