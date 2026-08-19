@@ -28,6 +28,7 @@ local CONVERSATION_HISTORY_LIMIT = tonumber(GameDefines.COMMONWEALTH_CONVERSATIO
 local lastConversationTrace = ''
 local conversationIDs = {}
 local duplicateConversationIDs = {}
+local eraScopedConversationCount = 0
 local function addConversationLine(row)
   local id=tostring(row and row.ID or '')
   if id == '' then
@@ -36,14 +37,22 @@ local function addConversationLine(row)
     duplicateConversationIDs[id]=true
   else
     conversationIDs[id]=true
-    conversationLines[#conversationLines+1]={id=id,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo}
+    local minEraType=row.MinEraType and tostring(row.MinEraType) or ''
+    local maxEraType=row.MaxEraType and tostring(row.MaxEraType) or ''
+    local minEra=minEraType ~= '' and GameInfoTypes[minEraType] or nil
+    local maxEra=maxEraType ~= '' and GameInfoTypes[maxEraType] or nil
+    if minEraType ~= '' and minEra == nil then print('CommonwealthFriends: conversation '..id..' has unknown minimum era '..minEraType) end
+    if maxEraType ~= '' and maxEra == nil then print('CommonwealthFriends: conversation '..id..' has unknown maximum era '..maxEraType) end
+    if minEra ~= nil or maxEra ~= nil then eraScopedConversationCount=eraScopedConversationCount+1 end
+    conversationLines[#conversationLines+1]={id=id,kind=row.EventType,a=row.SpeakerOne,b=row.SpeakerTwo,
+      minEra=minEra,maxEra=maxEra}
   end
 end
 -- Commonwealth_Conversations uses descriptive text IDs. Civ V's GameInfo
 -- cache assumes ID is numeric and can resolve every iterated row to the first
--- cached entry. Query SQLite directly so all 96 distinct exchanges reach Lua.
+-- cached entry. Query SQLite directly so every distinct exchange reaches Lua.
 if DB and DB.Query then
-  for row in DB.Query('SELECT ID, EventType, SpeakerOne, SpeakerTwo FROM Commonwealth_Conversations ORDER BY rowid') do
+  for row in DB.Query('SELECT ID, EventType, SpeakerOne, SpeakerTwo, MinEraType, MaxEraType FROM Commonwealth_Conversations ORDER BY rowid') do
     addConversationLine(row)
   end
 elseif GameInfo.Commonwealth_Conversations then
@@ -53,6 +62,7 @@ end
 local duplicateCount=0
 for _ in pairs(duplicateConversationIDs) do duplicateCount=duplicateCount+1 end
 print('CommonwealthFriends: loaded '..tostring(#conversationLines)..' unique conversation exchanges'
+  ..' ('..tostring(eraScopedConversationCount)..' era-scoped)'
   ..(duplicateCount > 0 and ' ('..tostring(duplicateCount)..' duplicate text IDs ignored)' or ''))
 if #conversationLines == 0 then print('CommonwealthFriends: no conversation data was loaded') end
 local function isCommonwealth(player)
@@ -574,29 +584,36 @@ local function pendingPairEvent(p,a,b)
   end
   return nil,-1000
 end
+local function conversationEraEligible(line,currentEra)
+  return (line.minEra == nil or currentEra >= line.minEra)
+    and (line.maxEra == nil or currentEra <= line.maxEra)
+end
 local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
   local eventLines,contextual,general = {}, {}, {}
   local turn=Game.GetGameTurn(); local eventPairHasUnused=false
+  local currentEra=Players[p]:GetCurrentEra()
   local active=(tonumber(save.GetValue('COY_'..p..'_ACTIVE')) or 0) > 0
   local bedroom=nearBedroom(unitA) or nearBedroom(unitB)
   local scarred=(unitA:GetMaxHitPoints()-unitA:GetDamage() <= 25) or (unitB:GetMaxHitPoints()-unitB:GetDamage() <= 25)
   local veteran=math.min(tonumber(getr(p,a,'YEARS',0)) or 0,tonumber(getr(p,b,'YEARS',0)) or 0) >= 3
   local away=getr(p,a,'STATUS','') == 'Away From Home' or getr(p,b,'STATUS','') == 'Away From Home'
   for _,line in ipairs(conversationLines) do
-    local pairUnused=tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) == 0
-    local globalLast=tonumber(save.GetValue(globalConversationKey(p,line.id))) or -1000
-    if globalLast > turn then
-      -- OpenSaveData persists across loading an earlier save. Preserve the
-      -- fact that the line was heard, but clamp its timestamp to this timeline.
-      globalLast=turn; save.SetValue(globalConversationKey(p,line.id),globalLast)
-    end
-    if eventType and line.kind == eventType and pairUnused then eventPairHasUnused=true end
-    if pairUnused and turn-globalLast >= GLOBAL_LINE_REPEAT_COOLDOWN then
-      if eventType and line.kind == eventType then eventLines[#eventLines+1]=line
-      elseif line.kind == 'general' then general[#general+1]=line
-      elseif (line.kind == 'reminiscence' and active) or (line.kind == 'bedroom' and bedroom)
-        or (line.kind == 'scarred' and scarred) or (line.kind == 'veteran' and veteran)
-        or (line.kind == 'away' and away) then contextual[#contextual+1]=line end
+    if conversationEraEligible(line,currentEra) then
+      local pairUnused=tonumber(save.GetValue(conversationPairKey(p,a,b,'USED_'..line.id)) or 0) == 0
+      local globalLast=tonumber(save.GetValue(globalConversationKey(p,line.id))) or -1000
+      if globalLast > turn then
+        -- OpenSaveData persists across loading an earlier save. Preserve the
+        -- fact that the line was heard, but clamp its timestamp to this timeline.
+        globalLast=turn; save.SetValue(globalConversationKey(p,line.id),globalLast)
+      end
+      if eventType and line.kind == eventType and pairUnused then eventPairHasUnused=true end
+      if pairUnused and turn-globalLast >= GLOBAL_LINE_REPEAT_COOLDOWN then
+        if eventType and line.kind == eventType then eventLines[#eventLines+1]=line
+        elseif line.kind == 'general' then general[#general+1]=line
+        elseif (line.kind == 'reminiscence' and active) or (line.kind == 'bedroom' and bedroom)
+          or (line.kind == 'scarred' and scarred) or (line.kind == 'veteran' and veteran)
+          or (line.kind == 'away' and away) then contextual[#contextual+1]=line end
+      end
     end
   end
   -- Once this pair has heard every line for a recurring event category, use
@@ -604,7 +621,7 @@ local function unusedConversationLines(p,a,b,unitA,unitB,eventType)
   -- unseen lines recently, keep the event queued instead of repeating them.
   if eventType and #eventLines == 0 and not eventPairHasUnused then
     local oldestLine=nil; local oldestTurn=math.huge
-    for _,line in ipairs(conversationLines) do if line.kind == eventType then
+    for _,line in ipairs(conversationLines) do if line.kind == eventType and conversationEraEligible(line,currentEra) then
       local globalLast=tonumber(save.GetValue(globalConversationKey(p,line.id))) or -1000
       if globalLast < oldestTurn then oldestLine,oldestTurn=line,globalLast end
     end end

@@ -5,6 +5,8 @@
     <Column name="EventType" type="text" notnull="true" />
     <Column name="SpeakerOne" type="text" notnull="true" />
     <Column name="SpeakerTwo" type="text" notnull="true" />
+    <Column name="MinEraType" type="text" />
+    <Column name="MaxEraType" type="text" />
   </Table>
 
   <Commonwealth_Conversations>
@@ -36,6 +38,50 @@
     <Row><ID>game_music</ID><EventType>general</EventType><SpeakerOne>Bro, this bit has the best music.</SpeakerOne><SpeakerTwo>You say that every five minutes.</SpeakerTwo></Row>
     <Row><ID>wrong_road</ID><EventType>general</EventType><SpeakerOne>I think we took the wrong road.</SpeakerOne><SpeakerTwo>Do not look at me. You were leading.</SpeakerTwo></Row>
     <Row><ID>location_check</ID><EventType>general</EventType><SpeakerOne>So this is {LOCATION}?</SpeakerOne><SpeakerTwo>Bit mid, honestly.</SpeakerTwo></Row>
+    <Row><ID>dibs</ID><EventType>general</EventType><SpeakerOne>Dibs on whatever we find next.</SpeakerOne><SpeakerTwo>That is not how exploring works, bro.</SpeakerTwo></Row>
+    <Row><ID>last_slice</ID><EventType>general</EventType><SpeakerOne>Who ate the last slice?</SpeakerOne><SpeakerTwo>No idea. Anyway, you should have been quicker.</SpeakerTwo></Row>
+    <Row><ID>homework</ID><EventType>general</EventType><SpeakerOne>Did you finish your homework?</SpeakerOne><SpeakerTwo>Mate, I have not finished this turn.</SpeakerTwo></Row>
+    <Row><ID>mum_calling</ID><EventType>general</EventType><SpeakerOne>Oi, your mum is calling you.</SpeakerOne><SpeakerTwo>Tell her I am saving the world.</SpeakerTwo></Row>
+    <Row><ID>school_tomorrow</ID><EventType>general</EventType><SpeakerOne>We have school tomorrow, you know.</SpeakerOne><SpeakerTwo>Tomorrow-me can deal with that.</SpeakerTwo></Row>
+    <Row><ID>headphones</ID><EventType>general</EventType><SpeakerOne>Your headphones are leaking again.</SpeakerOne><SpeakerTwo>Good. Now you get the boss music too.</SpeakerTwo></Row>
+    <Row><ID>screen_peeking</ID><EventType>general</EventType><SpeakerOne>Stop looking at my side of the screen.</SpeakerOne><SpeakerTwo>Bro, we are on the same team.</SpeakerTwo></Row>
+    <Row><ID>blame_game</ID><EventType>general</EventType><SpeakerOne>Whose fault was that?</SpeakerOne><SpeakerTwo>Yours. I decided before you asked.</SpeakerTwo></Row>
+    <Row><ID>dare</ID><EventType>general</EventType><SpeakerOne>I dare you to go first.</SpeakerOne><SpeakerTwo>That is just you being scared with extra steps.</SpeakerTwo></Row>
+    <Row><ID>brb</ID><EventType>general</EventType><SpeakerOne>BRB. Do not move without me.</SpeakerOne><SpeakerTwo>No promises, mate.</SpeakerTwo></Row>
+    <Row><ID>team_name</ID><EventType>general</EventType><SpeakerOne>We need a cooler team name.</SpeakerOne><SpeakerTwo>Not if you are choosing it again.</SpeakerTwo></Row>
+    <Row><ID>password</ID><EventType>general</EventType><SpeakerOne>What was the password?</SpeakerOne><SpeakerTwo>The one I told you to write down, genius.</SpeakerTwo></Row>
+    <Row><ID>sleepover</ID><EventType>general</EventType><SpeakerOne>Are we actually sleeping tonight?</SpeakerOne><SpeakerTwo>Yeah. Right after one more game.</SpeakerTwo></Row>
+    <Row><ID>rage_quit</ID><EventType>general</EventType><SpeakerOne>You nearly rage quit back there.</SpeakerOne><SpeakerTwo>I was taking a tactical break.</SpeakerTwo></Row>
+    <Row><ID>leaderboard</ID><EventType>general</EventType><SpeakerOne>I am still ahead on the leaderboard.</SpeakerOne><SpeakerTwo>Only because you made the leaderboard.</SpeakerTwo></Row>
+    <Row><ID>save_slot</ID><EventType>general</EventType><SpeakerOne>Why do we have twelve save files?</SpeakerOne><SpeakerTwo>Because you keep saying this one is probably fine.</SpeakerTwo></Row>
+    <Row><ID>cheat_code</ID><EventType>general</EventType><SpeakerOne>Do you remember the cheat code?</SpeakerOne><SpeakerTwo>Yeah. Get good.</SpeakerTwo></Row>
+    <Row><ID>mic_noise</ID><EventType>general</EventType><SpeakerOne>What is that noise through your mic?</SpeakerOne><SpeakerTwo>My fan is fighting for its life.</SpeakerTwo></Row>
+    <Row><ID>boss_plan</ID><EventType>general</EventType><SpeakerOne>What is the plan if there is a boss?</SpeakerOne><SpeakerTwo>You distract it. I become the legend.</SpeakerTwo></Row>
+    <Row><ID>victory_dance</ID><EventType>general</EventType><SpeakerOne>Was that meant to be a victory dance?</SpeakerOne><SpeakerTwo>Jealous because you cannot do it.</SpeakerTwo></Row>
+
+    <Row><ID>ancient_wifi</ID><EventType>general</EventType><SpeakerOne>This place has not even got Wi-Fi.</SpeakerOne><SpeakerTwo>Bro, they only just invented roads.</SpeakerTwo><MaxEraType>ERA_CLASSICAL</MaxEraType></Row>
+    <Row><ID>ancient_stick</ID><EventType>general</EventType><SpeakerOne>They gave me a pointy stick.</SpeakerOne><SpeakerTwo>Careful, mate. That is cutting-edge tech.</SpeakerTwo><MaxEraType>ERA_CLASSICAL</MaxEraType></Row>
+    <Row><ID>ancient_wheel</ID><EventType>general</EventType><SpeakerOne>Yo, they invented the wheel.</SpeakerOne><SpeakerTwo>Bit OP. Bet it gets nerfed next era.</SpeakerTwo><MaxEraType>ERA_CLASSICAL</MaxEraType></Row>
+    <Row><ID>ancient_chariot</ID><EventType>general</EventType><SpeakerOne>Dibs on the chariot.</SpeakerOne><SpeakerTwo>No chance. You cannot even steer on foot.</SpeakerTwo><MaxEraType>ERA_CLASSICAL</MaxEraType></Row>
+    <Row><ID>ancient_oracle</ID><EventType>general</EventType><SpeakerOne>Should we ask the Oracle what happens next?</SpeakerOne><SpeakerTwo>Nah. Spoilers, bro.</SpeakerTwo><MaxEraType>ERA_CLASSICAL</MaxEraType></Row>
+
+    <Row><ID>medieval_castle</ID><EventType>general</EventType><SpeakerOne>This castle would make a sick base.</SpeakerOne><SpeakerTwo>Until you fill every room with random loot.</SpeakerTwo><MinEraType>ERA_MEDIEVAL</MinEraType><MaxEraType>ERA_RENAISSANCE</MaxEraType></Row>
+    <Row><ID>medieval_sword</ID><EventType>general</EventType><SpeakerOne>Swords are definitely the new meta.</SpeakerOne><SpeakerTwo>You say that because you cannot aim.</SpeakerTwo><MinEraType>ERA_MEDIEVAL</MinEraType><MaxEraType>ERA_RENAISSANCE</MaxEraType></Row>
+    <Row><ID>medieval_crossbow</ID><EventType>general</EventType><SpeakerOne>Stop camping with the crossbow.</SpeakerOne><SpeakerTwo>It is called holding a tactical position.</SpeakerTwo><MinEraType>ERA_MEDIEVAL</MinEraType><MaxEraType>ERA_RENAISSANCE</MaxEraType></Row>
+    <Row><ID>medieval_royal</ID><EventType>general</EventType><SpeakerOne>Do you reckon the king knows us?</SpeakerOne><SpeakerTwo>Mate, everyone knows us. We are cracked.</SpeakerTwo><MinEraType>ERA_MEDIEVAL</MinEraType><MaxEraType>ERA_RENAISSANCE</MaxEraType></Row>
+    <Row><ID>medieval_musket</ID><EventType>general</EventType><SpeakerOne>This musket takes forever to reload.</SpeakerOne><SpeakerTwo>Skill issue. Reload faster.</SpeakerTwo><MinEraType>ERA_MEDIEVAL</MinEraType><MaxEraType>ERA_RENAISSANCE</MaxEraType></Row>
+
+    <Row><ID>industrial_train</ID><EventType>general</EventType><SpeakerOne>Finally, fast travel.</SpeakerOne><SpeakerTwo>It is a train, bro. Please act normal.</SpeakerTwo><MinEraType>ERA_INDUSTRIAL</MinEraType><MaxEraType>ERA_MODERN</MaxEraType></Row>
+    <Row><ID>industrial_factory</ID><EventType>general</EventType><SpeakerOne>Why is everything so loud now?</SpeakerOne><SpeakerTwo>Progress, mate. Apparently.</SpeakerTwo><MinEraType>ERA_INDUSTRIAL</MinEraType><MaxEraType>ERA_MODERN</MaxEraType></Row>
+    <Row><ID>industrial_radio</ID><EventType>general</EventType><SpeakerOne>They invented radio. We can talk from anywhere.</SpeakerOne><SpeakerTwo>You already talk from everywhere.</SpeakerTwo><MinEraType>ERA_INDUSTRIAL</MinEraType><MaxEraType>ERA_MODERN</MaxEraType></Row>
+    <Row><ID>industrial_tank</ID><EventType>general</EventType><SpeakerOne>Dibs on the tank.</SpeakerOne><SpeakerTwo>Absolutely not. You drive like a noob.</SpeakerTwo><MinEraType>ERA_INDUSTRIAL</MinEraType><MaxEraType>ERA_MODERN</MaxEraType></Row>
+    <Row><ID>industrial_camera</ID><EventType>general</EventType><SpeakerOne>Hold still. I got a camera.</SpeakerOne><SpeakerTwo>If this goes in the Ledger, I am logging off.</SpeakerTwo><MinEraType>ERA_INDUSTRIAL</MinEraType><MaxEraType>ERA_MODERN</MaxEraType></Row>
+
+    <Row><ID>future_wifi</ID><EventType>general</EventType><SpeakerOne>We made it this far and the Wi-Fi still lags.</SpeakerOne><SpeakerTwo>Some things are forever, mate.</SpeakerTwo><MinEraType>ERA_POSTMODERN</MinEraType></Row>
+    <Row><ID>future_robot</ID><EventType>general</EventType><SpeakerOne>That robot is acting kinda sus.</SpeakerOne><SpeakerTwo>Bro, you say that about every robot.</SpeakerTwo><MinEraType>ERA_POSTMODERN</MinEraType></Row>
+    <Row><ID>future_button</ID><EventType>general</EventType><SpeakerOne>What does the big red button do?</SpeakerOne><SpeakerTwo>Nothing you need to find out, champ.</SpeakerTwo><MinEraType>ERA_POSTMODERN</MinEraType></Row>
+    <Row><ID>future_spaceship</ID><EventType>general</EventType><SpeakerOne>Dibs on the window seat in the spaceship.</SpeakerOne><SpeakerTwo>We are saving the planet, not going on holiday.</SpeakerTwo><MinEraType>ERA_POSTMODERN</MinEraType></Row>
+    <Row><ID>future_noob</ID><EventType>general</EventType><SpeakerOne>We made it to the future.</SpeakerOne><SpeakerTwo>And you are somehow still a noob.</SpeakerTwo><MinEraType>ERA_POSTMODERN</MinEraType></Row>
 
     <Row><ID>bedroom_desk</ID><EventType>bedroom</EventType><SpeakerOne>Why does that desk look tiny?</SpeakerOne><SpeakerTwo>Because you used to be tiny, genius.</SpeakerTwo></Row>
     <Row><ID>bedroom_screen</ID><EventType>bedroom</EventType><SpeakerOne>That old computer is taking forever to boot.</SpeakerOne><SpeakerTwo>Give it a sec, bro. It is doing its best.</SpeakerTwo></Row>

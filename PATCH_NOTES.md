@@ -1,5 +1,25 @@
 # Patch Notes
 
+## Repository version 1.0.68 - Era-aware Friend chatter
+
+### Expanded conversation library
+
+- Expanded the Old Friends library from 96 to 136 unique exchanges.
+- Added twenty all-era conversations about homework, sleepovers, snacks, split-screen cheating, passwords, saves, microphones, rage quitting, leaderboards, and other childhood nonsense.
+- Added twenty era-scoped conversations with slang-heavy reactions to ancient inventions, medieval equipment, industrial technology, and the strange problems of the future.
+
+### Era-aware selection
+
+- Added optional minimum and maximum era fields to conversation data and resolved them through Civ V's native era types rather than hard-coded numeric indices.
+- Filtered era-scoped rows before shuffle-bag, per-pair history, global cooldown, and queued-event selection, so unavailable lines cannot block or distort an eligible pool.
+- Added startup diagnostics reporting both the total unique exchange count and the number of era-scoped exchanges.
+
+### Compatibility
+
+- Existing 96 dialogue IDs, categories, histories, cooldowns, event queues, and archived conversations remain unchanged; the forty new IDs simply enter the least-used pool when eligible.
+- Friend identities, upgrade transfers, Memories, gameplay values, UI layouts, art, Dawn of Man assets, and the in-game ModBuddy version remain unchanged at `1`.
+- Rebuild and deploy manually.
+
 ## Repository version 1.0.67 - Childhood banter
 
 ### Friendlier conversations
