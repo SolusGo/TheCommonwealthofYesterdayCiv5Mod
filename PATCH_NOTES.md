@@ -1,5 +1,19 @@
 # Patch Notes
 
+## Repository version 1.0.67 - Childhood banter
+
+### Friendlier conversations
+
+- Reworked the everyday conversation tone around after-school gaming chatter, kid slang, friendly roasting, minor arguments, and deliberately overconfident nonsense.
+- Added natural uses of mate, bro, noob, AFK, lag, GG, OP, rage quitting, and other familiar gaming language without turning every exchange into a catchphrase.
+- Made general, Bedroom, upgrade, victory, travel, veteran, and wounded reactions livelier while preserving sincere lines for Reminiscences, reunions, new eras, and genuinely dangerous moments.
+
+### Compatibility
+
+- Retained all 96 existing dialogue IDs and event categories, so existing per-pair history, campaign-wide use counts, cooldowns, event queues, and archived conversations remain compatible.
+- This is a dialogue-data update only. Conversation selection logic, Friend identities, upgrades, gameplay, UI layouts, art, Dawn of Man assets, and the in-game ModBuddy version remain unchanged at `1`.
+- Rebuild and deploy manually.
+
 ## Repository version 1.0.66 - Current-form profile badge
 
 ### Interface fix
