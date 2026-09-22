@@ -66,6 +66,15 @@
     </ModContent>
     <ModVersion>1</ModVersion>
     <Stability>Alpha</Stability>
+    <ModDependencies>
+      <Association>
+        <Type>Mod</Type>
+        <Name>(1) Community Patch</Name>
+        <Id>d1b6328c-ff44-4b0d-aad7-c657f83610cd</Id>
+        <MinVersion>151</MinVersion>
+        <MaxVersion>999</MaxVersion>
+      </Association>
+    </ModDependencies>
     <ModReferences>
       <Association>
         <Type>Mod</Type>
@@ -150,14 +159,6 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="UI\FrontEnd\GameSetup\SelectCivilization.xml">
-      <SubType>Lua</SubType>
-      <ImportIntoVFS>True</ImportIntoVFS>
-    </Content>
-    <Content Include="UI\FrontEnd\GameSetup\SelectCivilization.lua">
-      <SubType>Lua</SubType>
-      <ImportIntoVFS>True</ImportIntoVFS>
-    </Content>
     <Content Include="Art\DawnOfMan\CommonwealthDawnOfMan.dds">
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
@@ -171,8 +172,6 @@
     <Folder Include="SQL\" />
     <Folder Include="Lua\" />
     <Folder Include="UI\" />
-    <Folder Include="UI\FrontEnd\" />
-    <Folder Include="UI\FrontEnd\GameSetup\" />
     <Folder Include="Art\" />
     <Folder Include="Art\DawnOfMan\" />
     <Folder Include="Art\Leader\" />

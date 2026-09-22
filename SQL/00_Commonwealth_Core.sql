@@ -7,7 +7,13 @@
 -- The Ledger transfers identity and lineage through these Community Patch
 -- events. They default to disabled in some CP-only installations.
 UPDATE CustomModOptions SET Value=1
-WHERE Name IN ('EVENTS_UNIT_UPGRADES','EVENTS_UNIT_PREKILL');
+WHERE Name IN (
+ 'EVENTS_BATTLES',
+ 'EVENTS_UNIT_CONVERTS',
+ 'EVENTS_UNIT_CREATED',
+ 'EVENTS_UNIT_PREKILL',
+ 'EVENTS_UNIT_UPGRADES'
+);
 
 -- Shared gameplay/UI configuration. Keeping these values in the database
 -- prevents the gameplay and presentation contexts from drifting apart.

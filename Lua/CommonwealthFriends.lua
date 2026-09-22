@@ -4,6 +4,9 @@ print('CommonwealthFriends loaded')
 local CIV = GameInfoTypes.CIVILIZATION_COMMONWEALTH_YESTERDAY
 local OLD_FRIEND = GameInfoTypes.UNIT_COMMONWEALTH_OLD_FRIEND
 local SINCE = GameInfoTypes.PROMOTION_COMMONWEALTH_SINCE_BEGINNING
+local FRIEND_ADJ = GameInfoTypes.PROMOTION_COMMONWEALTH_ADJACENT_FRIEND
+local REM_ADJ = GameInfoTypes.PROMOTION_COMMONWEALTH_REMINISCENCE_ADJ
+local WORKER_BUFF = GameInfoTypes.PROMOTION_COMMONWEALTH_WORKER_MOVE
 local BEDROOM = GameInfoTypes.BUILDING_COMMONWEALTH_BEDROOM
 local YEARS = {
   GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_1, GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_2,
@@ -11,7 +14,7 @@ local YEARS = {
   GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_5, GameInfoTypes.PROMOTION_COMMONWEALTH_YEARS_6
 }
 local save = CommonwealthSaveData or Modding.OpenSaveData()
-local combatCredit = {}
+local battles = {}
 local conversationLines = {}
 local EVENT_LIFETIME = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_EVENT_LIFETIME) or 40
 local MAX_PENDING_EVENTS = tonumber(GameDefines.COMMONWEALTH_CONVERSATION_EVENT_QUEUE_LIMIT) or 6
@@ -361,6 +364,17 @@ CommonwealthFriendState.AdvanceEra = function(p,unit,newEra)
 end
 CommonwealthFriendState.HandleUpgrade = function(p,oldID,newID,bGoodyHut,oldUnit,newUnit)
   if not newUnit then return false end
+  local turn=Game.GetGameTurn()
+  -- A repeated delivery can arrive after the first handoff has deliberately
+  -- retired the old UnitID mapping. Resolve the exact recorded transition
+  -- before attempting registration so it cannot fall through as an ordinary
+  -- +2-Memory upgrade.
+  local profileCount=tonumber(save.GetValue('COY2_COUNT_'..p)) or 0
+  for candidate=1,profileCount do
+    if tonumber(getr(p,candidate,'LAST_UPGRADE_TURN',-1000)) == turn
+      and tonumber(getr(p,candidate,'LAST_UPGRADE_OLD_UNIT',-1)) == oldID
+      and tonumber(getr(p,candidate,'LAST_UPGRADE_NEW_UNIT',-1)) == newID then return true end
+  end
   local pendingKey='COY2_PENDING_UNIT_'..p..'_'..oldID
   local pendingID=tonumber(save.GetValue(pendingKey)) or 0
   local pendingTurn=pendingID > 0 and (tonumber(getr(p,pendingID,'PENDING_DEATH_TURN',-1000)) or -1000) or -1000
@@ -369,9 +383,12 @@ CommonwealthFriendState.HandleUpgrade = function(p,oldID,newID,bGoodyHut,oldUnit
   -- A same-ID ruins replacement can briefly overwrite the numeric mapping with
   -- a provisional profile. Its pre-kill archive is the authoritative identity.
   if pendingIsCurrent and (not id or bGoodyHut or oldID == newID) then id=pendingID end
-  if not id and oldUnit and oldUnit:IsHasPromotion(SINCE) then id=registerFriend(oldUnit) end
+  -- UnitUpgraded fires while the genuine source still exists. This is the one
+  -- event-time path trusted to mint a missing profile: an Old Friend can be
+  -- created and upgraded before the first stable roster reconciliation.
+  if not id and oldUnit and oldUnit:GetOwner() == p and oldUnit:GetUnitType() == OLD_FRIEND
+    and oldUnit:IsHasPromotion(SINCE) then id=registerFriend(oldUnit,true) end
   if not id then return false end
-  local turn=Game.GetGameTurn()
   if tonumber(getr(p,id,'LAST_UPGRADE_TURN',-1000)) == turn
     and tonumber(getr(p,id,'LAST_UPGRADE_OLD_UNIT',-1)) == oldID
     and tonumber(getr(p,id,'LAST_UPGRADE_NEW_UNIT',-1)) == newID then return true end
@@ -802,44 +819,68 @@ GameEvents.UnitCreated.Add(function(p,unitID)
   end
 end)
 
-if Events.RunCombatSim then Events.RunCombatSim.Add(function(ap,au,_,_,_,dp,du)
-  local attacker=Players[ap] and Players[ap]:GetUnitByID(au); local defender=Players[dp] and Players[dp]:GetUnitByID(du)
-  if attacker and attacker:IsHasPromotion(SINCE) then
-    local id=registerFriend(attacker); if id then combatCredit[dp..'_'..du]={p=ap,id=id} end
+local function truth(value) return value == true or value == 1 end
+local function battleMember(playerID,unitID,role,isCity)
+  local member={p=playerID,unitID=unitID,role=role,isCity=truth(isCity)}
+  if member.isCity then return member end
+  local unit=Players[playerID] and Players[playerID]:GetUnitByID(unitID)
+  if unit and unit:IsHasPromotion(SINCE) then member.id=registerFriend(unit) end
+  return member
+end
+local function onBattleStarted(battleType,x,y)
+  battles[#battles+1]={battleType=battleType,x=x,y=y,members={},credited={}}
+end
+local function onBattleJoined(playerID,unitID,role,isCity)
+  local battle=battles[#battles]; if not battle then return end
+  battle.members[role]=battleMember(playerID,unitID,role,isCity)
+end
+local function recordLowHealth(member)
+  if not member or not member.id then return end
+  local unit=Players[member.p] and Players[member.p]:GetUnitByID(member.unitID)
+  if not unit or not unit:IsHasPromotion(SINCE) then return end
+  local hp=unit:GetMaxHitPoints()-unit:GetDamage(); local oldLow=tonumber(getr(member.p,member.id,'LOW_HP',hp)) or hp
+  if hp < oldLow then
+    setr(member.p,member.id,'LOW_HP',hp)
+    if hp <= 10 and oldLow > 10 then
+      appendTimeline(member.p,member.id,getr(member.p,member.id,'NAME','An Old Friend')..' survived a battle with only '..hp..' HP.',nil,'near_death')
+      markFriendEvent(member.p,member.id,'near_death')
+    end
   end
-  if defender and defender:IsHasPromotion(SINCE) then
-    local id=registerFriend(defender); if id then combatCredit[ap..'_'..au]={p=dp,id=id} end
-  end
-end) end
-if Events.EndCombatSim then Events.EndCombatSim.Add(function(ap,au,_,af,amax,dp,du,_,df,dmax)
+end
+local function onBattleFinished()
+  local battle=table.remove(battles); if not battle then return end
   local seen={}
-  for _,data in ipairs({{ap,au,af,amax},{dp,du,df,dmax}}) do
-    local p,unitID,finalDamage,maxHP=data[1],data[2],data[3],data[4]; local unit=Players[p] and Players[p]:GetUnitByID(unitID)
-    if unit and unit:IsHasPromotion(SINCE) then
-      local id=registerFriend(unit)
-      if id and not seen[id] then setr(p,id,'BATTLES',(tonumber(getr(p,id,'BATTLES',0)) or 0)+1); seen[id]=true end
-      if id and type(maxHP)=='number' and type(finalDamage)=='number' then
-        local hp=maxHP-finalDamage; local oldLow=tonumber(getr(p,id,'LOW_HP',hp)) or hp
-        if hp < oldLow then
-          setr(p,id,'LOW_HP',hp)
-          if hp <= 10 and oldLow > 10 then
-            appendTimeline(p,id,getr(p,id,'NAME','An Old Friend')..' survived a battle with only '..hp..' HP.',nil,'near_death')
-            markFriendEvent(p,id,'near_death')
-          end
+  for _,role in ipairs({0,1}) do
+    local member=battle.members[role]
+    local key=member and member.id and (member.p..':'..member.id) or nil
+    if key and not seen[key] then
+      setr(member.p,member.id,'BATTLES',(tonumber(getr(member.p,member.id,'BATTLES',0)) or 0)+1)
+      recordLowHealth(member); seen[key]=true
+    end
+  end
+end
+local function creditBattleKill(killedP,killedID,x,y,killerP)
+  for index=#battles,1,-1 do
+    local battle=battles[index]
+    for _,role in ipairs({0,1}) do
+      local victim=battle.members[role]
+      if victim and not victim.isCity and victim.p == killedP and victim.unitID == killedID then
+        local killer=battle.members[role == 0 and 1 or 0]
+        local creditKey=killedP..':'..killedID
+        if killer and killer.id and killer.p ~= killedP and not battle.credited[creditKey]
+          and (killerP == nil or killerP < 0 or killerP == killer.p) then
+          setr(killer.p,killer.id,'KILLS',(tonumber(getr(killer.p,killer.id,'KILLS',0)) or 0)+1)
+          appendTimeline(killer.p,killer.id,getr(killer.p,killer.id,'NAME','An Old Friend')..' defeated an enemy near tile '..x..', '..y..'.',nil,'victory')
+          markFriendEvent(killer.p,killer.id,'victory'); battle.credited[creditKey]=true
         end
+        return
       end
     end
   end
-end) end
+end
 
-if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(function(killedP,killedID,_,x,y,_,killerP)
-  local credit=combatCredit[killedP..'_'..killedID]
-  if credit and killerP == credit.p then
-    setr(credit.p,credit.id,'KILLS',(tonumber(getr(credit.p,credit.id,'KILLS',0)) or 0)+1)
-    appendTimeline(credit.p,credit.id,getr(credit.p,credit.id,'NAME','An Old Friend')..' defeated an enemy near tile '..x..', '..y..'.',nil,'victory')
-    markFriendEvent(credit.p,credit.id,'victory')
-  end
-  combatCredit[killedP..'_'..killedID]=nil
+local function onUnitPrekill(killedP,killedID,_,x,y,_,killerP)
+  creditBattleKill(killedP,killedID,x,y,killerP)
   local player=Players[killedP]; if not isCommonwealth(player) then return end
   local id=friendID(killedP,killedID)
   if not id then return end
@@ -851,7 +892,61 @@ if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(function(killedP,kille
   setFriendID(killedP,killedID,nil)
   save.SetValue(unitFriendField(killedP,killedID,'ACTIVE'),0)
   save.SetValue(unitFriendField(killedP,killedID,'PROFILE_ID'),-1)
-end) end
+end
+
+local commonwealthPromotions={SINCE,FRIEND_ADJ,REM_ADJ,WORKER_BUFF}
+for _,promotion in ipairs(YEARS) do commonwealthPromotions[#commonwealthPromotions+1]=promotion end
+local function stripCommonwealthPromotions(unit)
+  if not unit then return end
+  for _,promotion in ipairs(commonwealthPromotions) do
+    if unit:IsHasPromotion(promotion) then unit:SetHasPromotion(promotion,false) end
+  end
+end
+local function onUnitConverted(oldP,newP,oldID,newID,isUpgrade)
+  if oldP == newP then return end
+  local newUnit=Players[newP] and Players[newP]:GetUnitByID(newID)
+  if not newUnit then return end
+  local pendingKey='COY2_PENDING_UNIT_'..oldP..'_'..oldID
+  local id=friendID(oldP,oldID) or (tonumber(save.GetValue(pendingKey)) or 0)
+  if id <= 0 then id=nil end
+  local oldPlayer=Players[oldP]
+  local oldWasCommonwealth=oldPlayer and oldPlayer:GetCivilizationType() == CIV
+  local inheritedFriendState=newUnit:IsHasPromotion(SINCE)
+  if oldWasCommonwealth and id then
+    local turn=Game.GetGameTurn()
+    setFriendID(oldP,oldID,nil); setFriendID(newP,newID,nil)
+    save.SetValue(retiredUnitKey(oldP,oldID),turn); save.SetValue(pendingKey,-1)
+    save.SetValue(unitFriendField(oldP,oldID,'ACTIVE'),0)
+    save.SetValue(unitFriendField(oldP,oldID,'PROFILE_ID'),-1)
+    setr(oldP,id,'PENDING_DEATH_TURN',-1000); setr(oldP,id,'PENDING_OLD_UNIT',-1)
+    setr(oldP,id,'STATUS','Offline'); setr(oldP,id,'DEATH_TURN',turn)
+    setr(oldP,id,'CURRENT_UNIT',-1); setr(oldP,id,'LOCATION','Transferred away')
+    if tonumber(getr(oldP,id,'LAST_TRANSFER_TURN',-1000)) ~= turn
+      or tonumber(getr(oldP,id,'LAST_TRANSFER_UNIT',-1)) ~= oldID then
+      appendTimeline(oldP,id,getr(oldP,id,'NAME','An Old Friend')..' left Commonwealth service.',turn,'transferred')
+      setr(oldP,id,'LAST_TRANSFER_TURN',turn); setr(oldP,id,'LAST_TRANSFER_UNIT',oldID)
+    end
+  end
+  stripCommonwealthPromotions(newUnit)
+  if (id or inheritedFriendState) and newUnit.SetName then
+    local row=GameInfo.Units[newUnit:GetUnitType()]
+    newUnit:SetName(row and Locale.ConvertTextKey(row.Description) or '')
+  end
+end
+
+if GameEvents.BattleStarted then GameEvents.BattleStarted.Add(onBattleStarted) end
+if GameEvents.BattleJoined then GameEvents.BattleJoined.Add(onBattleJoined) end
+if GameEvents.BattleFinished then GameEvents.BattleFinished.Add(onBattleFinished) end
+if GameEvents.UnitPrekill then GameEvents.UnitPrekill.Add(onUnitPrekill) end
+if GameEvents.UnitConverted then GameEvents.UnitConverted.Add(onUnitConverted) end
+
+-- Named handlers keep the regression harness deterministic without creating a
+-- second gameplay path; production and tests invoke these exact functions.
+CommonwealthFriendState.OnBattleStarted=onBattleStarted
+CommonwealthFriendState.OnBattleJoined=onBattleJoined
+CommonwealthFriendState.OnBattleFinished=onBattleFinished
+CommonwealthFriendState.OnUnitPrekill=onUnitPrekill
+CommonwealthFriendState.OnUnitConverted=onUnitConverted
 
 local function epithet(p,id)
   if getr(p,id,'STATUS','') == 'Offline' then return 'Last Online' end
@@ -877,7 +972,7 @@ local function displayLineage(raw)
 end
 local function timelineEventIcon(kind,text)
   local icons={upgrade='[ICON_ARROW_RIGHT]',new_era='[ICON_CULTURE]',victory='[ICON_STRENGTH]',near_death='[ICON_HEALTH]',
-    conversation='[ICON_GREAT_PEOPLE]',offline='[ICON_RAZING]',joined='[ICON_CAPITAL]'}
+    conversation='[ICON_GREAT_PEOPLE]',offline='[ICON_RAZING]',transferred='[ICON_SWAP]',joined='[ICON_CAPITAL]'}
   if icons[kind] then return icons[kind] end
   -- Older timeline entries predate structured event kinds. Retain a narrow
   -- text fallback so existing campaigns keep their familiar icons.

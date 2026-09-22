@@ -56,7 +56,7 @@ The responsive Old Friends Ledger includes native current-form icons, six Years 
 
 ## Installation
 
-1. Install and enable Vox Populi / the Community Patch.
+1. Install and enable Community Patch version 151 or newer (normally through Vox Populi).
 2. Place this folder in `Documents/My Games/Sid Meier's Civilization 5/MODS`.
 3. Clear the Civ V mod cache after replacing an older build.
 4. Enable **The Commonwealth of Yesterday (v 1)** in the Mods menu and start a new game.
@@ -137,7 +137,8 @@ Repository versions track individual development commits. Each new mod or docume
 | 1.0.65 | `dffb744` | Loaded all distinct conversation rows through a text-ID-safe database query. |
 | 1.0.66 | `5a1b197` | Restored the Ledger profile's current-form unit portrait badge. |
 | 1.0.67 | `dd01e3f` | Rewrote Friend chatter with playful childhood and gaming slang. |
-| 1.0.68 | Current | Added forty slang-heavy conversations with era-aware chatter. |
+| 1.0.68 | `64da61f` | Added forty slang-heavy conversations with era-aware chatter and made the civilization player-only. |
+| 1.0.69 | Current | Closed the pre-registration upgrade gap, hardened lifecycle/combat tracking, and removed the global setup-screen override. |
 
 ## ModBuddy development
 
@@ -145,18 +146,20 @@ Open `CommonwealthOfYesterday.civ5proj` in the Civilization V SDK's ModBuddy. Th
 
 The project and checked-in `.modinfo` intentionally share the same mod GUID. ModBuddy's default output path is the project directory, matching the existing repository layout.
 
+Run `python tools/validate_mod.py` to check the project/manifest file set, dependency and event wiring, XML and Lua syntax, database inheritance and references, localization, and the deterministic Old Friend lifecycle regressions. Use `--database` and `--cp-root` if the Civ V cache or Community Patch is installed outside the default Documents path.
+
 ### Save compatibility
 
 Civ V saves custom units and promotions by numeric database ID, not only by their text `Type`. Changing the enabled mod list or load order—or adding, deleting, or reordering rows in `Units` or `UnitPromotions`—can therefore turn a saved unit or promotion into one belonging to another mod. There is no reliable Lua repair after that remapping has occurred because the original identity has already been lost.
 
 The Commonwealth has an optional ModBuddy reference to **Kid Kiyotaka White Room**, making the Commonwealth load after it whenever both mods are enabled. Future Commonwealth unit and promotion definitions must be appended after the existing rows. Keep the same enabled mods for an entire campaign, and start a new game after any database-row or mod-loadout change. Lua, UI, text, and art edits that leave database rows unchanged are generally safe for an existing save.
 
-The mod includes a front-end `SelectCivilization` override that places the full trait name on its own line beneath the full leader and civilization names. Because Civ V loads front-end overrides globally while a mod is enabled, another mod that replaces the same screen may conflict with this layout.
+The mod uses Vox Populi's normal civilization-selection screen and does not replace global front-end files.
 
 ## Technical notes
 
 State is stored with `Modding.OpenSaveData` under a campaign-specific identifier derived from immutable setup data and Civ V's serialized random seeds. Terrain and starting locations are deliberately excluded because map scripts can finalize them after the Commonwealth add-in loads. Repository version 1.0.62 uses the `COY4` namespace and provides read-through access to the matching `COY3` state when an existing save is first loaded; fresh games never import a legacy campaign. This keeps Memories, era counters, Bedroom construction eras, conversation history, and Old Friend records stable across ordinary save/load while separating newly generated campaigns. Multiplayer and hotseat are intentionally disabled because the interface and persistence layer target single-player.
 
-Old Friend registration, Years Together, era advancement, and old/new unit upgrade handoffs now use one authoritative archive API. The older unit-keyed fields remain as a synchronized runtime cache for compatibility, but no second upgrade listener can independently create, rename, archive, or retire a profile. Event-time unit callbacks may reconnect an existing archive, while only a stable roster scan may create a genuinely new Friend profile; this prevents Civ V's briefly unconverted upgrade replacement from appearing as an extra Friend. Shared Memories, Reminiscence, Melancholy, conversation, and presentation settings live in the Commonwealth database so gameplay and UI labels use the same source.
+Old Friend registration, Years Together, era advancement, and old/new unit upgrade handoffs use one authoritative archive API. The older unit-keyed fields remain as a synchronized runtime cache for compatibility, but no second upgrade listener can independently create, rename, archive, or retire a profile. Event-time unit callbacks may reconnect an existing archive; new profiles are normally created only by a stable roster scan, with one narrow exception for a genuine Old Friend while the authoritative pre-conversion `UnitUpgraded` callback still exposes it. This prevents transient replacements from becoming extra Friends without losing a unit upgraded before its first scan. If a Friend changes ownership, its Commonwealth profile is archived and all Commonwealth-only promotions are stripped from the receiving unit. Battle history is sourced from Community Patch gameplay battle events, so it does not depend on combat animations or visibility. Shared Memories, Reminiscence, Melancholy, conversation, and presentation settings live in the Commonwealth database so gameplay and UI labels use the same source.
 
 Some requested bonuses do not have a safe category-specific modifier in the exposed database/API. The current implementation keeps their intended timing and theme while using close city-level equivalents. Exact implementation differences are recorded in [PATCH_NOTES.md](PATCH_NOTES.md).

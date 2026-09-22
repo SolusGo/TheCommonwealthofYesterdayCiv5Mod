@@ -1,6 +1,27 @@
 # Patch Notes
 
+## Repository version 1.0.69 - Lifecycle hardening
+
+### Fixed
+
+- Let the authoritative pre-conversion `UnitUpgraded` callback create a permanent profile for a genuine Old Friend that upgrades before its first stable roster scan.
+- Enabled the Community Patch unit-created, unit-conversion, and battle event gates in addition to the existing upgrade and pre-kill gates.
+- Archived Friends that leave Commonwealth ownership and stripped their persistent, Years Together, adjacency, Reminiscence, and Worker promotions from the receiving unit.
+- Moved Ledger battle and victory statistics from presentation combat-simulation callbacks to gameplay battle events, covering Quick Combat, defensive kills, and off-screen AI-turn combat.
+- Corrected the Civilopedia's conversation odds to the configured 15% base, +10 points per miss, four-miss guarantee, and 75%/+8-point event odds.
+
+### Compatibility and tooling
+
+- Declared Community Patch version 151 or newer as a required dependency while retaining Kid Kiyotaka as an optional load-order reference.
+- Removed the global `SelectCivilization` VFS replacement so Vox Populi owns its current setup screen.
+- Added project/package/database validation and deterministic Old Friend lifecycle regressions without changing any existing unit or promotion row ordering.
+- Consolidated patch notes into this file.
+
 ## Repository version 1.0.68 - Era-aware Friend chatter
+
+### Civilization selection
+
+- Kept the Commonwealth human-playable while preventing AI players from selecting it.
 
 ### Expanded conversation library
 

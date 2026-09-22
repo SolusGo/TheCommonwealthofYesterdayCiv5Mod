@@ -12,7 +12,9 @@
     <SupportsHotSeat>0</SupportsHotSeat>
     <SupportsMac>0</SupportsMac>
   </Properties>
-  <Dependencies />
+  <Dependencies>
+    <Mod id="d1b6328c-ff44-4b0d-aad7-c657f83610cd" minversion="151" maxversion="999" title="(1) Community Patch" />
+  </Dependencies>
   <References>
     <Mod id="995265a7-f41f-495b-a753-2688d72cdca3" minversion="1" maxversion="999" title="Kid Kiyotaka White Room" />
   </References>
@@ -53,15 +55,15 @@
     <File import="0">Data\CommonwealthConversations.xml</File>
     <File import="0">SQL\00_Commonwealth_Core.sql</File>
     <File import="0">SQL\10_Commonwealth_Text.sql</File>
-    <File import="1">Lua\CommonwealthLoader.lua</File>
+    <File import="0">Lua\CommonwealthLoader.lua</File>
     <File import="1">Lua\CommonwealthCore.lua</File>
     <File import="1">Lua\CommonwealthFriends.lua</File>
-    <File import="1">UI\CommonwealthPanel.lua</File>
-    <File import="1">UI\CommonwealthPanel.xml</File>
-    <File import="1">UI\FrontEnd\GameSetup\SelectCivilization.xml</File>
-    <File import="1">UI\FrontEnd\GameSetup\SelectCivilization.lua</File>
+    <File import="0">UI\CommonwealthPanel.lua</File>
+    <File import="0">UI\CommonwealthPanel.xml</File>
     <File import="1">Art\DawnOfMan\CommonwealthDawnOfMan.dds</File>
     <File import="1">Art\DawnOfMan\CommonwealthMap.dds</File>
+    <File import="0">README.md</File>
+    <File import="0">PATCH_NOTES.md</File>
   </Files>
   <Actions>
     <OnModActivated>
